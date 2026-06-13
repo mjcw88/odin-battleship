@@ -1,6 +1,6 @@
 import { Ship } from "./ship.js";
 
-describe("Ship creation", () => {
+describe("Ship (constructor))", () => {
     test("creates a ship default size of 1", () => {
         const ship = new Ship();
         expect(ship.size).toBe(1);
@@ -18,10 +18,15 @@ describe("Ship creation", () => {
         const ship = new Ship(size);
         expect(ship.size).toBe(size);
     });
-    test("rejects more than 1 argument given", () => {
+    test("creates a ship default size of 3", () => {
+        const size = 3;
+        const ship = new Ship(size);
+        expect(ship.size).toBe(size);
+    });
+    test("Throws range error when more than 1 argument given", () => {
         expect(() => new Ship(3, 1)).toThrow(RangeError);
     });
-    test("rejects non-integer input for ship size", () => {
+    test("Throws type error for non-integer input for ship size", () => {
         expect(() => new Ship("Hello, World!")).toThrow(TypeError);
     });
 });
