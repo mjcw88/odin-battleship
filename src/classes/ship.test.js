@@ -18,34 +18,43 @@ describe("Ship creation", () => {
         const ship = new Ship(size);
         expect(ship.size).toBe(size);
     });
-    test("rejects non-integer input for ship size", () => {
-        expect(() => new Ship("Hello, World!")).toThrow(TypeError);
-    });
     test("rejects more than 1 argument given", () => {
         expect(() => new Ship(3, 1)).toThrow(RangeError);
+    });
+    test("rejects non-integer input for ship size", () => {
+        expect(() => new Ship("Hello, World!")).toThrow(TypeError);
     });
 });
 
 describe("Ship (hit)", () => {
     test("ship hit zero times", () => {
-        const ship = new Ship(5);
+        const ship = new Ship(3);
         expect(ship.hits).toBe(0);
     })
     test("ship hit once", () => {
-        const ship = new Ship(5);
+        const ship = new Ship(3);
         ship.hit();
         expect(ship.hits).toBe(1);
     })
     test("ship hit twice", () => {
-        const ship = new Ship(5);
+        const ship = new Ship(3);
         expect(ship.hits).toBe(0);
         ship.hit();
         ship.hit();
         expect(ship.hits).toBe(2);
     })
     test("ship hit three times", () => {
-        const ship = new Ship(5);
+        const ship = new Ship(3);
         expect(ship.hits).toBe(0);
+        ship.hit();
+        ship.hit();
+        ship.hit();
+        expect(ship.hits).toBe(3);
+    })
+    test("hits don't exceed size", () => {
+        const ship = new Ship(3);
+        expect(ship.hits).toBe(0);
+        ship.hit();
         ship.hit();
         ship.hit();
         ship.hit();
@@ -54,25 +63,15 @@ describe("Ship (hit)", () => {
 })
 
 describe("Ship (isSunk)", () => {
-    test("returns true on a 1 size ship hit once", () => {
+    test("returns false on a 1 size ship not hit", () => {
         const ship = new Ship();
         expect(ship.isSunk()).toBeFalsy();
-        ship.hit();
-        expect(ship.isSunk()).toBeTruthy();
     })
     test("returns false on a 2 size ship hit once", () => {
         const ship = new Ship(2);
         expect(ship.isSunk()).toBeFalsy();
         ship.hit();
         expect(ship.isSunk()).toBeFalsy();
-    })
-    test("returns true on a 2 size ship hit twice", () => {
-        const ship = new Ship(2);
-        expect(ship.isSunk()).toBeFalsy();
-        ship.hit();
-        expect(ship.isSunk()).toBeFalsy();
-        ship.hit();
-        expect(ship.isSunk()).toBeTruthy();
     })
     test("returns false on a 3 size ship hit twice", () => {
         const ship = new Ship(3);
@@ -81,6 +80,20 @@ describe("Ship (isSunk)", () => {
         expect(ship.isSunk()).toBeFalsy();
         ship.hit();
         expect(ship.isSunk()).toBeFalsy();
+    })
+    test("returns true on a 1 size ship hit once", () => {
+        const ship = new Ship();
+        expect(ship.isSunk()).toBeFalsy();
+        ship.hit();
+        expect(ship.isSunk()).toBeTruthy();
+    })
+    test("returns true on a 2 size ship hit twice", () => {
+        const ship = new Ship(2);
+        expect(ship.isSunk()).toBeFalsy();
+        ship.hit();
+        expect(ship.isSunk()).toBeFalsy();
+        ship.hit();
+        expect(ship.isSunk()).toBeTruthy();
     })
     test("returns true on a 3 size ship hit three times", () => {
         const ship = new Ship(3);
