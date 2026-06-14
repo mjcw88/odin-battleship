@@ -248,8 +248,9 @@ describe("Gameboard (isAllSunk)", () => {
         board.placeShip(start, end, carrier);
 
         const battleship = new Ship(4);
-        start = [6,0];
-        end = [6,start[1] + battleship.size-1];
+        const row = 6;
+        start = [row,0];
+        end = [row,start[1] + battleship.size-1];
         board.placeShip(start, end, battleship);
 
         expect(board.isAllSunk()).toBeFalsy();
@@ -259,7 +260,7 @@ describe("Gameboard (isAllSunk)", () => {
         }
 
         for(let i = 0; i < battleship.size; i++) {
-            board.recieveAttack(6,i);
+            board.recieveAttack(row,i);
         }
 
         expect(board.isAllSunk()).toBeTruthy();
