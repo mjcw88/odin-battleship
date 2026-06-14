@@ -2,15 +2,6 @@ import { Gameboard } from "./gameboard.js";
 import { Ship } from "./ship.js";
 
 describe("Gameboard (constructor)", () => {
-    test("Creates 10x10 gameboard", () => {
-        const board = new Gameboard();
-        expect(board.board.length).toBe(10);
-        for (let i = 0; i < board.board.length; i++) {
-            for (let j = 0; j < board.board.length; j++) {
-                expect(board.board[i][j]).toBeFalsy();
-            }
-        }
-    })
     test("Throws range error when any arguments given", () => {
         expect(() => new Gameboard(1)).toThrow(RangeError);
         expect(() => new Gameboard("1")).toThrow(RangeError);
@@ -19,37 +10,18 @@ describe("Gameboard (constructor)", () => {
         expect(() => new Gameboard(1, 2, 3)).toThrow(RangeError);
         expect(() => new Gameboard("1", "2", "3")).toThrow(RangeError);
     });
+    test("Creates 10x10 gameboard", () => {
+        const board = new Gameboard();
+        expect(board.board.length).toBe(10);
+        for (let i = 0; i < board.board.length; i++) {
+            for (let j = 0; j < board.board.length; j++) {
+                expect(board.board[i][j][0].hit).toBeFalsy();
+            }
+        }
+    })
 })
 
 describe("Gameboard (placeShip)", () => {
-    test("Places ship vertically", () => {
-        const board = new Gameboard();
-        const ship = new Ship(5);
-        const start = [0,0];
-        const end = [start[0] + ship.size-1,0];
-
-        board.placeShip(start, end, ship);
-
-        for (let i = 0; i < ship.size; i++) {
-            const row = start[0] + i;
-            const col = start[1];
-            expect(board.board[row][col]).toBe(ship);
-        }
-    })
-    test("Places ship horizontally", () => {
-        const board = new Gameboard();
-        const ship = new Ship(5);
-        const start = [0,0];
-        const end = [0,start[1] + ship.size-1];
-
-        board.placeShip(start, end, ship);
-
-        for (let i = 0; i < ship.size; i++) {
-            const row = start[0];
-            const col = start[1] + i;
-            expect(board.board[row][col]).toBe(ship);
-        }
-    })
     test("Throws type error if start input is not array", () => {
         const board = new Gameboard();
         const ship = new Ship(5);
@@ -160,5 +132,93 @@ describe("Gameboard (placeShip)", () => {
         board.placeShip(start, end, carrier);
         end = [start[0] + battleship.size-1,0];
         expect(() => board.placeShip(start, end, battleship)).toThrow(Error);
+    })
+    test("Places ship vertically", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = [start[0] + ship.size-1,0];
+
+        board.placeShip(start, end, ship);
+
+        for (let i = 0; i < ship.size; i++) {
+            const row = start[0] + i;
+            const col = start[1];
+            expect(board.board[row][col][1]).toBe(ship);
+        }
+    })
+    test("Places ship horizontally", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = [0,start[1] + ship.size-1];
+
+        board.placeShip(start, end, ship);
+
+        for (let i = 0; i < ship.size; i++) {
+            const row = start[0];
+            const col = start[1] + i;
+            expect(board.board[row][col][1]).toBe(ship);
+        }
+    })
+})
+
+describe("Gameboard (receivedAttack)", () => {
+    test("Throws type error if row isn't an integer", () => {
+        const board = new Gameboard();
+        expect(() => board.recieveAttack("0", 0)).toThrow(TypeError);
+    })
+    test("Throws type error if column isn't an integer", () => {
+        const board = new Gameboard();
+        expect(() => board.recieveAttack(0, "0")).toThrow(TypeError);
+    })
+    test("If attack is a miss and not previously hit, flips from false to true", () => {
+        const board = new Gameboard();
+        expect(board.board[0][0][0].hit).toBeFalsy();
+        board.recieveAttack(0,0);
+        expect(board.board[0][0][0].hit).toBeTruthy();
+    })
+    test("If attack is a miss and previously hit, stays true", () => {
+        const board = new Gameboard();
+        expect(board.board[0][0][0].hit).toBeFalsy();
+        board.recieveAttack(0,0);
+        expect(board.board[0][0][0].hit).toBeTruthy();
+        board.recieveAttack(0,0);
+        expect(board.board[0][0][0].hit).toBeTruthy();
+    })
+    test("If attack is a hit and not previously hit, add hit to ship", () => {
+        const board = new Gameboard();
+        const carrier = new Ship(5);
+        const start = [0,0];
+        const end = [start[0] + carrier.size-1,0];
+        board.placeShip(start, end, carrier);
+        expect(carrier.hits).toBe(0);
+        board.recieveAttack(0,0);
+        expect(carrier.hits).toBe(1);
+    })
+    test("If attack is a hit and previously hit, doesn't add hit to ship", () => {
+        const board = new Gameboard();
+        const carrier = new Ship(5);
+        const start = [0,0];
+        const end = [start[0] + carrier.size-1,0];
+        board.placeShip(start, end, carrier);
+        expect(carrier.hits).toBe(0);
+        board.recieveAttack(0,0);
+        board.recieveAttack(0,0);
+        expect(carrier.hits).toBe(1);
+    })
+    test("Size 5 ship hit 5 times and sinks", () => {
+        const board = new Gameboard();
+        const carrier = new Ship(5);
+        const start = [0,0];
+        const end = [start[0] + carrier.size-1,0];
+        board.placeShip(start, end, carrier);
+        expect(carrier.sunk).toBeFalsy();
+        expect(carrier.hits).toBe(0);
+        for(let i = 0; i < carrier.size; i++) {
+            board.recieveAttack(i,0);
+        }
+        expect(carrier.hits).toBe(5);
+        expect(carrier.sunk).toBeTruthy();
     })
 })
