@@ -85,6 +85,6 @@ export class Gameboard {
     }
 
     isAllSunk() {
-        return this.ships.every((currentValue) => currentValue.sunk);
+        return this.ships.every((currentValue) => currentValue.isSunk());
     }
 }

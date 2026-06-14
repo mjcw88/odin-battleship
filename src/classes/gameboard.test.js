@@ -219,7 +219,7 @@ describe("Gameboard (receivedAttack)", () => {
             board.recieveAttack(i,0);
         }
         expect(carrier.hits).toBe(5);
-        expect(carrier.sunk).toBeTruthy();
+        expect(carrier.isSunk()).toBeTruthy();
     })
 })
 
