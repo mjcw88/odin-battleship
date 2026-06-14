@@ -1,5 +1,3 @@
-import { Ship } from "./ship.js";
-
 export class Gameboard {
     constructor(...rest) {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
