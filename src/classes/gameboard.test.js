@@ -50,6 +50,86 @@ describe("Gameboard (placeShip)", () => {
             expect(board.board[row][col]).toBe(ship);
         }
     })
+    test("Throws type error if start input is not array", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = "[0,0]";
+        const end = [0,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(TypeError);
+    })
+    test("Throws type error if start input contains non-integers", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = ["0",0];
+        const end = [0,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(TypeError);
+    })
+    test("Throws range error if start input contains less than two inputs", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0];
+        const end = [0,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
+    test("Throws range error if start input contains more than two inputs", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0,0];
+        const end = [0,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
+    test("Throws range error if start input is out of bounds", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [board.board.length+1,0];
+        const end = [0,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
+    test("Throws type error if end input is not array", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = "[0,start[1] + ship.size-1]";
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(TypeError);
+    })
+    test("Throws type error if end input contains non-integers", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = ["0",start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(TypeError);
+    })
+    test("Throws range error if end input contains less than two inputs", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = [start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
+    test("Throws range error if end input contains more than two inputs", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = [0,start[1] + ship.size-1,0];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
+    test("Throws range error if end input is out of bounds", () => {
+        const board = new Gameboard();
+        const ship = new Ship(5);
+        const start = [0,0];
+        const end = [board.board.length+1,start[1] + ship.size-1];
+
+        expect(() => board.placeShip(start, end, ship)).toThrow(RangeError);
+    })
     test("Throws error if ship is diagonal", () => {
         const board = new Gameboard();
         const ship = new Ship(5);

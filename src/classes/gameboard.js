@@ -8,8 +8,26 @@ export class Gameboard {
         this.board = Array.from({ length: SIZE }, () => new Array(SIZE).fill(false));
     }
 
+    #isValid(start, end, size) {
+        if (!Array.isArray(start)) throw new TypeError("Start must be an array");
+        if (start.some((x) => !Number.isInteger(x))) throw new TypeError("Start must contain only integers");
+        if (start.length !== 2) throw new RangeError("Start must have 2 values only");
+        start.forEach(num => {
+            if (num < 0 || num >= this.board.length) throw new RangeError("Start index out of bounds");
+        });
+
+        if (!Array.isArray(end)) throw new TypeError("End must be an array");
+        if (end.some((x) => !Number.isInteger(x))) throw new TypeError("End must contain only integers");
+        if (end.length !== 2) throw new RangeError("End must have 2 values only");
+        end.forEach(num => {
+            if (num < 0 || num >= this.board.length) throw new RangeError("End index out of bounds");
+        });
+
+        if (!Number.isInteger(size)) throw new TypeError("Ship size must be an integer");
+    }
+
     #isDiagonal(start, end) {
-        return start[0] !== end[0] && start[1] !== end[1];
+        if (start[0] !== end[0] && start[1] !== end[1]) throw new Error("Ship cannot be diagonal");
     }
 
     #isVertical(startRow, endRow) {
@@ -19,10 +37,6 @@ export class Gameboard {
     #isValidPlacement(start, end, size) {
         if (end - start !== size - 1) throw new Error("End point and ship size mismatch");
         if (start < 0 || end >= this.board.length) throw new RangeError("Ship placement out of bounds");
-    }
-
-    #isSquareEmpty(row, col) {
-        if (this.board[row][col]) throw new Error("Ships cannot overlap");
     }
 
     #checkVerticalSquares(start, end) {
@@ -41,8 +55,13 @@ export class Gameboard {
         }
     }
 
+    #isSquareEmpty(row, col) {
+        if (this.board[row][col]) throw new Error("Ships cannot overlap");
+    }
+
     placeShip(start, end, ship) {
-        if (this.#isDiagonal(start, end)) throw new Error("Ship cannot be diagonal");
+        this.#isValid(start, end, ship.size);
+        this.#isDiagonal(start, end);
 
         if (this.#isVertical(start[0], end[0])) {
             this.#isValidPlacement(start[0], end[0], ship.size);
@@ -77,7 +96,7 @@ export class Gameboard {
         console.log("  " + letters.join(" "));
         for (let i = 0; i < this.board.length; i++) {
             for (let j = 0; j < this.board.length; j++) {
-                string = string + Number(this.board[i][j]) + " ";
+                string = string + (isNaN(Number(this.board[i][j])) ? this.board[i][j].size + " ": 0 + " ");
             }
             console.log(letters[i] + " " + string);
             string = "";
