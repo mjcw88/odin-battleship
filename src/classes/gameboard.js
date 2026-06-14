@@ -5,7 +5,7 @@ export class Gameboard {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
 
         const SIZE = 10;
-        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{hit: false }]));
+        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{ hit: false }]));
     }
 
     #isValid(start, end, size) {
