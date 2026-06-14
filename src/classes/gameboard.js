@@ -6,6 +6,7 @@ export class Gameboard {
 
         const SIZE = 10;
         this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{ hit: false, ship: null }]));
+        this.ships = [];
     }
 
     #isValid(start, end, size) {
@@ -70,6 +71,7 @@ export class Gameboard {
                 this.board[row][col].ship = ship;
             }
         }
+        this.ships.push(ship);
     }
 
     recieveAttack(row, col) {
@@ -82,38 +84,7 @@ export class Gameboard {
         this.board[row][col].hit = true;
     }
 
-    allShipsSunk() {
-
-    }
-
-    printBoard() {
-        const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-        let string = "";
-        console.log("  " + letters.join(" "));
-        for (let i = 0; i < this.board.length; i++) {
-            for (let j = 0; j < this.board.length; j++) {
-                string = string + (this.board[i][j].ship ? this.board[i][j].ship.size + " " : 0 + " ");
-            }
-            console.log(letters[i] + " " + string);
-            string = "";
-        }
+    isAllSunk() {
+        return this.ships.every((currentValue) => currentValue.sunk);
     }
 }
-
-const carrier = new Ship(5);
-const battleship = new Ship(4);
-const cruiser = new Ship(3);
-const submarine = new Ship(3);
-const destroyer = new Ship(2);
-
-const board = new Gameboard();
-
-let start = [0,0];
-let end = [start[0] + carrier.size-1,0];
-board.placeShip(start, end, carrier);
-
-start = [6,0];
-end = [6,start[1] + battleship.size-1];
-board.placeShip(start, end, battleship);
-
-board.printBoard();

@@ -223,6 +223,45 @@ describe("Gameboard (receivedAttack)", () => {
     })
 })
 
-describe("Gameboard (allShipsSunk)", () => {
-    
+describe("Gameboard (isAllSunk)", () => {
+    test("Returns false if not all ships are sunk", () => {
+        const board = new Gameboard();
+
+        const carrier = new Ship(5);
+        let start = [0,0];
+        let end = [start[0] + carrier.size-1,0];
+        board.placeShip(start, end, carrier);
+
+        const battleship = new Ship(4);
+        start = [6,0];
+        end = [6,start[1] + battleship.size-1];
+        board.placeShip(start, end, battleship);
+
+        expect(board.isAllSunk()).toBeFalsy();
+    })
+    test("Returns true if all ships are sunk", () => {
+        const board = new Gameboard();
+
+        const carrier = new Ship(5);
+        let start = [0,0];
+        let end = [start[0] + carrier.size-1,0];
+        board.placeShip(start, end, carrier);
+
+        const battleship = new Ship(4);
+        start = [6,0];
+        end = [6,start[1] + battleship.size-1];
+        board.placeShip(start, end, battleship);
+
+        expect(board.isAllSunk()).toBeFalsy();
+
+        for(let i = 0; i < carrier.size; i++) {
+            board.recieveAttack(i,0);
+        }
+
+        for(let i = 0; i < battleship.size; i++) {
+            board.recieveAttack(6,i);
+        }
+
+        expect(board.isAllSunk()).toBeTruthy();
+    })
 })
