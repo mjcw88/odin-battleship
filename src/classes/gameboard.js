@@ -5,7 +5,7 @@ export class Gameboard {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
 
         const SIZE = 10;
-        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{ hit: false }]));
+        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{ hit: false, ship: null }]));
     }
 
     #isValid(start, end, size) {
@@ -49,7 +49,7 @@ export class Gameboard {
     }
 
     #isSquareEmpty(row, col) {
-        if (this.board[row][col][1]) throw new Error("Ships cannot overlap");
+        if (this.board[row][col].ship) throw new Error("Ships cannot overlap");
     }
 
     placeShip(start, end, ship) {
@@ -60,26 +60,26 @@ export class Gameboard {
             for (let i = 0; i < ship.size; i++) {
                 const row = start[0] + i;
                 const col = start[1];
-                this.board[row][col].push(ship);
+                this.board[row][col].ship = ship;
             }
         } else {
             this.#checkHorizontalSquares(start, ship.size);
             for (let i = 0; i < ship.size; i++) {
                 const row = start[0];
                 const col = start[1] + i;
-                this.board[row][col].push(ship);
+                this.board[row][col].ship = ship;
             }
         }
     }
 
     recieveAttack(row, col) {
         if (!Number.isInteger(row) || !Number.isInteger(col)) throw new TypeError("Coordinates must be an integer");
-        if (this.board[row][col][0].hit) return;
-        if (this.board[row][col][1]) {
-            const ship = this.board[row][col][1];
+        if (this.board[row][col].hit) return;
+        if (this.board[row][col].ship) {
+            const ship = this.board[row][col].ship;
             ship.hit();
         }
-        this.board[row][col][0].hit = true;
+        this.board[row][col].hit = true;
     }
 
     allShipsSunk() {
@@ -92,7 +92,7 @@ export class Gameboard {
         console.log("  " + letters.join(" "));
         for (let i = 0; i < this.board.length; i++) {
             for (let j = 0; j < this.board.length; j++) {
-                string = string + (this.board[i][j][1] ? this.board[i][j][1].size + " " : 0 + " ");
+                string = string + (this.board[i][j].ship ? this.board[i][j].ship.size + " " : 0 + " ");
             }
             console.log(letters[i] + " " + string);
             string = "";

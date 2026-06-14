@@ -15,7 +15,7 @@ describe("Gameboard (constructor)", () => {
         expect(board.board.length).toBe(10);
         for (let i = 0; i < board.board.length; i++) {
             for (let j = 0; j < board.board.length; j++) {
-                expect(board.board[i][j][0].hit).toBeFalsy();
+                expect(board.board[i][j].hit).toBeFalsy();
             }
         }
     })
@@ -144,7 +144,7 @@ describe("Gameboard (placeShip)", () => {
         for (let i = 0; i < ship.size; i++) {
             const row = start[0] + i;
             const col = start[1];
-            expect(board.board[row][col][1]).toBe(ship);
+            expect(board.board[row][col].ship).toBe(ship);
         }
     })
     test("Places ship horizontally", () => {
@@ -158,7 +158,7 @@ describe("Gameboard (placeShip)", () => {
         for (let i = 0; i < ship.size; i++) {
             const row = start[0];
             const col = start[1] + i;
-            expect(board.board[row][col][1]).toBe(ship);
+            expect(board.board[row][col].ship).toBe(ship);
         }
     })
 })
@@ -174,17 +174,17 @@ describe("Gameboard (receivedAttack)", () => {
     })
     test("If attack is a miss and not previously hit, flips from false to true", () => {
         const board = new Gameboard();
-        expect(board.board[0][0][0].hit).toBeFalsy();
+        expect(board.board[0][0].hit).toBeFalsy();
         board.recieveAttack(0,0);
-        expect(board.board[0][0][0].hit).toBeTruthy();
+        expect(board.board[0][0].hit).toBeTruthy();
     })
     test("If attack is a miss and previously hit, stays true", () => {
         const board = new Gameboard();
-        expect(board.board[0][0][0].hit).toBeFalsy();
+        expect(board.board[0][0].hit).toBeFalsy();
         board.recieveAttack(0,0);
-        expect(board.board[0][0][0].hit).toBeTruthy();
+        expect(board.board[0][0].hit).toBeTruthy();
         board.recieveAttack(0,0);
-        expect(board.board[0][0][0].hit).toBeTruthy();
+        expect(board.board[0][0].hit).toBeTruthy();
     })
     test("If attack is a hit and not previously hit, add hit to ship", () => {
         const board = new Gameboard();
@@ -221,4 +221,8 @@ describe("Gameboard (receivedAttack)", () => {
         expect(carrier.hits).toBe(5);
         expect(carrier.sunk).toBeTruthy();
     })
+})
+
+describe("Gameboard (allShipsSunk)", () => {
+    
 })
