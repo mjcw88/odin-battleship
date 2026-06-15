@@ -11,7 +11,12 @@ export default {
   },
   devtool: "eval-source-map",
   devServer: {
+    hot: true,
     watchFiles: ["./src/template.html"],
+  },
+  watchOptions: {
+    poll: 1000,
+    aggregateTimeout: 300,
   },
   plugins: [
     new HtmlWebpackPlugin({
