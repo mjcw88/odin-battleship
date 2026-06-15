@@ -12,6 +12,7 @@
   },
     "scripts": {
     "dev": "webpack serve",
-    "deploy": "git checkout gh-pages && git merge main --no-edit && webpack && git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages && git checkout main"
+    "deploy": "git checkout gh-pages && git merge main --no-edit && webpack && git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages && git checkout main",
+    "deploy-temp": "git add . && git commit -m 'Pre-deploy commit' && git checkout gh-pages && git merge main --no-edit --allow-unrelated-histories && npx webpack && git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages && git checkout main"
   }
 }
