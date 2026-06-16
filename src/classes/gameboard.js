@@ -3,7 +3,7 @@ export class Gameboard {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
 
         const SIZE = 10;
-        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => [{ hit: false, ship: null }]));
+        this.board = Array.from({ length: SIZE }, () => Array.from({ length: SIZE }, () => ({ hit: false, ship: null })));
         this.ships = [];
     }
 
@@ -84,5 +84,18 @@ export class Gameboard {
 
     isAllSunk() {
         return this.ships.every((currentValue) => currentValue.isSunk());
+    }
+
+    printBoard() {
+        const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+        let string = "";
+        console.log("  " + letters.join(" "));
+        for (let i = 0; i < this.board.length; i++) {
+            for (let j = 0; j < this.board.length; j++) {
+                string = string + (this.board[i][j].ship ? this.board[i][j].ship.size + " " : 0 + " ");
+            }
+            console.log(letters[i] + " " + string);
+            string = "";
+        }
     }
 }
