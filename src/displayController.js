@@ -1,10 +1,9 @@
-import { createNewGame } from "./gameController.js";
+import { addBoardClickEvent } from "./eventsController.js";
 
-export function renderGameboard() {
+export function renderGameboard(game) {
     const contents = document.getElementById("main-contents");
 
-    const game = createNewGame();
-    game.forEach(player => {
+    game.players.forEach(player => {
         const playerContainer = document.createElement("div");
         playerContainer.className = "player-container";
 
@@ -15,17 +14,45 @@ export function renderGameboard() {
         const board = document.createElement("div");
         board.className = "player-board";
 
+        const letters = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+        letters.forEach(letter => {
+            const square = document.createElement("div");
+            square.textContent = letter;
+            board.append(square);
+        })
+
         player.gameboard.board.forEach((row, rowIndex) => {
+            const square = document.createElement("div");
+            square.textContent = rowIndex + 1;
+            board.append(square);
             row.forEach((cell, colIndex) => {
                 const square = document.createElement("div");
-                square.dataset.index = [rowIndex, colIndex];
-                if (cell.ship) square.className = "square-with-ship";
+                square.classList.add("board-square");
+                square.dataset.rowIndex = rowIndex;
+                square.dataset.colIndex = colIndex;
+                if (player.human && cell.ship) square.classList.add("square-with-ship");
                 board.append(square);
+                if (!player.human) {
+                    square.classList.add("cpu-board-square");
+                    addBoardClickEvent(square, player.gameboard, game);
+                }
             })
-
         })
         
         contents.append(playerContainer);
         playerContainer.append(playerHeader, board);
     })
+}
+
+export function updateGameBoard(square, board, row, col) {
+    if (board.board[row][col].ship) {
+        square.classList.add("board-hit");
+    } else {
+        square.classList.add("board-miss");
+    }
+}
+
+export function renderWinner(player) {
+    const name = player.name;
+    console.log(`A winner is you, ${name}!`);
 }

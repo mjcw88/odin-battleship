@@ -30,10 +30,33 @@ body {
     --size: 50px;
 
     display: grid;
-    grid-template-columns: repeat(10, minmax(var(--size), 1fr));
+    grid-template-columns: repeat(11, minmax(var(--size), 1fr));
     grid-auto-rows: minmax(var(--size), 1fr);
+}
+
+.player-board > div {
+    text-align: center;
+    align-content: center;
+    border: 1px solid grey;
+}
+
+.board-square {
+    border: 1px solid grey;
+    background-color: blue;
 }
 
 .square-with-ship {
     background-color: darkgray;
+}
+
+.cpu-board-square {
+    cursor: pointer;
+}
+
+.board-hit {
+    background-color: red;
+}
+
+.board-miss {
+    background-color: lightyellow;
 }

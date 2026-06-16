@@ -1,3 +1,5 @@
+import { Ship } from "./ship.js";
+
 export class Gameboard {
     constructor(...rest) {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
@@ -51,19 +53,20 @@ export class Gameboard {
         if (this.board[row][col].ship) throw new Error("Ships cannot overlap");
     }
 
-    placeShip(start, end, ship) {
-        this.#isValid(start, end, ship.size);
+    placeShip(start, end, size) {
+        this.#isValid(start, end, size);
+        const ship = new Ship(size);
 
         if (this.#isVertical(start[0], end[0])) {
-            this.#checkVerticalSquares(start, ship.size);
-            for (let i = 0; i < ship.size; i++) {
+            this.#checkVerticalSquares(start, size);
+            for (let i = 0; i < size; i++) {
                 const row = start[0] + i;
                 const col = start[1];
                 this.board[row][col].ship = ship;
             }
         } else {
-            this.#checkHorizontalSquares(start, ship.size);
-            for (let i = 0; i < ship.size; i++) {
+            this.#checkHorizontalSquares(start, size);
+            for (let i = 0; i < size; i++) {
                 const row = start[0];
                 const col = start[1] + i;
                 this.board[row][col].ship = ship;
@@ -92,7 +95,14 @@ export class Gameboard {
         console.log("  " + letters.join(" "));
         for (let i = 0; i < this.board.length; i++) {
             for (let j = 0; j < this.board.length; j++) {
-                string = string + (this.board[i][j].ship ? this.board[i][j].ship.size + " " : 0 + " ");
+                const cell = this.board[i][j];
+                if (cell.hit && cell.ship) {
+                    string += "X ";
+                } else if (cell.hit && !cell.ship) {
+                    string += "O ";
+                } else {
+                    string += (cell.ship ? cell.ship.size + " " : ". ");
+                }
             }
             console.log(letters[i] + " " + string);
             string = "";

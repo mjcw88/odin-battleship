@@ -1,42 +1,51 @@
 import { Player } from "./classes/player.js";
-import { Ship } from "./classes/ship.js";
 
-function createShips() {
-    const ships = [];
-    const shipSizes = [5, 4, 3, 3, 2];
-    shipSizes.forEach(size => { 
-        const ship = new Ship(size);
-        ships.push(ship);
-    })
-    return ships;
-}
+export class Game {
+    constructor(...rest) {
+        if (rest.length > 0) throw new RangeError("Too many arguments given");
 
-export function createNewGame() {
-    // Placeholder Coordinates - delete later
-    const coordinates = [
-        [[0,0],[4,0]],
-        [[6,0],[6,3]],
-        [[8,5],[8,7]],
-        [[1,4],[3,4]],
-        [[3,7],[4,7]]
-    ];
+        this.players = [];
+        this.playerOneTurn = true;
+        this.winner = null;
+    }
 
-    const players = [];
-    const playerOne = new Player("Human", true);
-    const playerTwo = new Player();
+    createNewGame() {
+        // Placeholder Coordinates - delete later
+        const coordinates = [
+            [[0,0],[4,0]],
+            [[6,0],[6,3]],
+            [[8,5],[8,7]],
+            [[1,4],[3,4]],
+            [[3,7],[4,7]],
+            [[5,5],[5,9]],
+            [[3,2],[6,2]],
+            [[9,0],[9,2]],
+            [[3,5],[3,7]],
+            [[1,0],[1,1]],
+        ];
 
-    players.push(playerOne);
-    players.push(playerTwo);
+        const ships = [5, 4, 3, 3, 2];
 
-    const ships = createShips();
+        const playerOne = new Player("Human", true);
+        const playerTwo = new Player();
 
-    players.forEach(player => {
-        ships.forEach((ship, index) => {
-            player.gameboard.placeShip(coordinates[index][0], coordinates[index][1], ship);
+        this.players.push(playerOne);
+        this.players.push(playerTwo);
+        
+        this.players.forEach((player, playerIndex) => {
+            const offset = playerIndex * ships.length;
+            ships.forEach((ship, shipIndex) => {
+                player.gameboard.placeShip(coordinates[offset + shipIndex][0], coordinates[offset + shipIndex][1], ship);
+            });
         });
-        // console.log(player.name);
-        // player.gameBoard.printBoard();
-        // console.log("");
-    });
-    return players;
+    }
+
+    declareWinner(player) {
+        this.winner = player;
+    }
+
+    playComputerTurn() {
+        console.log("COMPUTING CPU TURN");
+        this.playerOneTurn = true;
+    }
 }

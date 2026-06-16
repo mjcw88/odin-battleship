@@ -1,4 +1,7 @@
 import "./styles.css";
+import { Game } from "./gameController.js";
 import { renderGameboard } from "./displayController.js";
 
-renderGameboard();
+const game = new Game();
+game.createNewGame();
+renderGameboard(game);
