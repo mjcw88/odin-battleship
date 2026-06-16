@@ -1,4 +1,4 @@
-import { Player } from "./classes/player.js";
+import { Player } from "./player.js";
 
 export class Game {
     constructor(...rest) {
@@ -40,12 +40,32 @@ export class Game {
         });
     }
 
-    declareWinner(player) {
-        this.winner = player;
+    playHumanTurn(row, col) {
+        if (this.winner || !this.playerOneTurn) return;
+
+        const enemyBoard = this.players[1].gameboard;
+        if (enemyBoard.board[row][col].hit) return;
+
+        this.playerOneTurn = false;
+        
+        enemyBoard.recieveAttack(row, col);
+        if (enemyBoard.isAllSunk()) {
+            this.declareWinner(this.players[0]);
+        } else {
+            this.playComputerTurn();
+        }
     }
 
     playComputerTurn() {
         console.log("COMPUTING CPU TURN");
         this.playerOneTurn = true;
+    }
+
+    getEnemyBoard() {
+        return this.players[1].gameboard;
+    }
+
+    declareWinner(player) {
+        this.winner = player;
     }
 }

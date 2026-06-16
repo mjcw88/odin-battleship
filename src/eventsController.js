@@ -1,20 +1,12 @@
-import { updateGameBoard, renderWinner } from "./displayController.js";
+import { updateGameBoard, renderWinner } from "./uiController.js";
 
-export function addBoardClickEvent(btn, board, game) {
+export function addBoardClickEvent(btn, game) {
     btn.addEventListener("click", () => {
-        if (game.winner) return;
-        if (!game.playerOneTurn) return;
-        game.playerOneTurn = false;
+        if (game.winner || !game.playerOneTurn) return;
         const row = parseInt(btn.dataset.rowIndex);
         const col = parseInt(btn.dataset.colIndex);
-        if (board.board[row][col].hit) return;
-        board.recieveAttack(row, col);
-        updateGameBoard(btn, board, row, col);
-        if (board.isAllSunk()) {
-            game.declareWinner(game.players[0]);
-            renderWinner(game.winner);
-        } else {
-            game.playComputerTurn();
-        }
+        game.playHumanTurn(row, col);
+        updateGameBoard(btn, game.getEnemyBoard(), row, col);
+        if (game.winner) renderWinner(game.winner);
     });
 }

@@ -34,7 +34,7 @@ export function renderGameboard(game) {
                 board.append(square);
                 if (!player.human) {
                     square.classList.add("cpu-board-square");
-                    addBoardClickEvent(square, player.gameboard, game);
+                    addBoardClickEvent(square, game);
                 }
             })
         })
@@ -42,17 +42,4 @@ export function renderGameboard(game) {
         contents.append(playerContainer);
         playerContainer.append(playerHeader, board);
     })
-}
-
-export function updateGameBoard(square, board, row, col) {
-    if (board.board[row][col].ship) {
-        square.classList.add("board-hit");
-    } else {
-        square.classList.add("board-miss");
-    }
-}
-
-export function renderWinner(player) {
-    const name = player.name;
-    console.log(`A winner is you, ${name}!`);
 }
