@@ -6,10 +6,10 @@ export function addBoardClickEvent(btn, game) {
 
         const row = parseInt(btn.dataset.rowIndex);
         const col = parseInt(btn.dataset.colIndex);
-        game.playHumanTurn(row, col);
+        const cpuBoard = game.getPlayerBoard("CPU");
+        if (cpuBoard.board[row][col].hit) return;
 
-        const cpu = game.getCpuPlayerIndex();
-        const cpuBoard = game.getPlayerBoard(cpu);
+        game.playHumanTurn(row, col);
         updateGameBoard(btn, cpuBoard, row, col);
 
         if (game.winner) {
@@ -18,8 +18,8 @@ export function addBoardClickEvent(btn, game) {
             const square = game.playComputerTurn();
             const cpuRow = square[0];
             const cpuCol = square[1];
-            const human = game.getHumanPlayerIndex();
-            const humanBoard = game.getPlayerBoard(human);
+            const humanName = game.players.find(player => player.human).name;
+            const humanBoard = game.getPlayerBoard(humanName);
             const boardDisplay = document.querySelectorAll(".human-board-square");
             const cell = Array.from(boardDisplay).find(square => 
                 square.dataset.rowIndex == cpuRow && square.dataset.colIndex == cpuCol
