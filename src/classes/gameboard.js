@@ -9,7 +9,7 @@ export class Gameboard {
         this.ships = [];
     }
 
-    #isValid(start, end, size) {
+    #isValidCoordinates(start, end) {
         if (!Array.isArray(start)) throw new TypeError("Start must be an array");
         if (start.some((x) => !Number.isInteger(x))) throw new TypeError("Start must contain only integers");
         if (start.length !== 2) throw new RangeError("Start must have 2 values only");
@@ -25,8 +25,11 @@ export class Gameboard {
         });
 
         if (start[0] !== end[0] && start[1] !== end[1]) throw new Error("Ship cannot be diagonal");
+    }
 
-        if (!Number.isInteger(size)) throw new TypeError("Ship size must be an integer");
+    #isValidNumber(num) {
+        if (!Number.isInteger(num)) throw new TypeError("Number must be an integer");
+        if (num < 0 || num >= this.board.length) throw new RangeError("Integer out of bounds");
     }
 
     #isVertical(startRow, endRow) {
@@ -54,9 +57,11 @@ export class Gameboard {
     }
 
     placeShip(start, end, size) {
-        this.#isValid(start, end, size);
-        const ship = new Ship(size);
+        this.#isValidCoordinates(start, end);
+        this.#isValidNumber(size);
 
+        const ship = new Ship(size);
+        
         if (this.#isVertical(start[0], end[0])) {
             this.#checkVerticalSquares(start, size);
             for (let i = 0; i < size; i++) {
@@ -76,7 +81,9 @@ export class Gameboard {
     }
 
     recieveAttack(row, col) {
-        if (!Number.isInteger(row) || !Number.isInteger(col)) throw new TypeError("Coordinates must be an integer");
+        this.#isValidNumber(row);
+        this.#isValidNumber(col);
+
         if (this.board[row][col].hit) return;
         if (this.board[row][col].ship) {
             const ship = this.board[row][col].ship;

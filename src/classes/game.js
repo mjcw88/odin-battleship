@@ -9,6 +9,14 @@ export class Game {
         this.winner = null;
     }
 
+    #isValidNumber(num) {
+        if (!Number.isInteger(num)) throw new TypeError("Number must be an integer");
+
+        const index = this.getCpuPlayerIndex();
+        const board = this.getPlayerBoard(index);
+        if (num < 0 || num >= board.board.length) throw new RangeError("Integer out of bounds");
+    }
+
     createNewGame() {
         // Placeholder Coordinates - delete later
         const coordinates = [
@@ -41,31 +49,74 @@ export class Game {
     }
 
     playHumanTurn(row, col) {
+        this.#isValidNumber(row);
+        this.#isValidNumber(col);
+
         if (this.winner || !this.playerOneTurn) return;
 
-        const enemyBoard = this.players[1].gameboard;
-        if (enemyBoard.board[row][col].hit) return;
+        const index = this.getCpuPlayerIndex();
+        const cpuBoard = this.getPlayerBoard(index);
+        if (cpuBoard.board[row][col].hit) return;
 
-        this.playerOneTurn = false;
-        
-        enemyBoard.recieveAttack(row, col);
-        if (enemyBoard.isAllSunk()) {
-            this.declareWinner(this.players[0]);
-        } else {
-            this.playComputerTurn();
+        cpuBoard.recieveAttack(row, col);
+        if (cpuBoard.isAllSunk()) {
+            const index = this.getHumanPlayerIndex();
+            this.declareWinner(this.players[index]);
         }
+        this.playerOneTurn = false;
     }
 
     playComputerTurn() {
-        console.log("COMPUTING CPU TURN");
+        const index = this.getHumanPlayerIndex();
+        const board = this.getPlayerBoard(index);
+
+        const { available, hits } = board.board.reduce(
+             (accumulator, currentValue, row) => {
+                currentValue.forEach((square, col) => {
+                    if (square.hit === false) accumulator.available.push([row, col]);
+                    else if (square.hit === true && square.ship !== null && square.ship.isSunk() === false) accumulator.hits.push([row, col]);
+                })
+                return accumulator;
+             },
+             { available: [], hits: [] }
+        );
+
+        //console.log(available);
+        //console.log(hits);
+
+        let square;
+        if (hits.length > 0) {
+            console.log("hits found!");
+        } else {
+            square = available[Math.floor(Math.random() * available.length)];
+        }
+        const row = square[0];
+        const col = square[1];
+        board.recieveAttack(row, col);
         this.playerOneTurn = true;
+        return square;
     }
 
-    getEnemyBoard() {
-        return this.players[1].gameboard;
+    getHumanPlayerIndex() {
+        return this.players.findIndex(player => player.human === true);
+    }
+
+    getCpuPlayerIndex() {
+        return this.players.findIndex(player => player.human === false);
+    }
+
+    getPlayerBoard(index) {
+        if (!Number.isInteger(index)) throw new TypeError("Number must be an integer");
+        return this.players[index].gameboard;
     }
 
     declareWinner(player) {
         this.winner = player;
     }
 }
+
+// const game = new Game();
+
+// game.createNewGame();
+
+// game.playComputerTurn();

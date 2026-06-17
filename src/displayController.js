@@ -35,6 +35,8 @@ export function renderGameboard(game) {
                 if (!player.human) {
                     square.classList.add("cpu-board-square");
                     addBoardClickEvent(square, game);
+                } else {
+                    square.classList.add("human-board-square");
                 }
             })
         })
