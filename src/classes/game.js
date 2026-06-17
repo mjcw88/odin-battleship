@@ -31,7 +31,7 @@ export class Game {
             [[1,0],[1,1]],
         ];
 
-        const ships = [2, 2, 2, 2, 2];
+        const ships = [5, 4, 3, 3, 2];
 
         const playerOne = new Player("Human", true);
         const playerTwo = new Player();
