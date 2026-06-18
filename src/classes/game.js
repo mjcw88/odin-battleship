@@ -16,6 +16,10 @@ export class Game {
         if (num < 0 || num >= board.board.length) throw new RangeError("Integer out of bounds");
     }
 
+    #isVertical(startRow, endRow) {
+        return startRow !== endRow;
+    }
+
     createNewGame() {
         // Placeholder Coordinates - delete later
         const coordinates = [
@@ -80,25 +84,63 @@ export class Game {
              { available: [], hits: [] }
         );
 
+        const targets = [];
         let square;
         if (hits.length > 0) {
-            const targets = [];
             const hit = hits[Math.floor(Math.random() * hits.length)];
-
             if (hit.ship.hits > 1) {
+                const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
 
+                const queue = [hit];
+                const visited = [];
+                const TRAVERSE_DIRECTIONS = [-1,1];
+
+                if (this.#isVertical(rows[0], rows[1])) {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.row)) continue;
+                        visited.push(current.row);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.row + direction;
+                            if (dir < 0 || dir >= humanBoard.board.length) return;
+                            if (humanBoard.board[dir][current.col].hit === false) {
+                                targets.push([dir,current.col])
+                            } else if (humanBoard.board[dir][current.col].hit === true && humanBoard.board[dir][current.col].ship) {
+                                queue.push({ row: dir, col: current.col });
+                            };
+                        })
+                    }
+                } else {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.col)) continue;
+                        visited.push(current.col);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.col + direction;
+                            if (dir < 0 || dir >= humanBoard.board.length) return;
+                            if (humanBoard.board[current.row][dir].hit === false) {
+                                targets.push([current.row,dir])
+                            } else if (humanBoard.board[current.row][dir].hit === true && humanBoard.board[current.row][dir].ship) {
+                                queue.push({ row: current.row, col: dir });
+                            };
+                        })
+                    }
+                }
             } else {
-                const directions = [[-1,0],[0,1],[1,0],[0,-1]];
-                directions.forEach(dir => {
+                const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+                DIRECTIONS.forEach(dir => {
                     const row = hit.row + dir[0];
                     const col = hit.col + dir[1];
                     if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
-                })
-                square = targets[Math.floor(Math.random() * targets.length)];
+                })   
             }
+            square = targets[Math.floor(Math.random() * targets.length)];
         } else {
             square = available[Math.floor(Math.random() * available.length)];
         }
+        
         const row = square[0];
         const col = square[1];
         humanBoard.recieveAttack(row, col);
