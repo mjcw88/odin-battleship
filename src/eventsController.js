@@ -25,6 +25,7 @@ export function addBoardClickEvent(btn, game) {
                 square.dataset.rowIndex == cpuRow && square.dataset.colIndex == cpuCol
             );
             updateGameBoard(cell, humanBoard, cpuRow, cpuCol);
+            if (game.winner) renderWinner(game.winner);
         }
     });
 }

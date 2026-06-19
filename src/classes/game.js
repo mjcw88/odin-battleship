@@ -62,9 +62,8 @@ export class Game {
 
         cpuBoard.recieveAttack(row, col);
         if (cpuBoard.isAllSunk()) {
-            const humanName = this.players.find(player => player.human).name;
-            const index = this.getPlayerBoard(humanName);
-            this.declareWinner(this.players[index]);
+            const player = this.players.find(player => player.human);
+            this.declareWinner(player);
         }
         this.playerOneTurn = false;
     }
@@ -144,6 +143,10 @@ export class Game {
         const row = square[0];
         const col = square[1];
         humanBoard.recieveAttack(row, col);
+        if (humanBoard.isAllSunk()) {
+            const cpu = this.players.find(player => !player.human);
+            this.declareWinner(cpu);
+        }
         this.playerOneTurn = true;
         return square;
     }
