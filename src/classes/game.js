@@ -1,4 +1,5 @@
 import { Player } from "./player.js";
+import { Gameboard } from "./gameboard.js";
 
 export class Game {
     constructor(...rest) {
@@ -12,29 +13,58 @@ export class Game {
     #isValidNumber(num) {
         if (!Number.isInteger(num)) throw new TypeError("Number must be an integer");
 ;
-        const board = this.getPlayerBoard("CPU");
-        if (num < 0 || num >= board.board.length) throw new RangeError("Integer out of bounds");
+        const player = this.getPlayer("CPU");
+        const board = player.gameboard.board;
+        if (num < 0 || num >= board.length) throw new RangeError("Integer out of bounds");
     }
 
     #isVertical(startRow, endRow) {
         return startRow !== endRow;
     }
 
-    createNewGame() {
-        // Placeholder Coordinates - delete later
-        const coordinates = [
-            [[0,0],[4,0]],
-            [[6,0],[6,3]],
-            [[8,5],[8,7]],
-            [[1,4],[3,4]],
-            [[3,7],[4,7]],
-            [[5,5],[5,9]],
-            [[3,2],[6,2]],
-            [[9,0],[9,2]],
-            [[3,5],[3,7]],
-            [[1,0],[1,1]],
-        ];
+    #getRandomCoordinates(size, board) {
+        const coordinates = [];
+        const available = [];
 
+        board.forEach((row, rowIndex) => {
+            row.forEach((col, colIndex) => {
+                if (rowIndex + size <= board.length) { 
+                    const temp = [];
+                    for(let i = 0; i < size; i++) {
+                        const cell = board[rowIndex + i][colIndex];
+                        temp.push(cell);
+                    }
+                    if (temp.every((currentValue) => currentValue.ship === null)) {
+                        available.push({ coordinates: [rowIndex,colIndex], vertical: true })
+                    };
+                }
+
+                if (colIndex + size <= board.length) { 
+                    const temp = [];
+                    for(let i = 0; i < size; i++) {
+                        const cell = board[rowIndex][colIndex + i];
+                        temp.push(cell);
+                    }
+                    if (temp.every((currentValue) => currentValue.ship === null)) {
+                        available.push({ coordinates: [rowIndex,colIndex], vertical: false })
+                    };
+                }
+            })
+        })
+        const start = available[Math.floor(Math.random() * available.length)];
+        const end = Array.from(start.coordinates);
+
+        if (start.vertical) {
+            end[0] += (size - 1);
+        } else {
+            end[1] += (size -1);
+        }
+
+        coordinates.push(start.coordinates,end);
+        return coordinates;
+    }
+
+    createNewGame() {
         const ships = [5, 4, 3, 3, 2];
 
         const playerOne = new Player("Human", true);
@@ -42,11 +72,13 @@ export class Game {
 
         this.players.push(playerOne);
         this.players.push(playerTwo);
-        
-        this.players.forEach((player, playerIndex) => {
-            const offset = playerIndex * ships.length;
-            ships.forEach((ship, shipIndex) => {
-                player.gameboard.placeShip(coordinates[offset + shipIndex][0], coordinates[offset + shipIndex][1], ship);
+
+        this.players.forEach((player) => {
+            ships.forEach((ship) => {
+                const coordinates = this.#getRandomCoordinates(ship, player.gameboard.board);
+                const start = coordinates[0];
+                const end = coordinates[1];
+                player.gameboard.placeShip(start, end, ship);
             });
         });
     }
@@ -57,22 +89,18 @@ export class Game {
 
         if (this.winner || !this.playerOneTurn) return;
 
-        const cpuBoard = this.getPlayerBoard("CPU");
+        const cpu = this.getPlayer("CPU");
+        const cpuBoard = cpu.gameboard;
+
         if (cpuBoard.board[row][col].hit) return;
 
         cpuBoard.recieveAttack(row, col);
-        if (cpuBoard.isAllSunk()) {
-            const player = this.players.find(player => player.human);
-            this.declareWinner(player);
-        }
-        this.playerOneTurn = false;
     }
 
     playComputerTurn() {
-        const humanName = this.players.find(player => player.human).name;
-        const humanBoard = this.getPlayerBoard(humanName);
+        const humanPlayer = this.getPlayer("Human");
 
-        const { available, hits } = humanBoard.board.reduce(
+        const { available, hits } = humanPlayer.gameboard.board.reduce(
              (acc, cur, row) => {
                 cur.forEach((square, col) => {
                     if (square.hit === false) acc.available.push([row, col]);
@@ -102,10 +130,10 @@ export class Game {
 
                         TRAVERSE_DIRECTIONS.forEach(direction => {
                             const dir = current.row + direction;
-                            if (dir < 0 || dir >= humanBoard.board.length) return;
-                            if (humanBoard.board[dir][current.col].hit === false) {
+                            if (dir < 0 || dir >= humanPlayer.gameboard.board.length) return;
+                            if (humanPlayer.gameboard.board[dir][current.col].hit === false) {
                                 targets.push([dir,current.col])
-                            } else if (humanBoard.board[dir][current.col].hit === true && humanBoard.board[dir][current.col].ship) {
+                            } else if (humanPlayer.gameboard.board[dir][current.col].hit === true && humanPlayer.gameboard.board[dir][current.col].ship) {
                                 queue.push({ row: dir, col: current.col });
                             };
                         })
@@ -118,10 +146,10 @@ export class Game {
 
                         TRAVERSE_DIRECTIONS.forEach(direction => {
                             const dir = current.col + direction;
-                            if (dir < 0 || dir >= humanBoard.board.length) return;
-                            if (humanBoard.board[current.row][dir].hit === false) {
+                            if (dir < 0 || dir >= humanPlayer.gameboard.board.length) return;
+                            if (humanPlayer.gameboard.board[current.row][dir].hit === false) {
                                 targets.push([current.row,dir])
-                            } else if (humanBoard.board[current.row][dir].hit === true && humanBoard.board[current.row][dir].ship) {
+                            } else if (humanPlayer.gameboard.board[current.row][dir].hit === true && humanPlayer.gameboard.board[current.row][dir].ship) {
                                 queue.push({ row: current.row, col: dir });
                             };
                         })
@@ -142,18 +170,17 @@ export class Game {
         
         const row = square[0];
         const col = square[1];
-        humanBoard.recieveAttack(row, col);
-        if (humanBoard.isAllSunk()) {
-            const cpu = this.players.find(player => !player.human);
-            this.declareWinner(cpu);
-        }
-        this.playerOneTurn = true;
+        humanPlayer.gameboard.recieveAttack(row, col);
         return square;
     }
 
-    getPlayerBoard(name) {
+    flipPlayerOneTurn() {
+        this.playerOneTurn = !this.playerOneTurn;
+    }
+
+    getPlayer(name) {
         const index = this.players.findIndex(player => player.name === name);
-        return this.players[index].gameboard;
+        return this.players[index];
     }
 
     declareWinner(player) {
