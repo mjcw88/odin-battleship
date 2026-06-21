@@ -202,15 +202,15 @@ export class Game {
             }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const shortestShip = this.#getLargestShip(ships);
+            const largestShip = this.#getLargestShip(ships);
 
             available.forEach(coordinate => {
                 const row = coordinate[0];
                 const col = coordinate[1];
 
-                if (row + shortestShip <= board.length) {
+                if (row + largestShip <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < shortestShip; i++) {
+                    for (let i = 0; i < largestShip; i++) {
                         const square = [row + i,col];
                         temp.push(square);
                     }
@@ -219,9 +219,9 @@ export class Game {
                     }
                 }
 
-                if (col + shortestShip <= board.length) {
+                if (col + largestShip <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < shortestShip; i++) {
+                    for (let i = 0; i < largestShip; i++) {
                         const square = [row,col + i];
                         temp.push(square);
                     }
@@ -297,7 +297,7 @@ export class Game {
             }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const shortestShip = this.#getSmallestShip(ships);
+            const smallestShip = this.#getSmallestShip(ships);
 
             available.forEach(coordinate => {
                 const row = coordinate[0];
@@ -312,7 +312,7 @@ export class Game {
                     else break;
                     i++;
                 }
-                if (verticalTemp.length >= shortestShip) {
+                if (verticalTemp.length >= smallestShip) {
                     if (!verticalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
                         targets.push(verticalTemp);
                     }
@@ -327,7 +327,7 @@ export class Game {
                     else break;
                     j++;
                 }
-                if (horizontalTemp.length >= shortestShip) {
+                if (horizontalTemp.length >= smallestShip) {
                     if (!horizontalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
                         targets.push(horizontalTemp);
                     }
