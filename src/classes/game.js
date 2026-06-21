@@ -2,11 +2,12 @@ import { Player } from "./player.js";
 import { Gameboard } from "./gameboard.js";
 
 export class Game {
-    constructor(...rest) {
+    constructor(difficulty = 1, ...rest) {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
 
         this.players = [];
         this.playerOneTurn = true;
+        this.difficulty = difficulty;
         this.winner = null;
     }
 
@@ -22,6 +23,14 @@ export class Game {
         return startRow !== endRow;
     }
 
+    #shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
     #getRandomCoordinates(size, board) {
         const coordinates = [];
         const available = [];
@@ -30,22 +39,22 @@ export class Game {
             row.forEach((col, colIndex) => {
                 if (rowIndex + size <= board.length) { 
                     const temp = [];
-                    for(let i = 0; i < size; i++) {
-                        const cell = board[rowIndex + i][colIndex];
-                        temp.push(cell);
+                    for (let i = 0; i < size; i++) {
+                        const square = board[rowIndex + i][colIndex];
+                        temp.push(square);
                     }
-                    if (temp.every((currentValue) => currentValue.ship === null)) {
+                    if (temp.every((cur) => cur.ship === null)) {
                         available.push({ coordinates: [rowIndex,colIndex], vertical: true })
                     };
                 }
 
                 if (colIndex + size <= board.length) { 
                     const temp = [];
-                    for(let i = 0; i < size; i++) {
+                    for (let i = 0; i < size; i++) {
                         const cell = board[rowIndex][colIndex + i];
                         temp.push(cell);
                     }
-                    if (temp.every((currentValue) => currentValue.ship === null)) {
+                    if (temp.every((cur) => cur.ship === null)) {
                         available.push({ coordinates: [rowIndex,colIndex], vertical: false })
                     };
                 }
@@ -57,7 +66,7 @@ export class Game {
         if (start.vertical) {
             end[0] += (size - 1);
         } else {
-            end[1] += (size -1);
+            end[1] += (size - 1);
         }
 
         coordinates.push(start.coordinates,end);
@@ -74,6 +83,7 @@ export class Game {
         this.players.push(playerTwo);
 
         this.players.forEach((player) => {
+            this.#shuffleArray(ships);
             ships.forEach((ship) => {
                 const coordinates = this.#getRandomCoordinates(ship, player.gameboard.board);
                 const start = coordinates[0];
@@ -97,81 +107,136 @@ export class Game {
         cpuBoard.recieveAttack(row, col);
     }
 
+    #getShortestShip(ships) {
+        const unsunkShips = ships.filter(ship => !ship.isSunk());
+        return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
+    }
+
+    #playEasyTurn(board, available, hits) {
+
+    }
+
+    #playMediumTurn(board, ships, available, hits) {
+        const targets = [];
+        let target
+        // if (hits.length > 0) {
+        //     target = targets[Math.floor(Math.random() * targets.length)];
+        // } else {
+            const shortestShip = this.#getShortestShip(ships);
+
+            available.forEach(coordinate => {
+                const row = coordinate[0];
+                const col = coordinate[1];
+
+                if (row + shortestShip <= board.length) {
+                    const temp = [];
+                    for (let i = 0; i < shortestShip; i++) {
+                        const square = [row + i,col];
+                        temp.push(square);
+                    }
+                    if (temp.every((cur) => available.some(element => element[0] === cur[0] && element[1] === cur[1]))) {
+                        targets.push(temp);
+                    }
+                }
+
+                if (col + shortestShip <= board.length) {
+                    const temp = [];
+                    for (let i = 0; i < shortestShip; i++) {
+                        const square = [row,col + i];
+                        temp.push(square);
+                    }
+                    if (temp.every((cur) => available.some(element => element[0] === cur[0] && element[1] === cur[1]))) {
+                        targets.push(temp);
+                    }
+                }
+            })
+
+            if (targets.length > 0) {
+                const combination = targets[Math.floor(Math.random() * targets.length)];
+                target = combination[Math.floor(combination.length / 2)];
+            } else {
+                target = available[Math.floor(Math.random() * available.length)];
+            }
+        //}
+        return target;
+    }
+
+    #playHardTurn(board, ships, available, hits) {
+        const targets = [];
+        let target
+        if (hits.length > 0) {
+            target = targets[Math.floor(Math.random() * targets.length)];
+        } else {
+            const shortestShip = this.#getShortestShip(ships);
+
+            available.forEach(coordinate => {
+                const row = coordinate[0];
+                const col = coordinate[1];
+
+                const verticalTemp = [coordinate];
+                let i = 1;
+                while (true) {
+                    const nextRow = row + i;
+                    const next = available.some(element => element[0] === nextRow && element[1] === col);
+                    if (next) verticalTemp.push([nextRow,col]);
+                    else break;
+                    i++;
+                }
+                if (verticalTemp.length >= shortestShip) {
+                    if (!verticalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
+                        targets.push(verticalTemp);
+                    }
+                };
+
+                const horizontalTemp = [coordinate];
+                let j = 1;
+                while (true) {
+                    const nextCol = col + j;
+                    const next = available.some(element => element[0] === row && element[1] === nextCol);
+                    if (next) horizontalTemp.push([row,nextCol]);
+                    else break;
+                    j++;
+                }
+                if (horizontalTemp.length >= shortestShip) {
+                    if (!horizontalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
+                        targets.push(horizontalTemp);
+                    }
+                };
+            })
+
+            if (targets.length > 0) {
+                const combination = targets[Math.floor(Math.random() * targets.length)];
+                target = combination[Math.floor(combination.length / 2)];
+            } else {
+                target = available[Math.floor(Math.random() * available.length)];
+            }
+        }
+        return target;
+    }
+
     playComputerTurn() {
         const humanPlayer = this.getPlayer("Human");
-
         const { available, hits } = humanPlayer.gameboard.board.reduce(
              (acc, cur, row) => {
                 cur.forEach((square, col) => {
                     if (square.hit === false) acc.available.push([row, col]);
-                    else if (square.hit === true && square.ship !== null && square.ship.isSunk() === false) acc.hits.push({ row: row, col: col, ship: square.ship });
+                    else if (square.hit === true && square.ship !== null && square.ship.isSunk() === false) acc.hits.push({ row: row, col: col });
                 })
                 return acc;
              },
              { available: [], hits: [] }
         );
 
-        const targets = [];
-        let square;
-        if (hits.length > 0) {
-            const hit = hits[Math.floor(Math.random() * hits.length)];
-            if (hit.ship.hits > 1) {
-                const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
+        let target;
 
-                const queue = [hit];
-                const visited = [];
-                const TRAVERSE_DIRECTIONS = [-1,1];
+        if (this.difficulty === 0) target = this.#playEasyTurn(humanPlayer.gameboard.board, available, hits);
+        else if (this.difficulty === 1) target = this.#playMediumTurn(humanPlayer.gameboard.board, humanPlayer.gameboard.ships, available, hits);
+        else target = this.#playHardTurn(humanPlayer.gameboard.board, humanPlayer.gameboard.ships, available, hits);
 
-                if (this.#isVertical(rows[0], rows[1])) {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.row)) continue;
-                        visited.push(current.row);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.row + direction;
-                            if (dir < 0 || dir >= humanPlayer.gameboard.board.length) return;
-                            if (humanPlayer.gameboard.board[dir][current.col].hit === false) {
-                                targets.push([dir,current.col])
-                            } else if (humanPlayer.gameboard.board[dir][current.col].hit === true && humanPlayer.gameboard.board[dir][current.col].ship) {
-                                queue.push({ row: dir, col: current.col });
-                            };
-                        })
-                    }
-                } else {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.col)) continue;
-                        visited.push(current.col);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.col + direction;
-                            if (dir < 0 || dir >= humanPlayer.gameboard.board.length) return;
-                            if (humanPlayer.gameboard.board[current.row][dir].hit === false) {
-                                targets.push([current.row,dir])
-                            } else if (humanPlayer.gameboard.board[current.row][dir].hit === true && humanPlayer.gameboard.board[current.row][dir].ship) {
-                                queue.push({ row: current.row, col: dir });
-                            };
-                        })
-                    }
-                }
-            } else {
-                const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
-                DIRECTIONS.forEach(dir => {
-                    const row = hit.row + dir[0];
-                    const col = hit.col + dir[1];
-                    if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
-                })   
-            }
-            square = targets[Math.floor(Math.random() * targets.length)];
-        } else {
-            square = available[Math.floor(Math.random() * available.length)];
-        }
-        
-        const row = square[0];
-        const col = square[1];
+        const row = target[0];
+        const col = target[1];
         humanPlayer.gameboard.recieveAttack(row, col);
-        return square;
+        return target;
     }
 
     flipPlayerOneTurn() {
@@ -187,3 +252,53 @@ export class Game {
         this.winner = player;
     }
 }
+
+            // const hit = hits[Math.floor(Math.random() * hits.length)];
+            // if (hit.ship.hits > 1) {
+            //     const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
+
+            //     const queue = [hit];
+            //     const visited = [];
+            //     const TRAVERSE_DIRECTIONS = [-1,1];
+
+            //     if (this.#isVertical(rows[0], rows[1])) {
+            //         while (queue.length > 0) {
+            //             const current = queue.shift();
+            //             if (visited.includes(current.row)) continue;
+            //             visited.push(current.row);
+
+            //             TRAVERSE_DIRECTIONS.forEach(direction => {
+            //                 const dir = current.row + direction;
+            //                 if (dir < 0 || dir >= board.length) return;
+            //                 if (board[dir][current.col].hit === false) {
+            //                     targets.push([dir,current.col])
+            //                 } else if (board[dir][current.col].hit === true && board[dir][current.col].ship) {
+            //                     queue.push({ row: dir, col: current.col });
+            //                 };
+            //             })
+            //         }
+            //     } else {
+            //         while (queue.length > 0) {
+            //             const current = queue.shift();
+            //             if (visited.includes(current.col)) continue;
+            //             visited.push(current.col);
+
+            //             TRAVERSE_DIRECTIONS.forEach(direction => {
+            //                 const dir = current.col + direction;
+            //                 if (dir < 0 || dir >= board.length) return;
+            //                 if (board[current.row][dir].hit === false) {
+            //                     targets.push([current.row,dir])
+            //                 } else if (board[current.row][dir].hit === true && board[current.row][dir].ship) {
+            //                     queue.push({ row: current.row, col: dir });
+            //                 };
+            //             })
+            //         }
+            //     }
+            // } else {
+            //     const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+            //     DIRECTIONS.forEach(dir => {
+            //         const row = hit.row + dir[0];
+            //         const col = hit.col + dir[1];
+            //         if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
+            //     })   
+            // }
