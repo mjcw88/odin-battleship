@@ -113,15 +113,90 @@ export class Game {
     }
 
     #playEasyTurn(board, available, hits) {
-
+        const targets = [];
+        let target
+        if (hits.length > 0) {
+            const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+            hits.forEach(hit => {
+                DIRECTIONS.forEach(dir => {
+                    const row = hit.row + dir[0];
+                    const col = hit.col + dir[1];
+                    if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
+                })   
+            })
+            if (targets.length === 0) target = available[Math.floor(Math.random() * available.length)];    
+            else target = targets[Math.floor(Math.random() * targets.length)];
+        } else {
+            target = available[Math.floor(Math.random() * available.length)];
+        }
+        return target;
     }
 
     #playMediumTurn(board, ships, available, hits) {
+        const singleHit = function(targets) {
+            const hit = hits[Math.floor(Math.random() * hits.length)];
+            const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+            DIRECTIONS.forEach(dir => {
+                const row = hit.row + dir[0];
+                const col = hit.col + dir[1];
+                if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
+            })   
+        }
+
         const targets = [];
         let target
-        // if (hits.length > 0) {
-        //     target = targets[Math.floor(Math.random() * targets.length)];
-        // } else {
+        if (hits.length > 0) {
+            if (hits.length > 1) {
+                const hit = hits[Math.floor(Math.random() * hits.length)];
+                const rows = [hit.row];
+                const adjacentRows = hits.filter((h) => (Math.abs(h.row - hit.row) === 1 && h.col === hit.col) || (Math.abs(h.col - hit.col) === 1 && h.row === hit.row)).map((h) => h.row).slice(0, 1);
+                rows.push(...adjacentRows);
+
+                const queue = [hit];
+                const visited = [];
+                const TRAVERSE_DIRECTIONS = [-1,1];
+
+                if (this.#isVertical(rows[0], rows[1])) {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.row)) continue;
+                        visited.push(current.row);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.row + direction;
+                            if (dir < 0 || dir >= board.length) return;
+                            if (board[dir][current.col].hit === false) {
+                                targets.push([dir,current.col])
+                            } else if (board[dir][current.col].hit === true && board[dir][current.col].ship) {
+                                queue.push({ row: dir, col: current.col });
+                            };
+                        })
+                    }
+                } else {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.col)) continue;
+                        visited.push(current.col);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.col + direction;
+                            if (dir < 0 || dir >= board.length) return;
+                            if (board[current.row][dir].hit === false) {
+                                targets.push([current.row,dir])
+                            } else if (board[current.row][dir].hit === true && board[current.row][dir].ship) {
+                                queue.push({ row: current.row, col: dir });
+                            };
+                        })
+                    }
+                }
+                if (targets.length === 0) {
+                    singleHit(targets);
+                }
+            } else {
+                singleHit(targets);
+            }
+            target = targets[Math.floor(Math.random() * targets.length)];
+        } else {
             const shortestShip = this.#getShortestShip(ships);
 
             available.forEach(coordinate => {
@@ -157,14 +232,64 @@ export class Game {
             } else {
                 target = available[Math.floor(Math.random() * available.length)];
             }
-        //}
+        }
         return target;
     }
 
     #playHardTurn(board, ships, available, hits) {
         const targets = [];
-        let target
+        let target;
+
         if (hits.length > 0) {
+            const hit = hits[Math.floor(Math.random() * hits.length)];
+            if (hit.ship.hits > 1) {
+                const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
+
+                const queue = [hit];
+                const visited = [];
+                const TRAVERSE_DIRECTIONS = [-1,1];
+
+                if (this.#isVertical(rows[0], rows[1])) {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.row)) continue;
+                        visited.push(current.row);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.row + direction;
+                            if (dir < 0 || dir >= board.length) return;
+                            if (board[dir][current.col].hit === false && board[dir][current.col].ship === hit.ship) {
+                                targets.push([dir,current.col])
+                            } else if (board[dir][current.col].hit === true && board[dir][current.col].ship === hit.ship) {
+                                queue.push({ row: dir, col: current.col });
+                            };
+                        })
+                    }
+                } else {
+                    while (queue.length > 0) {
+                        const current = queue.shift();
+                        if (visited.includes(current.col)) continue;
+                        visited.push(current.col);
+
+                        TRAVERSE_DIRECTIONS.forEach(direction => {
+                            const dir = current.col + direction;
+                            if (dir < 0 || dir >= board.length) return;
+                            if (board[current.row][dir].hit === false && board[current.row][dir].ship === hit.ship) {
+                                targets.push([current.row,dir])
+                            } else if (board[current.row][dir].hit === true && board[current.row][dir].ship === hit.ship) {
+                                queue.push({ row: current.row, col: dir });
+                            };
+                        })
+                    }
+                }
+            } else {
+                const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+                DIRECTIONS.forEach(dir => {
+                    const row = hit.row + dir[0];
+                    const col = hit.col + dir[1];
+                    if (available.some(square => square[0] === row && square[1] === col && board[row][col].ship === hit.ship)) targets.push([row,col]);
+                })   
+            }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
             const shortestShip = this.#getShortestShip(ships);
@@ -205,8 +330,9 @@ export class Game {
             })
 
             if (targets.length > 0) {
+                const modifier = Math.floor(Math.random() * 2);
                 const combination = targets[Math.floor(Math.random() * targets.length)];
-                target = combination[Math.floor(combination.length / 2)];
+                target = combination[Math.max(0, Math.floor(combination.length / 2) - modifier)];
             } else {
                 target = available[Math.floor(Math.random() * available.length)];
             }
@@ -220,7 +346,7 @@ export class Game {
              (acc, cur, row) => {
                 cur.forEach((square, col) => {
                     if (square.hit === false) acc.available.push([row, col]);
-                    else if (square.hit === true && square.ship !== null && square.ship.isSunk() === false) acc.hits.push({ row: row, col: col });
+                    else if (square.hit === true && square.ship !== null && square.ship.isSunk() === false) acc.hits.push({ row: row, col: col, ship: square.ship });
                 })
                 return acc;
              },
@@ -252,53 +378,3 @@ export class Game {
         this.winner = player;
     }
 }
-
-            // const hit = hits[Math.floor(Math.random() * hits.length)];
-            // if (hit.ship.hits > 1) {
-            //     const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
-
-            //     const queue = [hit];
-            //     const visited = [];
-            //     const TRAVERSE_DIRECTIONS = [-1,1];
-
-            //     if (this.#isVertical(rows[0], rows[1])) {
-            //         while (queue.length > 0) {
-            //             const current = queue.shift();
-            //             if (visited.includes(current.row)) continue;
-            //             visited.push(current.row);
-
-            //             TRAVERSE_DIRECTIONS.forEach(direction => {
-            //                 const dir = current.row + direction;
-            //                 if (dir < 0 || dir >= board.length) return;
-            //                 if (board[dir][current.col].hit === false) {
-            //                     targets.push([dir,current.col])
-            //                 } else if (board[dir][current.col].hit === true && board[dir][current.col].ship) {
-            //                     queue.push({ row: dir, col: current.col });
-            //                 };
-            //             })
-            //         }
-            //     } else {
-            //         while (queue.length > 0) {
-            //             const current = queue.shift();
-            //             if (visited.includes(current.col)) continue;
-            //             visited.push(current.col);
-
-            //             TRAVERSE_DIRECTIONS.forEach(direction => {
-            //                 const dir = current.col + direction;
-            //                 if (dir < 0 || dir >= board.length) return;
-            //                 if (board[current.row][dir].hit === false) {
-            //                     targets.push([current.row,dir])
-            //                 } else if (board[current.row][dir].hit === true && board[current.row][dir].ship) {
-            //                     queue.push({ row: current.row, col: dir });
-            //                 };
-            //             })
-            //         }
-            //     }
-            // } else {
-            //     const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
-            //     DIRECTIONS.forEach(dir => {
-            //         const row = hit.row + dir[0];
-            //         const col = hit.col + dir[1];
-            //         if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
-            //     })   
-            // }
