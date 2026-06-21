@@ -112,6 +112,11 @@ export class Game {
         return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
     }
 
+    #getLargestShip(ships) {
+        const unsunkShips = ships.filter(ship => !ship.isSunk());
+        return unsunkShips.reduce((acc, cur) => acc.size > cur.size ? acc : cur).size;
+    }
+
     #playEasyTurn(board, available, hits) {
         const targets = [];
         let target
@@ -197,7 +202,7 @@ export class Game {
             }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const shortestShip = this.#getShortestShip(ships);
+            const shortestShip = this.#getLargestShip(ships);
 
             available.forEach(coordinate => {
                 const row = coordinate[0];
@@ -330,8 +335,9 @@ export class Game {
             })
 
             if (targets.length > 0) {
-                const modifier = Math.floor(Math.random() * 2);
+                let modifier = 0;
                 const combination = targets[Math.floor(Math.random() * targets.length)];
+                if (combination.length % 2 === 0) modifier = Math.floor(Math.random() * 2);
                 target = combination[Math.max(0, Math.floor(combination.length / 2) - modifier)];
             } else {
                 target = available[Math.floor(Math.random() * available.length)];
