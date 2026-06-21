@@ -202,15 +202,15 @@ export class Game {
             }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const largestShip = this.#getLargestShip(ships);
+            const smallestShip = this.#getSmallestShip(ships);
 
             available.forEach(coordinate => {
                 const row = coordinate[0];
                 const col = coordinate[1];
 
-                if (row + largestShip <= board.length) {
+                if (row + smallestShip <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < largestShip; i++) {
+                    for (let i = 0; i < smallestShip; i++) {
                         const square = [row + i,col];
                         temp.push(square);
                     }
@@ -219,9 +219,9 @@ export class Game {
                     }
                 }
 
-                if (col + largestShip <= board.length) {
+                if (col + smallestShip <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < largestShip; i++) {
+                    for (let i = 0; i < smallestShip; i++) {
                         const square = [row,col + i];
                         temp.push(square);
                     }
