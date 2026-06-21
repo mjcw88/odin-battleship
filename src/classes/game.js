@@ -107,7 +107,7 @@ export class Game {
         cpuBoard.recieveAttack(row, col);
     }
 
-    #getShortestShip(ships) {
+    #getSmallestShip(ships) {
         const unsunkShips = ships.filter(ship => !ship.isSunk());
         return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
     }
@@ -297,7 +297,7 @@ export class Game {
             }
             target = targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const shortestShip = this.#getShortestShip(ships);
+            const shortestShip = this.#getSmallestShip(ships);
 
             available.forEach(coordinate => {
                 const row = coordinate[0];
