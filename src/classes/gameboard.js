@@ -95,24 +95,4 @@ export class Gameboard {
     isAllSunk() {
         return this.ships.every((currentValue) => currentValue.isSunk());
     }
-
-    printBoard() {
-        const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-        let string = "";
-        console.log("  " + letters.join(" "));
-        for (let i = 0; i < this.board.length; i++) {
-            for (let j = 0; j < this.board.length; j++) {
-                const cell = this.board[i][j];
-                if (cell.hit && cell.ship) {
-                    string += "X ";
-                } else if (cell.hit && !cell.ship) {
-                    string += "O ";
-                } else {
-                    string += (cell.ship ? cell.ship.size + " " : ". ");
-                }
-            }
-            console.log(letters[i] + " " + string);
-            string = "";
-        }
-    }
 }

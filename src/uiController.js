@@ -1,8 +1,56 @@
-export function updateGameBoard(square, board, row, col) {
-    if (board.board[row][col].ship) {
-        square.classList.add("board-hit");
+export function updateGameBoard(squares, board, row, col) {
+    const traverseBoard = function() {
+        const TRAVERSE_DIRECTIONS = [-1,1];
+        const visited = [];
+        const queue = [{ row: row, col: col }];
+        cell.classList.add("board-sunk");
+        
+        while (queue.length > 0) {
+            const current = queue.shift();
+            if (visited.some(v => v.row === current.row && v.col === current.col)) continue;
+            visited.push({ row: current.row, col: current.col });
+
+            TRAVERSE_DIRECTIONS.forEach(direction => {
+                const dir = current.row + direction;
+                if (dir < 0 || dir >= board.board.length) return;
+                if (board.board[dir][current.col].ship === coordinate.ship) {
+                    const cell = Array.from(squares).find(square => 
+                        square.dataset.rowIndex == dir && square.dataset.colIndex == current.col
+                    );
+                    cell.classList.remove("board-hit");
+                    cell.classList.add("board-sunk");
+                    queue.push({ row: dir, col: current.col });
+                }
+            })
+
+            TRAVERSE_DIRECTIONS.forEach(direction => {
+                const dir = current.col + direction;
+                if (dir < 0 || dir >= board.board.length) return;
+                if (board.board[current.row][dir].ship === coordinate.ship) {
+                    const cell = Array.from(squares).find(square => 
+                        square.dataset.rowIndex == current.row && square.dataset.colIndex == dir
+                    );
+                    cell.classList.remove("board-hit");
+                    cell.classList.add("board-sunk");
+                    queue.push({ row: current.row, col: dir });
+                }
+            })
+        }
+    }
+
+    const cell = Array.from(squares).find(square => 
+        square.dataset.rowIndex == row && square.dataset.colIndex == col
+    );
+
+    const coordinate = board.board[row][col];
+    if (coordinate.ship) {
+        if (coordinate.ship.isSunk()) {
+            traverseBoard();
+        } else {
+            cell.classList.add("board-hit");
+        }
     } else {
-        square.classList.add("board-miss");
+        cell.classList.add("board-miss");
     }
 }
 

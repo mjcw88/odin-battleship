@@ -31,7 +31,7 @@ export function renderGameboard(game) {
                 square.dataset.rowIndex = rowIndex;
                 square.dataset.colIndex = colIndex;
                 if (player.human && cell.ship) square.classList.add("square-with-ship");
-                // if (cell.ship) square.classList.add("square-with-ship");
+                //if (cell.ship) square.classList.add("square-with-ship");
                 board.append(square);
                 if (!player.human) {
                     square.classList.add("cpu-board-square");

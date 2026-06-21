@@ -60,3 +60,7 @@ body {
 .board-miss {
     background-color: lightyellow;
 }
+
+.board-sunk {
+    background-color: darkblue;
+}

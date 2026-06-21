@@ -12,7 +12,8 @@ export function addBoardClickEvent(btn, game) {
         if (cpuBoard.board[row][col].hit) return;
 
         game.playHumanTurn(row, col);
-        updateGameBoard(btn, cpuBoard, row, col);
+        const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
+        updateGameBoard(cpuBoardDisplay, cpuBoard, row, col);
         game.flipPlayerOneTurn();
 
         const humanPlayer = game.getPlayer("Human");
@@ -25,12 +26,8 @@ export function addBoardClickEvent(btn, game) {
             const cpuCol = square[1];
             const humanName = humanPlayer.name;
             const humanBoard = humanPlayer.gameboard;
-            const boardDisplay = document.querySelectorAll(".human-board-square");
-            const cell = Array.from(boardDisplay).find(square => 
-                square.dataset.rowIndex == cpuRow && square.dataset.colIndex == cpuCol
-            );
-            updateGameBoard(cell, humanBoard, cpuRow, cpuCol);
-
+            const humanBoardDisplay = document.querySelectorAll(".human-board-square");
+            updateGameBoard(humanBoardDisplay, humanBoard, cpuRow, cpuCol);
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
                 renderWinner(game.winner);
