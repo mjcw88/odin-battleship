@@ -112,14 +112,9 @@ export class Game {
         return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
     }
 
-    #getLargestShip(ships) {
-        const unsunkShips = ships.filter(ship => !ship.isSunk());
-        return unsunkShips.reduce((acc, cur) => acc.size > cur.size ? acc : cur).size;
-    }
-
     #playEasyTurn(board, available, hits) {
         const targets = [];
-        let target
+        
         if (hits.length > 0) {
             const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
             hits.forEach(hit => {
@@ -129,17 +124,52 @@ export class Game {
                     if (available.some(square => square[0] === row && square[1] === col)) targets.push([row,col]);
                 })   
             })
-            if (targets.length === 0) target = available[Math.floor(Math.random() * available.length)];    
-            else target = targets[Math.floor(Math.random() * targets.length)];
-        } else {
-            target = available[Math.floor(Math.random() * available.length)];
         }
-        return target;
+        
+        if (targets.length > 0) return targets[Math.floor(Math.random() * targets.length)];
+        return available[Math.floor(Math.random() * available.length)];
     }
 
     #playMediumTurn(board, ships, available, hits) {
-        const singleHit = function(targets) {
-            const hit = hits[Math.floor(Math.random() * hits.length)];
+        const TRAVERSE_DIRECTIONS = [-1,1];
+
+        const verticalTraversal = function(queue, visited, targets) {
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (visited.includes(current.row)) continue;
+                visited.push(current.row);
+
+                TRAVERSE_DIRECTIONS.forEach(direction => {
+                    const dir = current.row + direction;
+                    if (dir < 0 || dir >= board.length) return;
+                    if (board[dir][current.col].hit === false) {
+                        targets.push([dir,current.col])
+                    } else if (board[dir][current.col].hit === true && board[dir][current.col].ship) {
+                        queue.push({ row: dir, col: current.col });
+                    };
+                })
+            }
+        }
+
+        const horizontalTraversal = function(queue, visited, targets) {
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (visited.includes(current.col)) continue;
+                visited.push(current.col);
+
+                TRAVERSE_DIRECTIONS.forEach(direction => {
+                    const dir = current.col + direction;
+                    if (dir < 0 || dir >= board.length) return;
+                    if (board[current.row][dir].hit === false) {
+                        targets.push([current.row,dir])
+                    } else if (board[current.row][dir].hit === true && board[current.row][dir].ship) {
+                        queue.push({ row: current.row, col: dir });
+                    };
+                })
+            }
+        }
+
+        const singleHit = function(targets, hit) {
             const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
             DIRECTIONS.forEach(dir => {
                 const row = hit.row + dir[0];
@@ -148,83 +178,30 @@ export class Game {
             })   
         }
 
-        const targets = [];
-        let target
-        if (hits.length > 0) {
-            if (hits.length > 1) {
-                const hit = hits[Math.floor(Math.random() * hits.length)];
-                const rows = [hit.row];
-                const adjacentRows = hits.filter((h) => (Math.abs(h.row - hit.row) === 1 && h.col === hit.col) || (Math.abs(h.col - hit.col) === 1 && h.row === hit.row)).map((h) => h.row).slice(0, 1);
-                rows.push(...adjacentRows);
-
-                const queue = [hit];
-                const visited = [];
-                const TRAVERSE_DIRECTIONS = [-1,1];
-
-                if (this.#isVertical(rows[0], rows[1])) {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.row)) continue;
-                        visited.push(current.row);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.row + direction;
-                            if (dir < 0 || dir >= board.length) return;
-                            if (board[dir][current.col].hit === false) {
-                                targets.push([dir,current.col])
-                            } else if (board[dir][current.col].hit === true && board[dir][current.col].ship) {
-                                queue.push({ row: dir, col: current.col });
-                            };
-                        })
-                    }
-                } else {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.col)) continue;
-                        visited.push(current.col);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.col + direction;
-                            if (dir < 0 || dir >= board.length) return;
-                            if (board[current.row][dir].hit === false) {
-                                targets.push([current.row,dir])
-                            } else if (board[current.row][dir].hit === true && board[current.row][dir].ship) {
-                                queue.push({ row: current.row, col: dir });
-                            };
-                        })
-                    }
-                }
-                if (targets.length === 0) {
-                    singleHit(targets);
-                }
-            } else {
-                singleHit(targets);
-            }
-            target = targets[Math.floor(Math.random() * targets.length)];
-        } else {
-            const smallestShip = this.#getSmallestShip(ships);
-
+        const slidingWindowTraversal = function(ship) {
             available.forEach(coordinate => {
                 const row = coordinate[0];
                 const col = coordinate[1];
 
-                if (row + smallestShip <= board.length) {
+                if (row + ship <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < smallestShip; i++) {
+                    for (let i = 0; i < ship; i++) {
                         const square = [row + i,col];
                         temp.push(square);
                     }
+
                     if (temp.every((cur) => available.some(element => element[0] === cur[0] && element[1] === cur[1]))) {
                         targets.push(temp);
                     }
                 }
 
-                if (col + smallestShip <= board.length) {
+                if (col + ship <= board.length) {
                     const temp = [];
-                    for (let i = 0; i < smallestShip; i++) {
+                    for (let i = 0; i < ship; i++) {
                         const square = [row,col + i];
                         temp.push(square);
                     }
+
                     if (temp.every((cur) => available.some(element => element[0] === cur[0] && element[1] === cur[1]))) {
                         targets.push(temp);
                     }
@@ -233,72 +210,90 @@ export class Game {
 
             if (targets.length > 0) {
                 const combination = targets[Math.floor(Math.random() * targets.length)];
-                target = combination[Math.floor(combination.length / 2)];
-            } else {
-                target = available[Math.floor(Math.random() * available.length)];
+                return combination[Math.floor(combination.length / 2)];
             }
+            return available[Math.floor(Math.random() * available.length)];
         }
-        return target;
+
+        const targets = [];
+        if (hits.length > 1) {
+            const hit = hits[Math.floor(Math.random() * hits.length)];
+            const rows = [hit.row];
+            const callBack = (h) => (Math.abs(h.row - hit.row) === 1 && h.col === hit.col) || (Math.abs(h.col - hit.col) === 1 && h.row === hit.row);
+            const adjacentRows = hits.filter(callBack).map((h) => h.row).slice(0, 1);
+            rows.push(...adjacentRows);
+
+            const queue = [hit];
+            const visited = [];
+
+            if (this.#isVertical(rows[0], rows[1])) {
+                verticalTraversal(queue, visited, targets);
+            } else {
+                horizontalTraversal(queue, visited, targets);
+            }  
+
+            if (targets.length === 0) singleHit(targets, hit);
+
+            return targets[Math.floor(Math.random() * targets.length)];
+        } else if (hits.length === 1) {
+            const hit = hits[0];
+            singleHit(targets, hit);
+            return targets[Math.floor(Math.random() * targets.length)];
+        } else {
+            const smallestShip = this.#getSmallestShip(ships);
+            return slidingWindowTraversal(smallestShip);
+        }
     }
 
     #playHardTurn(board, ships, available, hits) {
-        const targets = [];
-        let target;
+        const TRAVERSE_DIRECTIONS = [-1,1];
 
-        if (hits.length > 0) {
-            const hit = hits[Math.floor(Math.random() * hits.length)];
-            if (hit.ship.hits > 1) {
-                const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
+        const verticalTraversal = function(queue, visited, targets, hit) {
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (visited.includes(current.row)) continue;
+                visited.push(current.row);
 
-                const queue = [hit];
-                const visited = [];
-                const TRAVERSE_DIRECTIONS = [-1,1];
-
-                if (this.#isVertical(rows[0], rows[1])) {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.row)) continue;
-                        visited.push(current.row);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.row + direction;
-                            if (dir < 0 || dir >= board.length) return;
-                            if (board[dir][current.col].hit === false && board[dir][current.col].ship === hit.ship) {
-                                targets.push([dir,current.col])
-                            } else if (board[dir][current.col].hit === true && board[dir][current.col].ship === hit.ship) {
-                                queue.push({ row: dir, col: current.col });
-                            };
-                        })
-                    }
-                } else {
-                    while (queue.length > 0) {
-                        const current = queue.shift();
-                        if (visited.includes(current.col)) continue;
-                        visited.push(current.col);
-
-                        TRAVERSE_DIRECTIONS.forEach(direction => {
-                            const dir = current.col + direction;
-                            if (dir < 0 || dir >= board.length) return;
-                            if (board[current.row][dir].hit === false && board[current.row][dir].ship === hit.ship) {
-                                targets.push([current.row,dir])
-                            } else if (board[current.row][dir].hit === true && board[current.row][dir].ship === hit.ship) {
-                                queue.push({ row: current.row, col: dir });
-                            };
-                        })
-                    }
-                }
-            } else {
-                const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
-                DIRECTIONS.forEach(dir => {
-                    const row = hit.row + dir[0];
-                    const col = hit.col + dir[1];
-                    if (available.some(square => square[0] === row && square[1] === col && board[row][col].ship === hit.ship)) targets.push([row,col]);
-                })   
+                TRAVERSE_DIRECTIONS.forEach(direction => {
+                    const dir = current.row + direction;
+                    if (dir < 0 || dir >= board.length) return;
+                    if (board[dir][current.col].hit === false && board[dir][current.col].ship === hit.ship) {
+                        targets.push([dir,current.col])
+                    } else if (board[dir][current.col].hit === true && board[dir][current.col].ship === hit.ship) {
+                        queue.push({ row: dir, col: current.col });
+                    };
+                })
             }
-            target = targets[Math.floor(Math.random() * targets.length)];
-        } else {
-            const smallestShip = this.#getSmallestShip(ships);
+        }
 
+        const horizontalTraversal = function(queue, visited, targets, hit) {
+            while (queue.length > 0) {
+                const current = queue.shift();
+                if (visited.includes(current.col)) continue;
+                visited.push(current.col);
+
+                TRAVERSE_DIRECTIONS.forEach(direction => {
+                    const dir = current.col + direction;
+                    if (dir < 0 || dir >= board.length) return;
+                    if (board[current.row][dir].hit === false && board[current.row][dir].ship === hit.ship) {
+                        targets.push([current.row,dir])
+                    } else if (board[current.row][dir].hit === true && board[current.row][dir].ship === hit.ship) {
+                        queue.push({ row: current.row, col: dir });
+                    };
+                })
+            }
+        }
+
+        const singleHit = function(targets, hit) {
+            const DIRECTIONS = [[-1,0],[0,1],[1,0],[0,-1]];
+            DIRECTIONS.forEach(dir => {
+                const row = hit.row + dir[0];
+                const col = hit.col + dir[1];
+                if (available.some(square => square[0] === row && square[1] === col && board[row][col].ship === hit.ship)) targets.push([row,col]);
+            })   
+        }
+
+        const longestRunTraversal = function(ship) {
             available.forEach(coordinate => {
                 const row = coordinate[0];
                 const col = coordinate[1];
@@ -312,7 +307,7 @@ export class Game {
                     else break;
                     i++;
                 }
-                if (verticalTemp.length >= smallestShip) {
+                if (verticalTemp.length >= ship) {
                     if (!verticalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
                         targets.push(verticalTemp);
                     }
@@ -327,7 +322,7 @@ export class Game {
                     else break;
                     j++;
                 }
-                if (horizontalTemp.length >= smallestShip) {
+                if (horizontalTemp.length >= ship) {
                     if (!horizontalTemp.every((cur) => targets.some(run => run.some(element => element[0] === cur[0] && element[1] === cur[1])))) {
                         targets.push(horizontalTemp);
                     }
@@ -338,12 +333,32 @@ export class Game {
                 let modifier = 0;
                 const combination = targets[Math.floor(Math.random() * targets.length)];
                 if (combination.length % 2 === 0) modifier = Math.floor(Math.random() * 2);
-                target = combination[Math.max(0, Math.floor(combination.length / 2) - modifier)];
-            } else {
-                target = available[Math.floor(Math.random() * available.length)];
+                return combination[Math.max(0, Math.floor(combination.length / 2) - modifier)];
             }
+            return available[Math.floor(Math.random() * available.length)];
         }
-        return target;
+
+        const targets = [];
+        if (hits.length === 0) {
+            const smallestShip = this.#getSmallestShip(ships);
+            return longestRunTraversal(smallestShip);
+        }
+        
+        const hit = hits[Math.floor(Math.random() * hits.length)];
+        
+        if (hit.ship.hits > 1) {
+            const rows = hits.filter((h) => h.ship === hit.ship).map((h) => h.row).slice(0, 2);
+            const queue = [hit];
+            const visited = [];
+            if (this.#isVertical(rows[0], rows[1])) {
+                verticalTraversal(queue, visited, targets, hit);
+            } else {
+                horizontalTraversal(queue, visited, targets, hit);
+            }
+        } else {
+            singleHit(targets, hit);
+        }
+        return targets[Math.floor(Math.random() * targets.length)];
     }
 
     playComputerTurn() {
