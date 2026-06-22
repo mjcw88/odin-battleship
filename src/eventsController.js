@@ -1,4 +1,23 @@
-import { updateGameBoard, renderWinner, renderShips } from "./uiController.js";
+import { renderBoardDisplay, createGameBoard } from "./displayController.js"
+import { updateShipDisplay, renderWinner, renderShips } from "./uiController.js";
+import { humanPlayer, cpuPlayer, game } from "./index.js";
+
+export const eventListeners = {
+    init() { 
+        const randomiseBtn = document.getElementById("randomise-ships-btn");
+        const startBtn = document.getElementById("start-game-btn");
+        randomiseBtn.addEventListener("click", () => {
+            game.randomiseShipPlacement();
+            renderBoardDisplay(game);
+            startBtn.disabled = false;
+        })
+
+        startBtn.addEventListener("click", () => {
+            game.randomiseShipPlacement();
+            createGameBoard(game);
+        })
+    }
+}
 
 export function addBoardClickEvent(btn, game) {
     btn.addEventListener("click", () => {
@@ -13,7 +32,7 @@ export function addBoardClickEvent(btn, game) {
 
         game.playHumanTurn(row, col);
         const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
-        updateGameBoard(cpuBoardDisplay, cpuBoard.board, row, col);
+        updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col);
         game.flipPlayerOneTurn();
 
         const humanPlayer = game.getPlayer("Human");
@@ -27,7 +46,7 @@ export function addBoardClickEvent(btn, game) {
             const humanName = humanPlayer.name;
             const humanBoard = humanPlayer.gameboard;
             const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            updateGameBoard(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
+            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
                 renderWinner(game.winner);

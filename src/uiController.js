@@ -1,4 +1,4 @@
-export function updateGameBoard(squares, board, row, col) {
+export function updateShipDisplay(squares, board, row, col) {
     const traverseBoard = function() {
         const TRAVERSE_DIRECTIONS = [-1,1];
         const visited = [];

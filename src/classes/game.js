@@ -73,16 +73,10 @@ export class Game {
         return coordinates;
     }
 
-    createNewGame() {
+    randomiseShipPlacement() {
         const ships = [5, 4, 3, 3, 2];
-
-        const playerOne = new Player("Human", true);
-        const playerTwo = new Player();
-
-        this.players.push(playerOne);
-        this.players.push(playerTwo);
-
-        this.players.forEach((player) => {
+        this.players.forEach(player => {
+            player.gameboard = new Gameboard();
             this.#shuffleArray(ships);
             ships.forEach((ship) => {
                 const coordinates = this.#getRandomCoordinates(ship, player.gameboard.board);
@@ -90,7 +84,7 @@ export class Game {
                 const end = coordinates[1];
                 player.gameboard.placeShip(start, end, ship);
             });
-        });
+        })
     }
 
     playHumanTurn(row, col) {
