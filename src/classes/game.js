@@ -23,84 +23,6 @@ export class Game {
         return startRow !== endRow;
     }
 
-    #shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-
-    #getRandomCoordinates(size, board) {
-        const coordinates = [];
-        const available = [];
-
-        board.forEach((row, rowIndex) => {
-            row.forEach((col, colIndex) => {
-                if (rowIndex + size <= board.length) { 
-                    const temp = [];
-                    for (let i = 0; i < size; i++) {
-                        const square = board[rowIndex + i][colIndex];
-                        temp.push(square);
-                    }
-                    if (temp.every((cur) => cur.ship === null)) {
-                        available.push({ coordinates: [rowIndex,colIndex], vertical: true })
-                    };
-                }
-
-                if (colIndex + size <= board.length) { 
-                    const temp = [];
-                    for (let i = 0; i < size; i++) {
-                        const cell = board[rowIndex][colIndex + i];
-                        temp.push(cell);
-                    }
-                    if (temp.every((cur) => cur.ship === null)) {
-                        available.push({ coordinates: [rowIndex,colIndex], vertical: false })
-                    };
-                }
-            })
-        })
-        const start = available[Math.floor(Math.random() * available.length)];
-        const end = Array.from(start.coordinates);
-
-        if (start.vertical) {
-            end[0] += (size - 1);
-        } else {
-            end[1] += (size - 1);
-        }
-
-        coordinates.push(start.coordinates,end);
-        return coordinates;
-    }
-
-    randomiseShipPlacement() {
-        const ships = [5, 4, 3, 3, 2];
-        this.players.forEach(player => {
-            player.gameboard = new Gameboard();
-            this.#shuffleArray(ships);
-            ships.forEach((ship) => {
-                const coordinates = this.#getRandomCoordinates(ship, player.gameboard.board);
-                const start = coordinates[0];
-                const end = coordinates[1];
-                player.gameboard.placeShip(start, end, ship);
-            });
-        })
-    }
-
-    playHumanTurn(row, col) {
-        this.#isValidNumber(row);
-        this.#isValidNumber(col);
-
-        if (this.winner || !this.playerOneTurn) return;
-
-        const cpu = this.getPlayer("CPU");
-        const cpuBoard = cpu.gameboard;
-
-        if (cpuBoard.board[row][col].hit) return;
-
-        cpuBoard.recieveAttack(row, col);
-    }
-
     #getSmallestShip(ships) {
         const unsunkShips = ships.filter(ship => !ship.isSunk());
         return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
@@ -353,6 +275,83 @@ export class Game {
             singleHit(targets, hit);
         }
         return targets[Math.floor(Math.random() * targets.length)];
+    }
+
+    randomiseShipPlacement(player) {
+        const getRandomCoordinates = function(size, board) {
+            const coordinates = [];
+            const available = [];
+
+            board.forEach((row, rowIndex) => {
+                row.forEach((col, colIndex) => {
+                    if (rowIndex + size <= board.length) { 
+                        const temp = [];
+                        for (let i = 0; i < size; i++) {
+                            const square = board[rowIndex + i][colIndex];
+                            temp.push(square);
+                        }
+                        if (temp.every((cur) => cur.ship === null)) {
+                            available.push({ coordinates: [rowIndex,colIndex], vertical: true })
+                        };
+                    }
+
+                    if (colIndex + size <= board.length) { 
+                        const temp = [];
+                        for (let i = 0; i < size; i++) {
+                            const cell = board[rowIndex][colIndex + i];
+                            temp.push(cell);
+                        }
+                        if (temp.every((cur) => cur.ship === null)) {
+                            available.push({ coordinates: [rowIndex,colIndex], vertical: false })
+                        };
+                    }
+                })
+            })
+            const start = available[Math.floor(Math.random() * available.length)];
+            const end = Array.from(start.coordinates);
+
+            if (start.vertical) {
+                end[0] += (size - 1);
+            } else {
+                end[1] += (size - 1);
+            }
+
+            coordinates.push(start.coordinates,end);
+            return coordinates;
+        }
+
+        const shuffleArray = function(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        player.gameboard = new Gameboard();
+        const SHIPS = [5, 4, 3, 3, 2];
+        shuffleArray(SHIPS);
+        
+        SHIPS.forEach((ship) => {
+            const coordinates = getRandomCoordinates(ship, player.gameboard.board);
+            const start = coordinates[0];
+            const end = coordinates[1];
+            player.gameboard.placeShip(start, end, ship);
+        });
+    }
+
+    playHumanTurn(row, col) {
+        this.#isValidNumber(row);
+        this.#isValidNumber(col);
+
+        if (this.winner || !this.playerOneTurn) return;
+
+        const cpu = this.getPlayer("CPU");
+        const cpuBoard = cpu.gameboard;
+
+        if (cpuBoard.board[row][col].hit) return;
+
+        cpuBoard.recieveAttack(row, col);
     }
 
     playComputerTurn() {

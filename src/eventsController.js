@@ -1,20 +1,16 @@
-import { renderBoardDisplay, createGameBoard } from "./displayController.js"
+import { renderGameBoard } from "./displayController.js"
 import { updateShipDisplay, renderWinner, renderShips } from "./uiController.js";
 import { humanPlayer, cpuPlayer, game } from "./index.js";
 
 export const eventListeners = {
-    init() { 
+    init(game, humanPlayer, cpuPlayer) { 
         const randomiseBtn = document.getElementById("randomise-ships-btn");
-        const startBtn = document.getElementById("start-game-btn");
         randomiseBtn.addEventListener("click", () => {
-            game.randomiseShipPlacement();
-            renderBoardDisplay(game);
-            startBtn.disabled = false;
-        })
-
-        startBtn.addEventListener("click", () => {
-            game.randomiseShipPlacement();
-            createGameBoard(game);
+            game.randomiseShipPlacement(humanPlayer);
+            game.randomiseShipPlacement(cpuPlayer);
+            renderGameBoard(game);
+            game.playerOneTurn = true;
+            game.winner = null;
         })
     }
 }
