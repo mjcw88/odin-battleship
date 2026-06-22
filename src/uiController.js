@@ -12,8 +12,8 @@ export function updateGameBoard(squares, board, row, col) {
 
             TRAVERSE_DIRECTIONS.forEach(direction => {
                 const dir = current.row + direction;
-                if (dir < 0 || dir >= board.board.length) return;
-                if (board.board[dir][current.col].ship === coordinate.ship) {
+                if (dir < 0 || dir >= board.length) return;
+                if (board[dir][current.col].ship === coordinate.ship) {
                     const cell = Array.from(squares).find(square => 
                         square.dataset.rowIndex == dir && square.dataset.colIndex == current.col
                     );
@@ -25,8 +25,8 @@ export function updateGameBoard(squares, board, row, col) {
 
             TRAVERSE_DIRECTIONS.forEach(direction => {
                 const dir = current.col + direction;
-                if (dir < 0 || dir >= board.board.length) return;
-                if (board.board[current.row][dir].ship === coordinate.ship) {
+                if (dir < 0 || dir >= board.length) return;
+                if (board[current.row][dir].ship === coordinate.ship) {
                     const cell = Array.from(squares).find(square => 
                         square.dataset.rowIndex == current.row && square.dataset.colIndex == dir
                     );
@@ -42,7 +42,7 @@ export function updateGameBoard(squares, board, row, col) {
         square.dataset.rowIndex == row && square.dataset.colIndex == col
     );
 
-    const coordinate = board.board[row][col];
+    const coordinate = board[row][col];
     if (coordinate.ship) {
         if (coordinate.ship.isSunk()) {
             traverseBoard();
@@ -57,4 +57,15 @@ export function updateGameBoard(squares, board, row, col) {
 export function renderWinner(player) {
     const name = player.name;
     console.log(`A winner is you, ${name}!`);
+}
+
+export function renderShips(board, squares) {
+    board.forEach((row, rowIndex) => {
+        row.forEach((col, colIndex) => {
+            const cell = Array.from(squares).find(square => 
+                square.dataset.rowIndex == rowIndex && square.dataset.colIndex == colIndex
+            );
+            if (col.ship !== null && !col.ship.isSunk()) cell.classList.add("square-with-ship");  
+        })
+    })
 }

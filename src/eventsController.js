@@ -1,4 +1,4 @@
-import { updateGameBoard, renderWinner } from "./uiController.js";
+import { updateGameBoard, renderWinner, renderShips } from "./uiController.js";
 
 export function addBoardClickEvent(btn, game) {
     btn.addEventListener("click", () => {
@@ -13,7 +13,7 @@ export function addBoardClickEvent(btn, game) {
 
         game.playHumanTurn(row, col);
         const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
-        updateGameBoard(cpuBoardDisplay, cpuBoard, row, col);
+        updateGameBoard(cpuBoardDisplay, cpuBoard.board, row, col);
         game.flipPlayerOneTurn();
 
         const humanPlayer = game.getPlayer("Human");
@@ -27,12 +27,12 @@ export function addBoardClickEvent(btn, game) {
             const humanName = humanPlayer.name;
             const humanBoard = humanPlayer.gameboard;
             const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            updateGameBoard(humanBoardDisplay, humanBoard, cpuRow, cpuCol);
+            updateGameBoard(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
                 renderWinner(game.winner);
+                renderShips(game.winner.gameboard.board, cpuBoardDisplay);
             }
-
             game.flipPlayerOneTurn();
         }
     });
