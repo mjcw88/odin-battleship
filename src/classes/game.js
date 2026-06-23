@@ -6,6 +6,7 @@ export class Game {
         if (rest.length > 0) throw new RangeError("Too many arguments given");
 
         this.players = [];
+        this.ships = [5, 4, 3, 3, 2];
         this.playerOneTurn = true;
         this.difficulty = difficulty;
         this.winner = null;
@@ -13,7 +14,7 @@ export class Game {
 
     #isValidNumber(num) {
         if (!Number.isInteger(num)) throw new TypeError("Number must be an integer");
-;
+        
         const player = this.getPlayer("CPU");
         const board = player.gameboard.board;
         if (num < 0 || num >= board.length) throw new RangeError("Integer out of bounds");
@@ -277,6 +278,11 @@ export class Game {
         return targets[Math.floor(Math.random() * targets.length)];
     }
 
+    addPlayer(name = "CPU", human = false) {
+        const player = new Player(name, human);
+        this.players.push(player);
+    }
+
     randomiseShipPlacement(player) {
         const getRandomCoordinates = function(size, board) {
             const coordinates = [];
@@ -329,10 +335,10 @@ export class Game {
         }
 
         player.gameboard = new Gameboard();
-        const SHIPS = [5, 4, 3, 3, 2];
-        shuffleArray(SHIPS);
+        const ships = Array.from(this.ships);
+        shuffleArray(ships);
         
-        SHIPS.forEach((ship) => {
+        ships.forEach((ship) => {
             const coordinates = getRandomCoordinates(ship, player.gameboard.board);
             const start = coordinates[0];
             const end = coordinates[1];
@@ -354,8 +360,7 @@ export class Game {
         cpuBoard.recieveAttack(row, col);
     }
 
-    playComputerTurn() {
-        const humanPlayer = this.getPlayer("Human");
+    playComputerTurn(humanPlayer) {
         const { available, hits } = humanPlayer.gameboard.board.reduce(
              (acc, cur, row) => {
                 cur.forEach((square, col) => {

@@ -14,6 +14,14 @@ body {
     gap: 1rem;
 }
 
+#new-game-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: fit-content;
+}
+
 #main-contents {
     display: flex;
     width: 100%;
