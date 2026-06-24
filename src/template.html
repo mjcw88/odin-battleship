@@ -38,7 +38,7 @@
                     <label for="diffuclty-hard">Hard</label>
                 </div>
                 <div class="form-row form-btns">
-                    <button type="submit" id="start-game-btn">Start Game</button>
+                    <button type="submit">Start Game</button>
                 </div>
             </form>
         </dialog>
@@ -47,7 +47,10 @@
     <div id="main-contents-container">
         <div id="main-contents"></div>
         <div id="buttons-container">
-            <!-- <button id="randomise-ships-btn">Randomise</button> -->
+            <button id="randomise-ships-btn" hidden="true">Randomise</button>
+            <button id="start-game-btn" hidden="true" disabled="true">Start Game</button>
+            <button id="restart-game-btn" hidden="true">Restart Game</button>
+            <button id="new-game-btn" hidden="true">New Game</button>
         </div>
     </div>
 </body>
