@@ -1,4 +1,5 @@
 import { Game } from "./classes/game.js";
+import { Gameboard } from "./classes/gameboard.js";
 import { renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
 export function createGame(playerOneName, difficulty) {
@@ -22,7 +23,7 @@ export function createGame(playerOneName, difficulty) {
 export function randomiseClickEvent(game, player, startGameBtn) {
     game.randomiseShipPlacement(player);
     renderGameBoard(game);
-    if (isShipsOnBoard(player.gameboard, game)) {
+    if (isAllShipsOnBoard(player.gameboard, game)) {
         startGameBtn.disabled = false;
         startGameBtn.addEventListener("click", () => {
             startGameClickEvent(game);
@@ -30,24 +31,33 @@ export function randomiseClickEvent(game, player, startGameBtn) {
     };
 }
 
-export function isShipsOnBoard(gameboard, game) {
+export function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
 }
 
 export function startGameClickEvent(game) {
     if (game.players.length >= 2) return;
 
-    const randomiseBtn = document.getElementById("randomise-ships-btn");
-    randomiseBtn.hidden = true;
+    const hiddenBtns = [];
+    const unhiddenBtns = [];
 
+    const randomiseBtn = document.getElementById("randomise-ships-btn");
     const startGameBtn = document.getElementById("start-game-btn");
-    startGameBtn.hidden = true;
+    hiddenBtns.push(randomiseBtn);
+    hiddenBtns.push(startGameBtn);
+
+    hiddenBtns.forEach(btn => {
+        btn.hidden = true;
+    })
 
     const restartBtn = document.getElementById("restart-game-btn");
-    restartBtn.hidden = false;
-
     const newGameBtn = document.getElementById("new-game-btn");
-    newGameBtn.hidden = false;
+    unhiddenBtns.push(restartBtn);
+    unhiddenBtns.push(newGameBtn);
+
+    unhiddenBtns.forEach(btn => {
+        btn.hidden = false;
+    })
 
     game.addPlayer();
     const cpuPlayer = game.getPlayer("CPU");
@@ -57,6 +67,10 @@ export function startGameClickEvent(game) {
         square.addEventListener("click", () => {
             playTurnClickEvent(square, game);
         })
+    })
+
+    restartBtn.addEventListener("click", () => {
+        restartGame(game, hiddenBtns, unhiddenBtns);
     })
 }
 
@@ -94,4 +108,20 @@ export function playTurnClickEvent(btn, game) {
         }
         game.flipPlayerOneTurn();
     }
+}
+
+export function restartGame(game, hiddenBtns, unhiddenBtns) {
+    game.players.splice(1);
+    game.playerOneTurn = true;
+    game.winner = null;
+    const player = game.players[0];
+    player.gameboard = new Gameboard();
+    hiddenBtns.forEach(btn => {
+        if (btn.id === "start-game-btn") btn.disabled = true;
+        btn.hidden = false;
+    })
+    unhiddenBtns.forEach(btn => {
+        btn.hidden = true;
+    })
+    renderGameBoard(game);
 }
