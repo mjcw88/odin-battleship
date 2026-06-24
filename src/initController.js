@@ -3,7 +3,7 @@ import { submitForm, closeForm } from "./formController.js";
 export const renderNewGameForm = {
     init() {
         const newGameForm = document.getElementById("new-game-form");
-        const closeBtn = document.getElementById("close-btn");
+        const closeBtn = document.getElementById("close-new-game-btn");
 
         closeBtn.hidden = true;
         newGameForm.showModal();
@@ -19,5 +19,10 @@ export const eventListeners = {
             submitForm(newGameForm);
             closeForm(newGameFormDialog, newGameForm);
         });
+
+        const closeBtn = document.getElementById("close-new-game-btn");
+        closeBtn.addEventListener("click", () => {
+            closeForm(newGameFormDialog, newGameForm);
+        })
     }
 }

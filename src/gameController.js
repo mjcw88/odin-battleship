@@ -3,20 +3,28 @@ import { Gameboard } from "./classes/gameboard.js";
 import { renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
 export function createGame(playerOneName, difficulty) {
+    const hiddenBtns = [];
+    const unhiddenBtns = [];
+
     const game = new Game(difficulty);
     game.addPlayer(playerOneName, true);
     const player = game.getPlayer(playerOneName);
 
     const randomiseBtn = document.getElementById("randomise-ships-btn");
-    randomiseBtn.hidden = false;
-
     const startGameBtn = document.getElementById("start-game-btn");
-    startGameBtn.hidden = false;
+    hiddenBtns.push(randomiseBtn);
+    hiddenBtns.push(startGameBtn);
+
+    const restartBtn = document.getElementById("restart-game-btn");
+    const newGameBtn = document.getElementById("new-game-btn");
+    unhiddenBtns.push(restartBtn);
+    unhiddenBtns.push(newGameBtn);
 
     randomiseBtn.addEventListener("click", () => {
         randomiseClickEvent(game, player, startGameBtn);
     })
 
+    restartGame(game, hiddenBtns, unhiddenBtns);
     renderGameBoard(game);
 }
 
@@ -72,6 +80,10 @@ export function startGameClickEvent(game) {
     restartBtn.addEventListener("click", () => {
         restartGame(game, hiddenBtns, unhiddenBtns);
     })
+
+    newGameBtn.addEventListener("click", () => {
+        showNewGameForm();
+    })
 }
 
 export function playTurnClickEvent(btn, game) {
@@ -124,4 +136,12 @@ export function restartGame(game, hiddenBtns, unhiddenBtns) {
         btn.hidden = true;
     })
     renderGameBoard(game);
+}
+
+export function showNewGameForm() {
+    const newGameForm = document.getElementById("new-game-form");
+    const closeBtn = document.getElementById("close-new-game-btn");
+
+    closeBtn.hidden = false;
+    newGameForm.showModal();
 }
