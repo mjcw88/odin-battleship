@@ -24,7 +24,7 @@ export class Game {
         return startRow !== endRow;
     }
 
-    #getSmallestShip(ships) {
+    #getSmallestShipSize(ships) {
         const unsunkShips = ships.filter(ship => !ship.isSunk());
         return unsunkShips.reduce((acc, cur) => acc.size < cur.size ? acc : cur).size;
     }
@@ -157,7 +157,7 @@ export class Game {
             singleHit(targets, hit);
             return targets[Math.floor(Math.random() * targets.length)];
         } else {
-            const smallestShip = this.#getSmallestShip(ships);
+            const smallestShip = this.#getSmallestShipSize(ships);
             return slidingWindowTraversal(smallestShip);
         }
     }
@@ -257,7 +257,7 @@ export class Game {
 
         const targets = [];
         if (hits.length === 0) {
-            const smallestShip = this.#getSmallestShip(ships);
+            const smallestShip = this.#getSmallestShipSize(ships);
             return longestRunTraversal(smallestShip);
         }
         
