@@ -1,3 +1,20 @@
+export function renderShipDock(ships) {
+    const dock = document.getElementById("ship-dock-container");
+    dock.innerHTML = "";
+
+    ships.forEach(ship => {
+        const shipContainer = document.createElement("div");
+        shipContainer.classList.add("ship-container");
+        shipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
+        for (let i = 0; i < ship; i++) {
+            const square = document.createElement("div");
+            square.classList.add("square-with-ship");
+            shipContainer.append(square);
+        }
+        dock.append(shipContainer);
+    })
+}
+
 export function renderGameBoard(game) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
@@ -6,15 +23,15 @@ export function renderGameBoard(game) {
 
     game.players.forEach((player, index) => {
         const playerContainer = document.createElement("div");
-        playerContainer.className = "player-container";
+        playerContainer.classList.add("player-container");
 
         const playerHeader = document.createElement("div");
-        playerHeader.className = "player-name";
+        playerHeader.classList.add("player-name");
         playerHeader.id = `player-${index + 1}-name`;
         playerHeader.textContent = player.name;
 
         const board = document.createElement("div");
-        board.className = "player-board";
+        board.classList.add("player-board");
 
         const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
         LETTERS.forEach(letter => {

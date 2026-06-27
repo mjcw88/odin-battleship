@@ -1,8 +1,11 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
+import { renderShipDock, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
 export function createGame(playerOneName, difficulty) {
+    document.getElementById("main-contents-container").hidden = false;;
+    document.getElementById("ship-dock-container").hidden = false;
+
     const hiddenBtns = [];
     const unhiddenBtns = [];
 
@@ -21,10 +24,12 @@ export function createGame(playerOneName, difficulty) {
     unhiddenBtns.push(newGameBtn);
 
     randomiseBtn.addEventListener("click", () => {
+        document.getElementById("ship-dock-container").hidden = true;
         randomiseClickEvent(game, player, startGameBtn);
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
+    renderShipDock(game.ships);
     renderGameBoard(game);
 }
 
@@ -78,6 +83,7 @@ export function startGameClickEvent(game) {
     })
 
     restartBtn.addEventListener("click", () => {
+        document.getElementById("ship-dock-container").hidden = false;
         restartGame(game, hiddenBtns, unhiddenBtns);
     })
 

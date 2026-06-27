@@ -44,14 +44,17 @@
         </dialog>
     </div>
     <h1>Battleship</h1>
-    <div id="main-contents-container">
+    <div id="main-contents-container" hidden="true">
         <div id="buttons-container">
             <button id="randomise-ships-btn" hidden="true">Randomise</button>
             <button id="start-game-btn" hidden="true" disabled="true">Start Game</button>
             <button id="restart-game-btn" hidden="true">Restart Game</button>
             <button id="new-game-btn" hidden="true">New Game</button>
         </div>
-        <div id="main-contents"></div>
+        <div id="ship-dock-main-container">
+            <div id="ship-dock-container"></div>
+            <div id="main-contents"></div>
+        </div>
     </div>
 </body>
 </html>

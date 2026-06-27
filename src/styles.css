@@ -1,3 +1,7 @@
+:root {
+    --gridSize: 50px
+}
+
 *,
 *::before,
 *::after {
@@ -30,16 +34,33 @@ body {
     gap: 1rem;
 }
 
+#ship-dock-main-container {
+    display: flex;
+}
+
+#ship-dock-container {
+    align-self: center;
+}
+
+.ship-container {
+    display: grid;
+    grid-auto-rows: minmax(var(--gridSize), 1fr);
+    padding: 1rem;
+    justify-content: end;
+}
+
+.ship-container > div {
+    cursor: pointer;
+}
+
 .player-container {
     text-align: center;
 }
 
 .player-board {
-    --size: 50px;
-
     display: grid;
-    grid-template-columns: repeat(11, minmax(var(--size), 1fr));
-    grid-auto-rows: minmax(var(--size), 1fr);
+    grid-template-columns: repeat(11, minmax(var(--gridSize), 1fr));
+    grid-auto-rows: minmax(var(--gridSize), 1fr);
 }
 
 .player-board > div {
