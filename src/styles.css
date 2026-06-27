@@ -42,14 +42,17 @@ body {
     align-self: center;
 }
 
-.ship-container {
+.outer-ship-container {
+    padding: 1rem;
+}
+
+.inner-ship-container {
     display: grid;
     grid-auto-rows: minmax(var(--gridSize), 1fr);
-    padding: 1rem;
     justify-content: end;
 }
 
-.ship-container > div {
+.inner-ship-container > div {
     cursor: pointer;
 }
 

@@ -1,24 +1,36 @@
-export function renderShipDock(ships) {
+export function renderShipDock(ships, playerName) {
+    playerName = playerName.replace(/ /g, "-").toLowerCase();
+
     const dock = document.getElementById("ship-dock-container");
     dock.innerHTML = "";
 
+    let count = 1;
     ships.forEach(ship => {
-        const shipContainer = document.createElement("div");
-        shipContainer.classList.add("ship-container");
-        shipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
+        const outerShipContainer = document.createElement("div");
+        outerShipContainer.classList.add("outer-ship-container");
+
+        const innerShipContainer = document.createElement("div");
+        innerShipContainer.classList.add("inner-ship-container");
+
+        innerShipContainer.id = `${playerName}-ship-${count}`;
+        innerShipContainer.draggable = true;
+        innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
         for (let i = 0; i < ship; i++) {
             const square = document.createElement("div");
             square.classList.add("square-with-ship");
-            shipContainer.append(square);
+            innerShipContainer.append(square);
         }
-        dock.append(shipContainer);
+        outerShipContainer.append(innerShipContainer);
+        dock.append(outerShipContainer);
+        count++;
     })
 }
 
 export function renderGameBoard(game) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
-    
+
+    const humanSquares = [];
     const cpuSquares = [];
 
     game.players.forEach((player, index) => {
@@ -50,13 +62,13 @@ export function renderGameBoard(game) {
                 square.dataset.rowIndex = rowIndex;
                 square.dataset.colIndex = colIndex;
                 if (player.human && cell.ship) square.classList.add("square-with-ship");
-                // if (cell.ship) square.classList.add("square-with-ship");
                 board.append(square);
-                if (!player.human) {
+                if (player.human) {
+                    square.classList.add("human-board-square");
+                    humanSquares.push(square);
+                } else {
                     square.classList.add("cpu-board-square");
                     cpuSquares.push(square);                    
-                } else {
-                    square.classList.add("human-board-square");
                 }
             })
         })
@@ -64,7 +76,7 @@ export function renderGameBoard(game) {
         contents.append(playerContainer);
         playerContainer.append(playerHeader, board);
     })
-    return cpuSquares;
+    return { humanSquares, cpuSquares };
 }
 
 export function updateShipDisplay(squares, board, row, col) {

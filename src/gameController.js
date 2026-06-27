@@ -2,6 +2,10 @@ import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { renderShipDock, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
+function isAllShipsOnBoard(gameboard, game) {
+    return gameboard.ships.length === game.ships.length;
+}
+
 export function createGame(playerOneName, difficulty) {
     document.getElementById("main-contents-container").hidden = false;;
     document.getElementById("ship-dock-container").hidden = false;
@@ -29,11 +33,38 @@ export function createGame(playerOneName, difficulty) {
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
-    renderShipDock(game.ships);
-    renderGameBoard(game);
+    createShipDock(game, playerOneName);
+    const squares = renderGameBoard(game);
+    const humanSquares = squares.humanSquares;
+    humanSquares.forEach(square => {
+        square.addEventListener("dragover", dragOver)
+        square.addEventListener("drop", dragDrop)
+    })
 }
 
-export function randomiseClickEvent(game, player, startGameBtn) {
+function createShipDock(game, playerName) {
+    renderShipDock(game.ships, playerName);
+    const ships = document.querySelectorAll(".inner-ship-container");
+    ships.forEach(ship => {
+        ship.addEventListener("dragstart", dragStart)
+    })
+}
+
+let beingDragged;
+
+function dragStart(e) {
+    beingDragged = e.target;
+}
+
+function dragOver(e) {
+    e.preventDefault();
+}
+
+function dragDrop(e) {
+    e.target.append(beingDragged);
+}
+
+function randomiseClickEvent(game, player, startGameBtn) {
     game.randomiseShipPlacement(player);
     renderGameBoard(game);
     if (isAllShipsOnBoard(player.gameboard, game)) {
@@ -44,11 +75,7 @@ export function randomiseClickEvent(game, player, startGameBtn) {
     };
 }
 
-export function isAllShipsOnBoard(gameboard, game) {
-    return gameboard.ships.length === game.ships.length;
-}
-
-export function startGameClickEvent(game) {
+function startGameClickEvent(game) {
     if (game.players.length >= 2) return;
 
     const hiddenBtns = [];
@@ -75,7 +102,8 @@ export function startGameClickEvent(game) {
     game.addPlayer();
     const cpuPlayer = game.getPlayer("CPU");
     game.randomiseShipPlacement(cpuPlayer);
-    const cpuSquares = renderGameBoard(game);
+    const squares = renderGameBoard(game);
+    const cpuSquares = squares.cpuSquares;
     cpuSquares.forEach(square => {
         square.addEventListener("click", () => {
             playTurnClickEvent(square, game);
@@ -92,7 +120,7 @@ export function startGameClickEvent(game) {
     })
 }
 
-export function playTurnClickEvent(btn, game) {
+function playTurnClickEvent(btn, game) {
     if (game.winner || !game.playerOneTurn) return;
 
     const row = parseInt(btn.dataset.rowIndex);
@@ -131,7 +159,7 @@ export function playTurnClickEvent(btn, game) {
     }
 }
 
-export function restartGame(game, hiddenBtns, unhiddenBtns) {
+function restartGame(game, hiddenBtns, unhiddenBtns) {
     game.players.splice(1);
     game.playerOneTurn = true;
     game.winner = null;
@@ -147,7 +175,7 @@ export function restartGame(game, hiddenBtns, unhiddenBtns) {
     renderGameBoard(game);
 }
 
-export function showNewGameForm() {
+function showNewGameForm() {
     const newGameForm = document.getElementById("new-game-form");
     const closeBtn = document.getElementById("close-new-game-btn");
 
