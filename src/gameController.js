@@ -107,21 +107,18 @@ export function playTurnClickEvent(btn, game) {
         game.declareWinner(humanPlayer);
         renderWinner(game.winner);
     } else {
-        const WAIT = 500;
-        setTimeout(() => {
-            const square = game.playComputerTurn(humanPlayer);
-            const cpuRow = square[0];
-            const cpuCol = square[1];
-            const humanBoard = humanPlayer.gameboard;
-            const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
-            if (humanBoard.isAllSunk()) {
-                game.declareWinner(cpuPlayer);
-                renderWinner(game.winner);
-                renderShips(game.winner.gameboard.board, cpuBoardDisplay);
-            }
-            game.flipPlayerOneTurn();
-        }, WAIT);
+        const square = game.playComputerTurn(humanPlayer);
+        const cpuRow = square[0];
+        const cpuCol = square[1];
+        const humanBoard = humanPlayer.gameboard;
+        const humanBoardDisplay = document.querySelectorAll(".human-board-square");
+        updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
+        if (humanBoard.isAllSunk()) {
+            game.declareWinner(cpuPlayer);
+            renderWinner(game.winner);
+            renderShips(game.winner.gameboard.board, cpuBoardDisplay);
+        }
+        game.flipPlayerOneTurn();
     }
 }
 
