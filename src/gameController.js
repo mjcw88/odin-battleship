@@ -37,8 +37,12 @@ export function createGame(playerOneName, difficulty) {
     const squares = renderGameBoard(game);
     const humanSquares = squares.humanSquares;
     humanSquares.forEach(square => {
+        square.addEventListener("dragenter", dragEnter)
+        square.addEventListener("dragleave", dragLeave)
         square.addEventListener("dragover", dragOver)
-        square.addEventListener("drop", dragDrop)
+        square.addEventListener("drop", (e) => {
+            dragDrop(e, player, game)
+        })
     })
 }
 
@@ -56,12 +60,33 @@ function dragStart(e) {
     beingDragged = e.target;
 }
 
+function dragEnter(e) {
+    e.target.classList.add("highlight");
+}
+
+function dragLeave(e) {
+    e.target.classList.remove("highlight");
+}
+
 function dragOver(e) {
     e.preventDefault();
 }
 
-function dragDrop(e) {
-    e.target.append(beingDragged);
+function dragDrop(e, player, game) {
+    const row = parseInt(e.target.dataset.rowIndex);
+    const col = parseInt(e.target.dataset.colIndex);
+    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+    const shipSize = beingDragged.children.length;
+
+    const start = [row,col];
+    let end;
+    if (isVertical) end = [row + shipSize - 1, col];
+    else end = [row,col + shipSize - 1];
+    player.gameboard.placeShip(start, end, shipSize);
+    renderGameBoard(game); // This needs removing and just append to board instead
+
+    e.target.classList.remove("highlight");
+    // e.target.append(beingDragged);
 }
 
 function randomiseClickEvent(game, player, startGameBtn) {

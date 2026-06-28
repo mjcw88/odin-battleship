@@ -43,13 +43,15 @@ body {
 }
 
 .outer-ship-container {
+    display: flex;
+    justify-content: end;
     padding: 1rem;
 }
 
 .inner-ship-container {
     display: grid;
     grid-auto-rows: minmax(var(--gridSize), 1fr);
-    justify-content: end;
+    width: fit-content;
 }
 
 .inner-ship-container > div {
@@ -95,4 +97,8 @@ body {
 
 .board-sunk {
     background-color: darkblue;
+}
+
+.highlight {
+    background-color: red;
 }

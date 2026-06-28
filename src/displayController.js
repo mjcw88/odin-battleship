@@ -13,6 +13,7 @@ export function renderShipDock(ships, playerName) {
         innerShipContainer.classList.add("inner-ship-container");
 
         innerShipContainer.id = `${playerName}-ship-${count}`;
+        innerShipContainer.dataset.isVertical = "0";
         innerShipContainer.draggable = true;
         innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
         for (let i = 0; i < ship; i++) {
