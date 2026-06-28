@@ -99,6 +99,10 @@ body {
     background-color: darkblue;
 }
 
-.highlight {
+.valid-placement {
+    background-color: green;
+}
+
+.invalid-placement {
     background-color: red;
 }

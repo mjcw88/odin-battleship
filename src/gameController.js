@@ -37,7 +37,9 @@ export function createGame(playerOneName, difficulty) {
     const squares = renderGameBoard(game);
     const humanSquares = squares.humanSquares;
     humanSquares.forEach(square => {
-        square.addEventListener("dragenter", dragEnter)
+        square.addEventListener("dragenter", (e) => {
+            dragEnter(e, humanSquares, player.gameboard.board.length);
+        })
         square.addEventListener("dragleave", dragLeave)
         square.addEventListener("dragover", dragOver)
         square.addEventListener("drop", (e) => {
@@ -60,12 +62,38 @@ function dragStart(e) {
     beingDragged = e.target;
 }
 
-function dragEnter(e) {
-    e.target.classList.add("highlight");
+function dragEnter(e, humanSquares, boardSize) {
+    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+    const shipSize = beingDragged.children.length;
+
+    const row = parseInt(e.target.dataset.rowIndex);
+    const col = parseInt(e.target.dataset.colIndex);
+
+    const coordinates = [];
+    for(let i = 0; i < shipSize; i++) {
+        if (isVertical) coordinates.push([row + i, col]);
+        else coordinates.push([row,col + i]);
+    }
+
+    let isValid = true;
+    coordinates.forEach(coordinate => {
+        if (coordinate[0] >= boardSize || coordinate[1] >= boardSize) isValid = false;
+    })
+
+    humanSquares.forEach(square => {
+        square.classList.remove("valid-placement");
+        square.classList.remove("invalid-placement");
+        const squareRow = parseInt(square.dataset.rowIndex);
+        const squareCol = parseInt(square.dataset.colIndex);
+        if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
+            if (isValid) square.classList.add("valid-placement")
+            else square.classList.add("invalid-placement")
+        };
+    })
 }
 
 function dragLeave(e) {
-    e.target.classList.remove("highlight");
+
 }
 
 function dragOver(e) {
@@ -82,10 +110,10 @@ function dragDrop(e, player, game) {
     let end;
     if (isVertical) end = [row + shipSize - 1, col];
     else end = [row,col + shipSize - 1];
-    player.gameboard.placeShip(start, end, shipSize);
-    renderGameBoard(game); // This needs removing and just append to board instead
+    // player.gameboard.placeShip(start, end, shipSize);
+    // renderGameBoard(game); This needs removing and just append to board instead
 
-    e.target.classList.remove("highlight");
+    // e.target.classList.remove("valid-placement");
     // e.target.append(beingDragged);
 }
 
