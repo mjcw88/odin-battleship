@@ -27,6 +27,68 @@ export function renderShipDock(ships, playerName) {
     })
 }
 
+export function renderValidPlacement(beingDragged, e, humanSquares, boardSize) {
+    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+    const shipSize = beingDragged.children.length;
+
+    const row = parseInt(e.target.dataset.rowIndex);
+    const col = parseInt(e.target.dataset.colIndex);
+
+    const coordinates = [];
+    for(let i = 0; i < shipSize; i++) {
+        if (isVertical) coordinates.push([row + i, col]);
+        else coordinates.push([row,col + i]);
+    }
+
+    let isValid = true;
+    coordinates.forEach(coordinate => {
+        if (coordinate[0] >= boardSize || coordinate[1] >= boardSize) isValid = false;
+        const square = humanSquares.find(square => parseInt(square.dataset.rowIndex) === coordinate[0] && parseInt(square.dataset.colIndex) === coordinate[1]);
+        if (square && square.classList.contains("square-with-ship")) isValid = false;
+    })
+
+    humanSquares.forEach(square => {
+        square.classList.remove("valid-placement");
+        square.classList.remove("invalid-placement");
+        const squareRow = parseInt(square.dataset.rowIndex);
+        const squareCol = parseInt(square.dataset.colIndex);
+        if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
+            if (isValid) square.classList.add("valid-placement")
+            else square.classList.add("invalid-placement")
+        };
+    })
+}
+
+export function clearValidPlacement(humanSquares) {
+    humanSquares.forEach(square => {
+        square.classList.remove("valid-placement");
+        square.classList.remove("invalid-placement");
+    })
+}
+
+export function renderShipPlacement(startingSquare, isVertical, shipSize, humanSquares) {
+    const row = parseInt(startingSquare.dataset.rowIndex);
+    const col = parseInt(startingSquare.dataset.colIndex);
+
+    const coordinates = [];
+    for(let i = 0; i < shipSize; i++) {
+        if (isVertical) coordinates.push([row + i, col]);
+        else coordinates.push([row,col + i]);
+    }
+
+    humanSquares.forEach(square => {
+        const squareRow = parseInt(square.dataset.rowIndex);
+        const squareCol = parseInt(square.dataset.colIndex);
+        if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
+            square.classList.add("square-with-ship")
+        };
+    })
+}
+
+export function hideShipInDock(ship) {
+    ship.style.display = "none";
+}
+
 export function renderGameBoard(game) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";

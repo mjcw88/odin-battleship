@@ -1,6 +1,6 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderShipDock, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
+import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, hideShipInDock, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
 function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
@@ -16,6 +16,7 @@ export function createGame(playerOneName, difficulty) {
     const game = new Game(difficulty);
     game.addPlayer(playerOneName, true);
     const player = game.getPlayer(playerOneName);
+    const boardSize = player.gameboard.board.length;
 
     const randomiseBtn = document.getElementById("randomise-ships-btn");
     const startGameBtn = document.getElementById("start-game-btn");
@@ -28,24 +29,41 @@ export function createGame(playerOneName, difficulty) {
     unhiddenBtns.push(newGameBtn);
 
     randomiseBtn.addEventListener("click", () => {
-        document.getElementById("ship-dock-container").hidden = true;
         randomiseClickEvent(game, player, startGameBtn);
+
+        const ships = document.querySelectorAll(".inner-ship-container");
+        ships.forEach(ship => {
+            hideShipInDock(ship);
+        })
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
     createShipDock(game, playerOneName);
+
     const squares = renderGameBoard(game);
     const humanSquares = squares.humanSquares;
+    createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
+
+    startGameBtn.addEventListener("click", () => {
+        startGameClickEvent(game);
+    })
+}
+
+function createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize) {
     humanSquares.forEach(square => {
         square.addEventListener("dragenter", (e) => {
-            dragEnter(e, humanSquares, player.gameboard.board.length);
+            dragEnter(e, humanSquares, boardSize)
         })
-        square.addEventListener("dragleave", dragLeave)
         square.addEventListener("dragover", dragOver)
         square.addEventListener("drop", (e) => {
-            dragDrop(e, player, game)
+            dragDrop(e, player, game, humanSquares, startGameBtn)
         })
     })
+
+    const playerBoard = document.querySelector(".player-board");
+    playerBoard.addEventListener("dragleave", (e) => {
+        dragLeave(e, humanSquares);
+    });
 }
 
 function createShipDock(game, playerName) {
@@ -63,44 +81,22 @@ function dragStart(e) {
 }
 
 function dragEnter(e, humanSquares, boardSize) {
-    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
-    const shipSize = beingDragged.children.length;
-
-    const row = parseInt(e.target.dataset.rowIndex);
-    const col = parseInt(e.target.dataset.colIndex);
-
-    const coordinates = [];
-    for(let i = 0; i < shipSize; i++) {
-        if (isVertical) coordinates.push([row + i, col]);
-        else coordinates.push([row,col + i]);
-    }
-
-    let isValid = true;
-    coordinates.forEach(coordinate => {
-        if (coordinate[0] >= boardSize || coordinate[1] >= boardSize) isValid = false;
-    })
-
-    humanSquares.forEach(square => {
-        square.classList.remove("valid-placement");
-        square.classList.remove("invalid-placement");
-        const squareRow = parseInt(square.dataset.rowIndex);
-        const squareCol = parseInt(square.dataset.colIndex);
-        if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
-            if (isValid) square.classList.add("valid-placement")
-            else square.classList.add("invalid-placement")
-        };
-    })
+    if (!beingDragged) return;
+    renderValidPlacement(beingDragged, e, humanSquares, boardSize);
 }
 
-function dragLeave(e) {
-
+function dragLeave(e, humanSquares) {
+    if (humanSquares.includes(e.relatedTarget)) return;
+    clearValidPlacement(humanSquares);
 }
 
 function dragOver(e) {
     e.preventDefault();
 }
 
-function dragDrop(e, player, game) {
+function dragDrop(e, player, game, humanSquares, startGameBtn) {
+    if (!beingDragged) return;
+
     const row = parseInt(e.target.dataset.rowIndex);
     const col = parseInt(e.target.dataset.colIndex);
     const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
@@ -110,11 +106,24 @@ function dragDrop(e, player, game) {
     let end;
     if (isVertical) end = [row + shipSize - 1, col];
     else end = [row,col + shipSize - 1];
-    // player.gameboard.placeShip(start, end, shipSize);
-    // renderGameBoard(game); This needs removing and just append to board instead
 
-    // e.target.classList.remove("valid-placement");
-    // e.target.append(beingDragged);
+    clearValidPlacement(humanSquares);
+
+    try {
+        player.gameboard.placeShip(start, end, shipSize);
+    } catch (error) {
+        console.error(error);
+        return;
+    }
+
+    renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
+    hideShipInDock(beingDragged);
+
+    if (isAllShipsOnBoard(player.gameboard, game)) {
+        startGameBtn.disabled = false;
+    };
+
+    beingDragged = null;
 }
 
 function randomiseClickEvent(game, player, startGameBtn) {
@@ -122,9 +131,6 @@ function randomiseClickEvent(game, player, startGameBtn) {
     renderGameBoard(game);
     if (isAllShipsOnBoard(player.gameboard, game)) {
         startGameBtn.disabled = false;
-        startGameBtn.addEventListener("click", () => {
-            startGameClickEvent(game);
-        })
     };
 }
 
@@ -213,11 +219,15 @@ function playTurnClickEvent(btn, game) {
 }
 
 function restartGame(game, hiddenBtns, unhiddenBtns) {
+    const startGameBtn = document.getElementById("start-game-btn");
+
     game.players.splice(1);
     game.playerOneTurn = true;
     game.winner = null;
     const player = game.players[0];
     player.gameboard = new Gameboard();
+    const boardSize = player.gameboard.board.length;
+
     hiddenBtns.forEach(btn => {
         if (btn.id === "start-game-btn") btn.disabled = true;
         btn.hidden = false;
@@ -225,7 +235,11 @@ function restartGame(game, hiddenBtns, unhiddenBtns) {
     unhiddenBtns.forEach(btn => {
         btn.hidden = true;
     })
-    renderGameBoard(game);
+    createShipDock(game, player.name);
+
+    const squares = renderGameBoard(game);
+    const humanSquares = squares.humanSquares;
+    createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
 }
 
 function showNewGameForm() {
