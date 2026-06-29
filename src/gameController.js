@@ -49,6 +49,14 @@ export function createGame(playerOneName, difficulty) {
     })
 }
 
+function createShipDock(game, playerName) {
+    renderShipDock(game.ships, playerName);
+    const ships = document.querySelectorAll(".inner-ship-container");
+    ships.forEach(ship => {
+        ship.addEventListener("dragstart", dragStart)
+    })
+}
+
 function createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize) {
     humanSquares.forEach(square => {
         square.addEventListener("dragenter", (e) => {
@@ -64,14 +72,6 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
     playerBoard.addEventListener("dragleave", (e) => {
         dragLeave(e, humanSquares);
     });
-}
-
-function createShipDock(game, playerName) {
-    renderShipDock(game.ships, playerName);
-    const ships = document.querySelectorAll(".inner-ship-container");
-    ships.forEach(ship => {
-        ship.addEventListener("dragstart", dragStart)
-    })
 }
 
 let beingDragged;
