@@ -37,93 +37,11 @@ export function createGame(playerOneName, difficulty) {
         })
     })
 
-    restartGame(game, hiddenBtns, unhiddenBtns);
-    createShipDock(game, playerOneName);
-
-    const squares = renderGameBoard(game);
-    const humanSquares = squares.humanSquares;
-    createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
-
     startGameBtn.addEventListener("click", () => {
         startGameClickEvent(game);
     })
-}
 
-function createShipDock(game, playerName) {
-    renderShipDock(game.ships, playerName);
-    const ships = document.querySelectorAll(".inner-ship-container");
-    ships.forEach(ship => {
-        ship.addEventListener("dragstart", dragStart)
-    })
-}
-
-function createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize) {
-    humanSquares.forEach(square => {
-        square.addEventListener("dragenter", (e) => {
-            dragEnter(e, humanSquares, boardSize)
-        })
-        square.addEventListener("dragover", dragOver)
-        square.addEventListener("drop", (e) => {
-            dragDrop(e, player, game, humanSquares, startGameBtn)
-        })
-    })
-
-    const playerBoard = document.querySelector(".player-board");
-    playerBoard.addEventListener("dragleave", (e) => {
-        dragLeave(e, humanSquares);
-    });
-}
-
-let beingDragged;
-
-function dragStart(e) {
-    beingDragged = e.target;
-}
-
-function dragEnter(e, humanSquares, boardSize) {
-    if (!beingDragged) return;
-    renderValidPlacement(beingDragged, e, humanSquares, boardSize);
-}
-
-function dragLeave(e, humanSquares) {
-    if (humanSquares.includes(e.relatedTarget)) return;
-    clearValidPlacement(humanSquares);
-}
-
-function dragOver(e) {
-    e.preventDefault();
-}
-
-function dragDrop(e, player, game, humanSquares, startGameBtn) {
-    if (!beingDragged) return;
-
-    const row = parseInt(e.target.dataset.rowIndex);
-    const col = parseInt(e.target.dataset.colIndex);
-    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
-    const shipSize = beingDragged.children.length;
-
-    const start = [row,col];
-    let end;
-    if (isVertical) end = [row + shipSize - 1, col];
-    else end = [row,col + shipSize - 1];
-
-    clearValidPlacement(humanSquares);
-
-    try {
-        player.gameboard.placeShip(start, end, shipSize);
-    } catch (error) {
-        console.error(error);
-        return;
-    }
-
-    renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
-    hideShipInDock(beingDragged);
-
-    if (isAllShipsOnBoard(player.gameboard, game)) {
-        startGameBtn.disabled = false;
-    };
-
-    beingDragged = null;
+    restartGame(game, hiddenBtns, unhiddenBtns);
 }
 
 function randomiseClickEvent(game, player, startGameBtn) {
@@ -218,6 +136,14 @@ function playTurnClickEvent(btn, game) {
     }
 }
 
+function showNewGameForm() {
+    const newGameForm = document.getElementById("new-game-form");
+    const closeBtn = document.getElementById("close-new-game-btn");
+
+    closeBtn.hidden = false;
+    newGameForm.showModal();
+}
+
 function restartGame(game, hiddenBtns, unhiddenBtns) {
     const startGameBtn = document.getElementById("start-game-btn");
 
@@ -235,17 +161,97 @@ function restartGame(game, hiddenBtns, unhiddenBtns) {
     unhiddenBtns.forEach(btn => {
         btn.hidden = true;
     })
-    createShipDock(game, player.name);
 
     const squares = renderGameBoard(game);
     const humanSquares = squares.humanSquares;
     createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
 }
 
-function showNewGameForm() {
-    const newGameForm = document.getElementById("new-game-form");
-    const closeBtn = document.getElementById("close-new-game-btn");
+function createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize) {
+    const dragController = createDragController(
+        player,
+        game,
+        humanSquares,
+        startGameBtn,
+        boardSize
+    );
 
-    closeBtn.hidden = false;
-    newGameForm.showModal();
+    createShipDock(game, player.name, dragController);
+
+    humanSquares.forEach(square => {
+        square.addEventListener("dragenter", dragController.dragEnter);
+        square.addEventListener("dragover", dragController.dragOver);
+        square.addEventListener("drop", dragController.dragDrop);
+    });
+
+    const board = document.querySelector(".player-board");
+    board.addEventListener("dragleave", dragController.dragLeave);
+}
+
+function createDragController(player, game, humanSquares, startGameBtn, boardSize) {
+    let beingDragged = null;
+
+    function dragStart(e) {
+        beingDragged = e.target;
+    }
+
+    function dragEnter(e) {
+        if (!beingDragged) return;
+        renderValidPlacement(beingDragged, e, humanSquares, boardSize);
+    }
+
+    function dragLeave(e) {
+        if (humanSquares.includes(e.relatedTarget)) return;
+        clearValidPlacement(humanSquares);
+    }
+
+    function dragOver(e) {
+        e.preventDefault();
+    }
+
+    function dragDrop(e) {
+        if (!beingDragged) return;
+
+        const row = parseInt(e.target.dataset.rowIndex);
+        const col = parseInt(e.target.dataset.colIndex);
+        const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+        const shipSize = beingDragged.children.length;
+
+        const start = [row, col];
+        const end = isVertical ? [row + shipSize - 1, col] : [row, col + shipSize - 1];
+
+        clearValidPlacement(humanSquares);
+
+        try {
+            player.gameboard.placeShip(start, end, shipSize);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
+
+        renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
+        hideShipInDock(beingDragged);
+
+        if (isAllShipsOnBoard(player.gameboard, game)) {
+            startGameBtn.disabled = false;
+        }
+
+        beingDragged = null;
+    }
+
+    return {
+        dragStart,
+        dragEnter,
+        dragLeave,
+        dragOver,
+        dragDrop,
+    };
+}
+
+function createShipDock(game, playerName, dragController) {
+    renderShipDock(game.ships, playerName);
+    const ships = document.querySelectorAll(".inner-ship-container");
+    ships.forEach(ship => {
+        ship.addEventListener("dragstart", dragController.dragStart);
+    })
 }
