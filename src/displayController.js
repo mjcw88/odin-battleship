@@ -76,13 +76,20 @@ export function renderShipPlacement(startingSquare, isVertical, shipSize, humanS
         else coordinates.push([row,col + i]);
     }
 
+    const squares = [];
     humanSquares.forEach(square => {
         const squareRow = parseInt(square.dataset.rowIndex);
         const squareCol = parseInt(square.dataset.colIndex);
         if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
-            square.classList.add("square-with-ship")
+            square.classList.add("square-with-ship");
+            square.draggable = true;
+            square.dataset.shipsize = shipSize;
+            square.dataset.isVertical = isVertical === false ? 0 : 1
+            squares.push(square);
         };
     })
+
+    return squares;
 }
 
 export function hideShipInDock(ship) {
