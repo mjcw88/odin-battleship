@@ -190,7 +190,6 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
 
 function createDragController(player, game, humanSquares, startGameBtn, boardSize) {
     let beingDragged = null;
-    let squares = [];
 
     function dragStart(e) {
         beingDragged = e.target;
@@ -230,7 +229,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
             return;
         }
 
-        squares = renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
+        const squares = renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
         reattachDragEventOnShipsOnBoard(squares);
         hideShipInDock(beingDragged);
 
