@@ -192,7 +192,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
 
     function dragEnter(e) {
         if (!beingDragged) return;
-        renderValidPlacement(beingDragged, e, humanSquares, boardSize);
+        renderValidPlacement(beingDragged, e, humanSquares, boardSize, player.gameboard.board);
     }
 
     function dragLeave(e) {
@@ -207,7 +207,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     function dragDrop(e) {
         if (!beingDragged) return;
 
-        // ADD HERE: IF SHIP IS ALREADY ON BOARD THEN REMOVE IT AND UPDATE SHIP DISPLAY
+        // ADD HERE: IF SHIP IS ALREADY ON BOARD THEN REMOVE IT
 
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
