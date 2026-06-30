@@ -5,15 +5,15 @@ export function renderShipDock(ships, playerName) {
     dock.innerHTML = "";
 
     let count = 1;
-    ships.forEach(ship => {
+    ships.forEach((ship, index) => {
         const outerShipContainer = document.createElement("div");
         outerShipContainer.classList.add("outer-ship-container");
 
         const innerShipContainer = document.createElement("div");
         innerShipContainer.classList.add("inner-ship-container");
 
-        innerShipContainer.id = `${playerName}-ship-${count}`;
         innerShipContainer.dataset.isVertical = "0";
+        innerShipContainer.dataset.shipIndex = index;
         innerShipContainer.draggable = true;
         innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
         for (let i = 0; i < ship; i++) {
