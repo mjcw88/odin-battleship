@@ -13,12 +13,13 @@ export function renderShipDock(ships, playerName) {
         innerShipContainer.classList.add("inner-ship-container");
 
         innerShipContainer.dataset.isVertical = "0";
-        innerShipContainer.dataset.shipIndex = index;
         innerShipContainer.draggable = true;
         innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
         for (let i = 0; i < ship; i++) {
             const square = document.createElement("div");
             square.classList.add("square-with-ship");
+            square.dataset.shipIndex = index;
+            square.dataset.isVertical = "0";
             innerShipContainer.append(square);
         }
         outerShipContainer.append(innerShipContainer);
@@ -66,7 +67,7 @@ export function clearValidPlacement(humanSquares) {
     })
 }
 
-export function renderShipPlacement(startingSquare, isVertical, shipSize, humanSquares) {
+export function renderShipPlacement(beingDragged, startingSquare, isVertical, shipSize, humanSquares) {
     const row = parseInt(startingSquare.dataset.rowIndex);
     const col = parseInt(startingSquare.dataset.colIndex);
 
@@ -76,24 +77,17 @@ export function renderShipPlacement(startingSquare, isVertical, shipSize, humanS
         else coordinates.push([row,col + i]);
     }
 
-    const squares = [];
     humanSquares.forEach(square => {
         const squareRow = parseInt(square.dataset.rowIndex);
         const squareCol = parseInt(square.dataset.colIndex);
         if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
             square.classList.add("square-with-ship");
-            square.draggable = true;
-            square.dataset.shipsize = shipSize;
-            square.dataset.isVertical = isVertical === false ? 0 : 1
-            squares.push(square);
         };
     })
 
-    return squares;
-}
-
-export function hideShipInDock(ship) {
-    ship.style.display = "none";
+    beingDragged.classList.add("placed-ship");
+    beingDragged.style.left = `${startingSquare.offsetLeft}px`;
+    beingDragged.style.top = `${startingSquare.offsetTop}px`;
 }
 
 export function renderGameBoard(game) {

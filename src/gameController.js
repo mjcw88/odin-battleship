@@ -1,6 +1,6 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, hideShipInDock, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
+import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
 function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
@@ -30,11 +30,6 @@ export function createGame(playerOneName, difficulty) {
 
     randomiseBtn.addEventListener("click", () => {
         randomiseClickEvent(game, player, startGameBtn);
-
-        const ships = document.querySelectorAll(".inner-ship-container");
-        ships.forEach(ship => {
-            hideShipInDock(ship);
-        })
     })
 
     startGameBtn.addEventListener("click", () => {
@@ -212,6 +207,8 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     function dragDrop(e) {
         if (!beingDragged) return;
 
+        // ADD HERE: IF SHIP IS ALREADY ON BOARD THEN REMOVE IT AND UPDATE SHIP DISPLAY
+
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
         const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
@@ -229,20 +226,13 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
             return;
         }
 
-        const squares = renderShipPlacement(e.target, isVertical, shipSize, humanSquares);
-        reattachDragEventOnShipsOnBoard(squares);
-        hideShipInDock(beingDragged);
+        renderShipPlacement(beingDragged, e.target, isVertical, shipSize, humanSquares);
 
         if (isAllShipsOnBoard(player.gameboard, game)) {
             startGameBtn.disabled = false;
         }
 
         beingDragged = null;
-    }
-
-    function reattachDragEventOnShipsOnBoard(squares) {
-        // attach drag events to ship squares on board and remove ship from gameboard object (a new function inside the gameboard object needs to be created for this)
-        console.log(squares);
     }
 
     return {
