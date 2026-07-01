@@ -69,27 +69,17 @@ export function clearValidPlacement(humanSquares) {
     })
 }
 
-export function renderShipPlacement(beingDragged, startingSquare, isVertical, shipSize, humanSquares) {
+export function renderShipPlacement(beingDragged, startingSquare, isVertical, shipSize, playerName) {
     const row = parseInt(startingSquare.dataset.rowIndex);
     const col = parseInt(startingSquare.dataset.colIndex);
 
-    const coordinates = [];
-    for(let i = 0; i < shipSize; i++) {
-        if (isVertical) coordinates.push([row + i, col]);
-        else coordinates.push([row,col + i]);
-    }
+    beingDragged.dataset.rowIndex = row;
+    beingDragged.dataset.colIndex = col;
+    beingDragged.style.gridColumn = `${col + 2} / span ${isVertical ? 1 : shipSize}`;
+    beingDragged.style.gridRow = `${row + 2} / span ${isVertical ? shipSize : 1}`;
 
-    // humanSquares.forEach(square => {
-    //     const squareRow = parseInt(square.dataset.rowIndex);
-    //     const squareCol = parseInt(square.dataset.colIndex);
-    //     if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
-    //         square.classList.add("square-with-ship");
-    //     };
-    // })
-
-    beingDragged.classList.add("placed-ship");
-    beingDragged.style.left = `${startingSquare.offsetLeft}px`;
-    beingDragged.style.top = `${startingSquare.offsetTop}px`;
+    const board = document.querySelector(`[data-player-board="${playerName}"]`);
+    board.append(beingDragged);
 }
 
 export function renderGameBoard(game) {
@@ -107,6 +97,13 @@ export function renderGameBoard(game) {
         playerHeader.classList.add("player-name");
         playerHeader.id = `player-${index + 1}-name`;
         playerHeader.textContent = player.name;
+
+        const boardContainer = document.createElement("div");
+        boardContainer.classList.add("board-container");
+
+        const shipBoard = document.createElement("div");
+        shipBoard.classList.add("ship-board");
+        shipBoard.dataset.playerBoard = player.name;
 
         const board = document.createElement("div");
         board.classList.add("player-board");
@@ -140,7 +137,8 @@ export function renderGameBoard(game) {
         })
         
         contents.append(playerContainer);
-        playerContainer.append(playerHeader, board);
+        boardContainer.append(shipBoard, board)
+        playerContainer.append(playerHeader, boardContainer);
     })
     return { humanSquares, cpuSquares };
 }

@@ -6,6 +6,28 @@ function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
 }
 
+function replaceShipOnBoard(beingDragged, board) {
+    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+    const size = beingDragged.children.length;
+
+    const originalRow = parseInt(beingDragged.dataset.rowIndex);
+    const originalCol = parseInt(beingDragged.dataset.colIndex);
+
+    if (!isNaN(originalRow) && !isNaN(originalCol)) {
+        const originalStart = [originalRow, originalCol];
+        const originalEnd = isVertical ? [originalRow + size - 1, originalCol] : [originalRow, originalCol + size - 1];
+        board.placeShip(originalStart, originalEnd, size)
+    }
+}
+
+function setPointerEvents(beingDragged, event) {
+    document.querySelectorAll(".ship-board .inner-ship-container").forEach(ship => {
+        ship.style.pointerEvents = event;
+    });
+
+    beingDragged.style.pointerEvents = event;
+}
+
 export function createGame(playerOneName, difficulty) {
     document.getElementById("main-contents-container").hidden = false;;
     document.getElementById("ship-dock-container").hidden = false;
@@ -171,7 +193,7 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
         boardSize
     );
 
-    createShipDock(game, player.name, dragController);
+    createShipDock(game, player, dragController);
 
     humanSquares.forEach(square => {
         square.addEventListener("dragenter", dragController.dragEnter);
@@ -187,7 +209,21 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     let beingDragged = null;
 
     function dragStart(e) {
+        const row = parseInt(e.target.dataset.rowIndex);
+        const col = parseInt(e.target.dataset.colIndex);
+        
+        if (!isNaN(row) && !isNaN(col) && player.gameboard.isShipOnBoard(row, col)) {
+            const isVertical = parseInt(e.target.dataset.isVertical) === 1;
+            const size = e.target.children.length;
+
+            const start = [row, col];
+            const end = isVertical ? [row + size - 1, col] : [row, col + size - 1];
+            player.gameboard.removeShip(start, end, size);
+        }
+        
         beingDragged = e.target;
+        const pointerEvent = "none";
+        setPointerEvents(beingDragged, pointerEvent);
     }
 
     function dragEnter(e) {
@@ -207,31 +243,37 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     function dragDrop(e) {
         if (!beingDragged) return;
 
-        // ADD HERE: IF SHIP IS ALREADY ON BOARD THEN REMOVE IT
-
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
         const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
-        const shipSize = beingDragged.children.length;
+        const size = beingDragged.children.length;
 
         const start = [row, col];
-        const end = isVertical ? [row + shipSize - 1, col] : [row, col + shipSize - 1];
+        const end = isVertical ? [row + size - 1, col] : [row, col + size - 1];
 
         clearValidPlacement(humanSquares);
 
         try {
-            player.gameboard.placeShip(start, end, shipSize);
+            player.gameboard.placeShip(start, end, size);
         } catch (error) {
             console.error(error);
             return;
         }
 
-        renderShipPlacement(beingDragged, e.target, isVertical, shipSize, humanSquares);
+        renderShipPlacement(beingDragged, e.target, isVertical, size, player.name);
 
         if (isAllShipsOnBoard(player.gameboard, game)) {
             startGameBtn.disabled = false;
         }
 
+        setPointerEvents(beingDragged, "all");
+        beingDragged = null;
+    }
+
+    function dragEnd(e) {
+        if (!beingDragged) return;
+        replaceShipOnBoard(beingDragged, player.gameboard);
+        setPointerEvents(beingDragged, "all");
         beingDragged = null;
     }
 
@@ -241,13 +283,16 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         dragLeave,
         dragOver,
         dragDrop,
+        dragEnd,
     };
 }
 
-function createShipDock(game, playerName, dragController) {
+function createShipDock(game, player, dragController) {    
+    const playerName = player.name;
     renderShipDock(game.ships, playerName);
     const ships = document.querySelectorAll(".inner-ship-container");
     ships.forEach(ship => {
         ship.addEventListener("dragstart", dragController.dragStart);
+        ship.addEventListener("dragend", dragController.dragEnd);
     })
 }

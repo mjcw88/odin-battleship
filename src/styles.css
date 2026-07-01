@@ -52,36 +52,39 @@ body {
     display: grid;
     grid-auto-rows: minmax(var(--gridSize), 1fr);
     width: fit-content;
+    pointer-events: all
 }
 
 .inner-ship-container > div {
     cursor: pointer;
 }
 
-.placed-ship {
-    position: absolute;
-}
-
 .player-container {
     text-align: center;
 }
 
-.player-board {
+.board-container {
+    position: relative;
+    width: fit-content;
+}
+
+.ship-board {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.player-board, 
+.ship-board {
     display: grid;
-    grid-template-columns: repeat(11, minmax(var(--gridSize), 1fr));
-    grid-auto-rows: minmax(var(--gridSize), 1fr);
-    overflow: hidden;
+    grid-template-columns: repeat(11, var(--gridSize));
+    grid-auto-rows: var(--gridSize);
 }
 
 .player-board > div {
     text-align: center;
     align-content: center;
     border: 1px solid grey;
-}
-
-.human-board-square > div {
-    height: var(--gridSize);
-    width: var(--gridSize);
 }
 
 .board-square {

@@ -56,6 +56,10 @@ export class Gameboard {
         if (this.board[row][col].ship) throw new Error("Ships cannot overlap");
     }
 
+    #isSquareOccupied(row, col) {
+        if (!this.board[row][col].ship) throw new Error("No ship at this starting location");
+    }
+
     placeShip(start, end, size) {
         this.#isValidCoordinates(start, end);
         this.#isValidNumber(size);
@@ -94,5 +98,34 @@ export class Gameboard {
 
     isAllSunk() {
         return this.ships.every((currentValue) => currentValue.isSunk());
+    }
+
+    isShipOnBoard(row, col) {
+        this.#isValidNumber(row);
+        this.#isValidNumber(col);
+        return Boolean(this.board[row][col].ship);
+    }
+
+    removeShip(start, end, size) {
+        this.#isValidCoordinates(start, end);
+        this.#isValidNumber(size);
+        this.#isSquareOccupied(start[0], start[1]);
+
+        const ship = this.board[start[0]][start[1]].ship;
+
+        if (this.#isVertical(start[0], end[0])) {
+            for (let i = 0; i < size; i++) {
+                const row = start[0] + i;
+                const col = start[1];
+                this.board[row][col].ship = null;
+            }
+        } else {
+            for (let i = 0; i < size; i++) {
+                const row = start[0];
+                const col = start[1] + i;
+                this.board[row][col].ship = null;
+            }
+        }
+        this.ships = this.ships.filter(s => s !== ship);
     }
 }
