@@ -2,6 +2,7 @@ import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
+// Helper Functions
 function createDragImage(target) {
     const dragImage = target.cloneNode(true);
     dragImage.style.position = "absolute";
@@ -36,6 +37,7 @@ function replaceShipOnBoard(beingDragged, board) {
     }
 }
 
+// Main functions
 export function createGame(playerOneName, difficulty) {
     document.getElementById("main-contents-container").hidden = false;;
     document.getElementById("ship-dock-container").hidden = false;
@@ -50,8 +52,10 @@ export function createGame(playerOneName, difficulty) {
 
     const randomiseBtn = document.getElementById("randomise-ships-btn");
     const startGameBtn = document.getElementById("start-game-btn");
+    const rotateBtn = document.getElementById("rotate-btn");
     hiddenBtns.push(randomiseBtn);
     hiddenBtns.push(startGameBtn);
+    hiddenBtns.push(rotateBtn);
 
     const restartBtn = document.getElementById("restart-game-btn");
     const newGameBtn = document.getElementById("new-game-btn");
@@ -64,6 +68,10 @@ export function createGame(playerOneName, difficulty) {
 
     startGameBtn.addEventListener("click", () => {
         startGameClickEvent(game);
+    })
+
+    rotateBtn.addEventListener("click", () => {
+        rotateShipsClickEvent();
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
@@ -85,8 +93,10 @@ function startGameClickEvent(game) {
 
     const randomiseBtn = document.getElementById("randomise-ships-btn");
     const startGameBtn = document.getElementById("start-game-btn");
+    const rotateBtn = document.getElementById("rotate-btn");
     hiddenBtns.push(randomiseBtn);
     hiddenBtns.push(startGameBtn);
+    hiddenBtns.push(rotateBtn);
 
     hiddenBtns.forEach(btn => {
         btn.hidden = true;
@@ -121,6 +131,37 @@ function startGameClickEvent(game) {
         showNewGameForm();
     })
 }
+
+function rotateShipsClickEvent() {
+    const dock = document.getElementById("ship-dock-container");
+    const ships = document.querySelectorAll(".outer-ship-container");
+
+    ships.forEach(outerShipContainer => {
+        const innerShipContainer = outerShipContainer.children;
+        for (let ship of innerShipContainer) {
+            const data = parseInt(ship.dataset.isVertical);
+            const isVertical = data === 1;
+            ship.dataset.isVertical = Number(!Boolean(data));
+            const size = ship.children.length;
+            if (isVertical) {
+                ship.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
+                ship.style.gridTemplateRows = "";
+                ship.style.width = "fit-content";
+                dock.style.display = "block";
+            } else {
+                ship.style.gridTemplateColumns = "";
+                ship.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
+                ship.style.width = "var(--gridSize)";
+                dock.style.display = "flex";
+            }
+            const squares = ship.children;
+            for (let square of squares) {
+                square.dataset.isVertical = Number(!Boolean(parseInt(square.dataset.isVertical)));
+            }
+        }
+    })
+}
+
 
 function playTurnClickEvent(btn, game) {
     if (game.winner || !game.playerOneTurn) return;
@@ -171,6 +212,7 @@ function showNewGameForm() {
 
 function restartGame(game, hiddenBtns, unhiddenBtns) {
     const startGameBtn = document.getElementById("start-game-btn");
+    document.getElementById("ship-dock-container").style = "";
 
     game.players.splice(1);
     game.playerOneTurn = true;

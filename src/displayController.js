@@ -4,8 +4,7 @@ export function renderShipDock(ships, playerName) {
     const dock = document.getElementById("ship-dock-container");
     dock.innerHTML = "";
 
-    let count = 1;
-    ships.forEach((ship, index) => {
+    ships.forEach(ship => {
         const outerShipContainer = document.createElement("div");
         outerShipContainer.classList.add("outer-ship-container");
 
@@ -18,13 +17,12 @@ export function renderShipDock(ships, playerName) {
         for (let i = 0; i < ship; i++) {
             const square = document.createElement("div");
             square.classList.add("square-with-ship");
-            square.dataset.shipIndex = index;
             square.dataset.isVertical = "0";
             innerShipContainer.append(square);
         }
+
         outerShipContainer.append(innerShipContainer);
         dock.append(outerShipContainer);
-        count++;
     })
 }
 
