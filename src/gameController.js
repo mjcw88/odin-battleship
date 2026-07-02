@@ -2,6 +2,22 @@ import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
 
+function createDragImage(target) {
+    const dragImage = target.cloneNode(true);
+    dragImage.style.position = "absolute";
+    dragImage.style.top = "-1000px";
+    document.body.appendChild(dragImage);
+    return dragImage;
+}
+
+function setPointerEvents(beingDragged, event) {
+    document.querySelectorAll(".ship-board .inner-ship-container").forEach(ship => {
+        ship.style.pointerEvents = event;
+    });
+
+    beingDragged.style.pointerEvents = event;
+}
+
 function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
 }
@@ -18,14 +34,6 @@ function replaceShipOnBoard(beingDragged, board) {
         const originalEnd = isVertical ? [originalRow + size - 1, originalCol] : [originalRow, originalCol + size - 1];
         board.placeShip(originalStart, originalEnd, size)
     }
-}
-
-function setPointerEvents(beingDragged, event) {
-    document.querySelectorAll(".ship-board .inner-ship-container").forEach(ship => {
-        ship.style.pointerEvents = event;
-    });
-
-    beingDragged.style.pointerEvents = event;
 }
 
 export function createGame(playerOneName, difficulty) {
@@ -209,6 +217,10 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     let beingDragged = null;
 
     function dragStart(e) {
+        const dragImage = createDragImage(e.target);
+        e.dataTransfer.setDragImage(dragImage, 0, 0);
+        requestAnimationFrame(() => dragImage.remove());
+
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
         
@@ -222,8 +234,11 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         }
         
         beingDragged = e.target;
-        const pointerEvent = "none";
-        setPointerEvents(beingDragged, pointerEvent);
+
+        // setTimeout required to work in Chrome
+        setTimeout(() => {
+            setPointerEvents(beingDragged, "none");
+        }, 0);
     }
 
     function dragEnter(e) {
