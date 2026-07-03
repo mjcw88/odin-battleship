@@ -338,8 +338,6 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     function dragDropOnDock(e) {
         if (e.currentTarget.children.length > 0) return;
 
-        setStartBtn(startGameBtn, player.gameboard, game);
-
         delete beingDragged.dataset.rowIndex;
         delete beingDragged.dataset.colIndex;
 
@@ -352,6 +350,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         beingDragged.dataset.isVertical =  Number(isVertical);
         const size = beingDragged.children.length;
         setOrientationStyling(isVertical, beingDragged, size);
+        setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
         
         e.currentTarget.append(beingDragged);
