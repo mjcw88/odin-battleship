@@ -23,6 +23,14 @@ function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
 }
 
+function setStartBtn(startGameBtn, gameboard, game) {
+    if (isAllShipsOnBoard(gameboard, game)) {
+        startGameBtn.disabled = false;
+    } else {
+        startGameBtn.disabled = true;
+    }
+}
+
 function replaceShipOnBoard(beingDragged, board) {
     const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
     const size = beingDragged.children.length;
@@ -34,6 +42,18 @@ function replaceShipOnBoard(beingDragged, board) {
         const originalStart = [originalRow, originalCol];
         const originalEnd = isVertical ? [originalRow + size - 1, originalCol] : [originalRow, originalCol + size - 1];
         board.placeShip(originalStart, originalEnd, size)
+    }
+}
+
+function setOrientationStyling(isVertical, container, size) {
+    if (isVertical) {
+        container.style.gridTemplateColumns = "";
+        container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
+        container.style.width = "var(--gridSize)";
+    } else {
+        container.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
+        container.style.gridTemplateRows = "";
+        container.style.width = "fit-content";
     }
 }
 
@@ -71,7 +91,7 @@ export function createGame(playerOneName, difficulty) {
     })
 
     rotateBtn.addEventListener("click", () => {
-        rotateShipsClickEvent();
+        rotateShipsEvent();
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
@@ -80,9 +100,7 @@ export function createGame(playerOneName, difficulty) {
 function randomiseClickEvent(game, player, startGameBtn) {
     game.randomiseShipPlacement(player);
     renderGameBoard(game);
-    if (isAllShipsOnBoard(player.gameboard, game)) {
-        startGameBtn.disabled = false;
-    };
+    setStartBtn(startGameBtn, player.gameboard, game);
 }
 
 function startGameClickEvent(game) {
@@ -132,36 +150,30 @@ function startGameClickEvent(game) {
     })
 }
 
-function rotateShipsClickEvent() {
+function rotateShipsEvent() {
     const dock = document.getElementById("ship-dock-container");
-    const ships = document.querySelectorAll(".outer-ship-container");
+    const outerShipContainers = document.querySelectorAll(".outer-ship-container");
 
-    ships.forEach(outerShipContainer => {
-        const innerShipContainer = outerShipContainer.children;
+    const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
+    const isVertical = flip === 1;
+
+    if (isVertical) {
+        dock.style.display = "flex";
+    } else {
+        dock.style.display = "block";
+    }
+
+    dock.dataset.isVertical = flip;
+
+    outerShipContainers.forEach(container => {
+        const innerShipContainer = container.children;
         for (let ship of innerShipContainer) {
-            const data = parseInt(ship.dataset.isVertical);
-            const isVertical = data === 1;
-            ship.dataset.isVertical = Number(!Boolean(data));
+            ship.dataset.isVertical = flip;
             const size = ship.children.length;
-            if (isVertical) {
-                ship.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
-                ship.style.gridTemplateRows = "";
-                ship.style.width = "fit-content";
-                dock.style.display = "block";
-            } else {
-                ship.style.gridTemplateColumns = "";
-                ship.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
-                ship.style.width = "var(--gridSize)";
-                dock.style.display = "flex";
-            }
-            const squares = ship.children;
-            for (let square of squares) {
-                square.dataset.isVertical = Number(!Boolean(parseInt(square.dataset.isVertical)));
-            }
+            setOrientationStyling(isVertical, ship, size);
         }
     })
 }
-
 
 function playTurnClickEvent(btn, game) {
     if (game.winner || !game.playerOneTurn) return;
@@ -248,7 +260,7 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
     humanSquares.forEach(square => {
         square.addEventListener("dragenter", dragController.dragEnter);
         square.addEventListener("dragover", dragController.dragOver);
-        square.addEventListener("drop", dragController.dragDrop);
+        square.addEventListener("drop", dragController.dragDropOnBoard);
     });
 
     const board = document.querySelector(".player-board");
@@ -297,7 +309,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         e.preventDefault();
     }
 
-    function dragDrop(e) {
+    function dragDropOnBoard(e) {
         if (!beingDragged) return;
 
         const row = parseInt(e.target.dataset.rowIndex);
@@ -318,12 +330,31 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         }
 
         renderShipPlacement(beingDragged, e.target, isVertical, size, player.name);
-
-        if (isAllShipsOnBoard(player.gameboard, game)) {
-            startGameBtn.disabled = false;
-        }
-
+        setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
+        beingDragged = null;
+    }
+
+    function dragDropOnDock(e) {
+        if (e.currentTarget.children.length > 0) return;
+
+        setStartBtn(startGameBtn, player.gameboard, game);
+
+        delete beingDragged.dataset.rowIndex;
+        delete beingDragged.dataset.colIndex;
+
+        beingDragged.addEventListener("dragstart", dragStart);
+        beingDragged.addEventListener("dragend", dragEnd);
+
+        const dock = document.getElementById("ship-dock-container");
+        const isVertical = parseInt(dock.dataset.isVertical) === 1;
+
+        beingDragged.dataset.isVertical =  Number(isVertical);
+        const size = beingDragged.children.length;
+        setOrientationStyling(isVertical, beingDragged, size);
+        setPointerEvents(beingDragged, "all");
+        
+        e.currentTarget.append(beingDragged);
         beingDragged = null;
     }
 
@@ -339,7 +370,8 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         dragEnter,
         dragLeave,
         dragOver,
-        dragDrop,
+        dragDropOnBoard,
+        dragDropOnDock,
         dragEnd,
     };
 }
@@ -347,9 +379,17 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
 function createShipDock(game, player, dragController) {    
     const playerName = player.name;
     renderShipDock(game.ships, playerName);
+
+    const outerShipContainers = document.querySelectorAll(".outer-ship-container");
+    outerShipContainers.forEach(container => {
+        container.addEventListener("dragover", dragController.dragOver)
+        container.addEventListener("drop", dragController.dragDropOnDock)
+        container.addEventListener("dragend", dragController.dragEnd)
+    })
+
     const ships = document.querySelectorAll(".inner-ship-container");
     ships.forEach(ship => {
-        ship.addEventListener("dragstart", dragController.dragStart);
-        ship.addEventListener("dragend", dragController.dragEnd);
+        ship.addEventListener("dragstart", dragController.dragStart)
+        ship.addEventListener("dragend", dragController.dragEnd)
     })
 }
