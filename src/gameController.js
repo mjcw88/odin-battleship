@@ -91,7 +91,7 @@ export function createGame(playerOneName, difficulty) {
     })
 
     rotateBtn.addEventListener("click", () => {
-        rotateShipsEvent();
+        rotateShipsInDock();
     })
 
     restartGame(game, hiddenBtns, unhiddenBtns);
@@ -150,9 +150,15 @@ function startGameClickEvent(game) {
     })
 }
 
-function rotateShipsEvent() {
+function rotateShipsInDock() {
     const dock = document.getElementById("ship-dock-container");
     const outerShipContainers = document.querySelectorAll(".outer-ship-container");
+
+    const isEmpty = Array.from(outerShipContainers).every(container =>
+        container.children.length === 0
+    );
+
+    if (isEmpty) return;
 
     const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
     const isVertical = flip === 1;
@@ -173,6 +179,10 @@ function rotateShipsEvent() {
             setOrientationStyling(isVertical, ship, size);
         }
     })
+}
+
+function rotateDraggedShip(ship) {
+    ship.dataset.isVertical = Number(!Boolean(parseInt(ship.dataset.isVertical)));
 }
 
 function playTurnClickEvent(btn, game) {
@@ -265,10 +275,12 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
 
     const board = document.querySelector(".player-board");
     board.addEventListener("dragleave", dragController.dragLeave);
+    document.body.addEventListener("keydown", dragController.handleKeyboardPress);
 }
 
 function createDragController(player, game, humanSquares, startGameBtn, boardSize) {
     let beingDragged = null;
+    let shiftKeyHeld = false;
 
     function dragStart(e) {
         const dragImage = createDragImage(e.target);
@@ -307,6 +319,15 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
 
     function dragOver(e) {
         e.preventDefault();
+        if (!beingDragged) return;
+
+        if (e.shiftKey && !shiftKeyHeld) {
+            shiftKeyHeld = true;
+            rotateDraggedShip(beingDragged);
+            renderValidPlacement(beingDragged, e, humanSquares, boardSize, player.gameboard.board);
+        } else if (!e.shiftKey && shiftKeyHeld) {
+            shiftKeyHeld = false;
+        }
     }
 
     function dragDropOnBoard(e) {
@@ -314,7 +335,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
 
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
-        const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+        const isVertical = Boolean(parseInt(beingDragged.dataset.isVertical));
         const size = beingDragged.children.length;
 
         const start = [row, col];
@@ -329,6 +350,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
             return;
         }
 
+        setOrientationStyling(isVertical, beingDragged, size);
         renderShipPlacement(beingDragged, e.target, isVertical, size, player.name);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
@@ -347,7 +369,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         const dock = document.getElementById("ship-dock-container");
         const isVertical = parseInt(dock.dataset.isVertical) === 1;
 
-        beingDragged.dataset.isVertical =  Number(isVertical);
+        beingDragged.dataset.isVertical = Number(isVertical);
         const size = beingDragged.children.length;
         setOrientationStyling(isVertical, beingDragged, size);
         setStartBtn(startGameBtn, player.gameboard, game);
@@ -362,6 +384,13 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         replaceShipOnBoard(beingDragged, player.gameboard);
         setPointerEvents(beingDragged, "all");
         beingDragged = null;
+        shiftKeyHeld = false;
+    }
+
+    function handleKeyboardPress(e) {
+        if (e.key.toLowerCase() === "q") {
+            rotateShipsInDock()
+        }
     }
 
     return {
@@ -372,6 +401,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         dragDropOnBoard,
         dragDropOnDock,
         dragEnd,
+        handleKeyboardPress,
     };
 }
 
