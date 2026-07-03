@@ -1,0 +1,121 @@
+:root {
+    --gridSize: 50px
+}
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid red;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+#new-game-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: fit-content;
+}
+
+#main-contents {
+    display: flex;
+    width: 100%;
+    max-width: 2500px;
+    justify-content: space-evenly;
+    gap: 1rem;
+}
+
+#ship-dock-main-container {
+    display: flex;
+}
+
+#ship-dock-container {
+    align-self: center;
+}
+
+.outer-ship-container {
+    display: flex;
+    justify-content: end;
+    padding: 1rem;
+}
+
+.inner-ship-container {
+    display: grid;
+    grid-auto-rows: minmax(var(--gridSize), 1fr);
+    width: fit-content;
+    pointer-events: all
+}
+
+.inner-ship-container > div {
+    cursor: pointer;
+}
+
+.player-container {
+    text-align: center;
+}
+
+.board-container {
+    position: relative;
+    width: fit-content;
+}
+
+.ship-board {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.player-board, 
+.ship-board {
+    display: grid;
+    grid-template-columns: repeat(11, var(--gridSize));
+    grid-auto-rows: var(--gridSize);
+}
+
+.player-board > div {
+    text-align: center;
+    align-content: center;
+    border: 1px solid grey;
+}
+
+.board-square {
+    border: 1px solid grey;
+    background-color: blue;
+}
+
+.square-with-ship {
+    background-color: darkgray;
+}
+
+.cpu-board-square {
+    cursor: pointer;
+}
+
+.board-hit {
+    background-color: red;
+}
+
+.board-miss {
+    background-color: lightyellow;
+}
+
+.board-sunk {
+    background-color: darkblue;
+}
+
+.valid-placement {
+    background-color: green;
+}
+
+.invalid-placement {
+    background-color: red;
+}

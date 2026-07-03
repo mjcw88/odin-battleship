@@ -2,6 +2,7 @@ export function renderShipDock(ships, playerName) {
     playerName = playerName.replace(/ /g, "-").toLowerCase();
 
     const dock = document.getElementById("ship-dock-container");
+    dock.dataset.isVertical = "0";
     dock.innerHTML = "";
 
     ships.forEach(ship => {
