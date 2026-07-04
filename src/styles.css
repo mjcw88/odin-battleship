@@ -79,6 +79,7 @@ body {
     display: grid;
     grid-template-columns: repeat(11, var(--gridSize));
     grid-auto-rows: var(--gridSize);
+    user-select: none;
 }
 
 .player-board > div {

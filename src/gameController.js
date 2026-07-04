@@ -283,6 +283,9 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     let shiftKeyHeld = false;
 
     function dragStart(e) {
+        if (!e.target.classList.contains("inner-ship-container")) return;
+
+
         const dragImage = createDragImage(e.target);
         e.dataTransfer.setDragImage(dragImage, 0, 0);
         requestAnimationFrame(() => dragImage.remove());
@@ -358,7 +361,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     }
 
     function dragDropOnDock(e) {
-        if (e.currentTarget.children.length > 0) return;
+        if (!beingDragged || e.currentTarget.children.length > 0) return;
 
         delete beingDragged.dataset.rowIndex;
         delete beingDragged.dataset.colIndex;
