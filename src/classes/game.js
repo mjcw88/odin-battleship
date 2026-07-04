@@ -80,12 +80,16 @@ export class Game {
         const ships = Array.from(this.ships);
         shuffleArray(ships);
         
+        const placements = [];
         ships.forEach((ship) => {
             const coordinates = getRandomCoordinates(ship, player.gameboard.board);
             const start = coordinates[0];
             const end = coordinates[1];
             player.gameboard.placeShip(start, end, ship);
+            placements.push({ size: ship, start: start, end: end });
         });
+
+        return placements;
     }
 
     playHumanTurn(row, col) {

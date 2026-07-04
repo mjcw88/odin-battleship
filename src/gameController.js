@@ -1,6 +1,6 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips } from "./displayController.js";
+import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips, setOrientationStyling } from "./displayController.js";
 
 // Helper Functions
 function createDragImage(target) {
@@ -45,18 +45,6 @@ function replaceShipOnBoard(beingDragged, board) {
     }
 }
 
-function setOrientationStyling(isVertical, container, size) {
-    if (isVertical) {
-        container.style.gridTemplateColumns = "";
-        container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
-        container.style.width = "var(--gridSize)";
-    } else {
-        container.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
-        container.style.gridTemplateRows = "";
-        container.style.width = "fit-content";
-    }
-}
-
 // Main functions
 export function createGame(playerOneName, difficulty) {
     document.getElementById("main-contents-container").hidden = false;;
@@ -98,8 +86,20 @@ export function createGame(playerOneName, difficulty) {
 }
 
 function randomiseClickEvent(game, player, startGameBtn) {
-    game.randomiseShipPlacement(player);
-    renderGameBoard(game);
+    const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
+    const ships = game.randomiseShipPlacement(player);
+    
+    ships.forEach(ship => {
+        const size = ship.size;
+        const index = innerShipContainers.findIndex((s) => s.children.length === size);
+        const container = innerShipContainers.splice(index, 1)[0];
+        const row = ship.start[0];
+        const col = ship.start[1];
+        const isVertical = ship.start[0] !== ship.end[0];
+        container.dataset.isVertical = Number(isVertical);
+        setOrientationStyling(isVertical, container, size)
+        renderShipPlacement(container, row, col, isVertical, size, player.name);
+    })
     setStartBtn(startGameBtn, player.gameboard, game);
 }
 
@@ -285,7 +285,6 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     function dragStart(e) {
         if (!e.target.classList.contains("inner-ship-container")) return;
 
-
         const dragImage = createDragImage(e.target);
         e.dataTransfer.setDragImage(dragImage, 0, 0);
         requestAnimationFrame(() => dragImage.remove());
@@ -354,7 +353,7 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
         }
 
         setOrientationStyling(isVertical, beingDragged, size);
-        renderShipPlacement(beingDragged, e.target, isVertical, size, player.name);
+        renderShipPlacement(beingDragged, row, col, isVertical, size, player.name);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
         beingDragged = null;

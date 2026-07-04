@@ -67,17 +67,14 @@ export function clearValidPlacement(humanSquares) {
     })
 }
 
-export function renderShipPlacement(beingDragged, startingSquare, isVertical, shipSize, playerName) {
-    const row = parseInt(startingSquare.dataset.rowIndex);
-    const col = parseInt(startingSquare.dataset.colIndex);
-
-    beingDragged.dataset.rowIndex = row;
-    beingDragged.dataset.colIndex = col;
-    beingDragged.style.gridColumn = `${col + 2} / span ${isVertical ? 1 : shipSize}`;
-    beingDragged.style.gridRow = `${row + 2} / span ${isVertical ? shipSize : 1}`;
+export function renderShipPlacement(ship, row, col, isVertical, shipSize, playerName) {
+    ship.dataset.rowIndex = row;
+    ship.dataset.colIndex = col;
+    ship.style.gridColumn = `${col + 2} / span ${isVertical ? 1 : shipSize}`;
+    ship.style.gridRow = `${row + 2} / span ${isVertical ? shipSize : 1}`;
 
     const board = document.querySelector(`[data-player-board="${playerName}"]`);
-    board.append(beingDragged);
+    board.append(ship);
 }
 
 export function renderGameBoard(game) {
@@ -139,6 +136,18 @@ export function renderGameBoard(game) {
         playerContainer.append(playerHeader, boardContainer);
     })
     return { humanSquares, cpuSquares };
+}
+
+export function setOrientationStyling(isVertical, container, size) {
+    if (isVertical) {
+        container.style.gridTemplateColumns = "";
+        container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
+        container.style.width = "var(--gridSize)";
+    } else {
+        container.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
+        container.style.gridTemplateRows = "";
+        container.style.width = "fit-content";
+    }
 }
 
 export function updateShipDisplay(squares, board, row, col) {
