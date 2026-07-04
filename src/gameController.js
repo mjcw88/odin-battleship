@@ -1,6 +1,6 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, renderShips, setOrientationStyling } from "./displayController.js";
+import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, revealShips, setOrientationStyling } from "./displayController.js";
 
 // Helper Functions
 function createDragImage(target) {
@@ -148,6 +148,11 @@ function startGameClickEvent(game) {
     newGameBtn.addEventListener("click", () => {
         showNewGameForm();
     })
+
+    const shipBoards = document.querySelectorAll(".ship-board");
+    shipBoards.forEach(board => {
+        board.style.display = "none"
+    })
 }
 
 function rotateShipsInDock() {
@@ -217,7 +222,7 @@ function playTurnClickEvent(btn, game) {
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
                 renderWinner(game.winner);
-                renderShips(game.winner.gameboard.board, cpuBoardDisplay);
+                revealShips(game.winner.gameboard.board, cpuBoardDisplay);
             }
             game.flipPlayerOneTurn();
         }, WAIT);

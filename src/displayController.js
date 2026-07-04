@@ -211,7 +211,7 @@ export function renderWinner(player) {
     console.log(`A winner is you, ${name}!`);
 }
 
-export function renderShips(board, squares) {
+export function revealShips(board, squares) {
     board.forEach((row, rowIndex) => {
         row.forEach((col, colIndex) => {
             const cell = Array.from(squares).find(square => 
