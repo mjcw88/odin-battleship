@@ -275,7 +275,7 @@ export function createPlayerOne(playerOneName, playerTwoName, difficulty, player
         startGameClickEvent(game, playerCount);
     })
 
-    restartGame(game, hiddenBtns, unhiddenBtns);
+    restartGame(game, hiddenBtns, unhiddenBtns, playerCount);
 }
 
 function doneBtnClickEvent(playerCount, playerTwoName, game, doneBtn, startGameBtn, randomiseBtn, state) {
@@ -351,16 +351,15 @@ function startGameClickEvent(game, playerCount) {
         game.addPlayer();
         const cpuPlayer = game.getPlayer("CPU");
         game.randomiseShipPlacement(cpuPlayer);
-        const squares = renderGameBoard(game);
-        const cpuSquares = squares.cpuSquares;
-        cpuSquares.forEach(square => {
-            square.addEventListener("click", () => {
-                playTurnClickEvent(square, game);
-            })
-        })
-    } else {
-        // RENDER BOARD FOR TWO PLAYER MODE;
     }
+
+    const squares = renderGameBoard(game, playerCount);
+    const secondPlayerSquares = squares.secondPlayerSquares;
+    secondPlayerSquares.forEach(square => {
+        square.addEventListener("click", () => {
+            playTurnClickEvent(square, game);
+        })
+    })
 
     restartBtn.addEventListener("click", () => {
         document.getElementById("ship-dock-container").hidden = false;
@@ -451,7 +450,7 @@ function playTurnClickEvent(btn, game) {
     }
 }
 
-function restartGame(game, hiddenBtns, unhiddenBtns) {
+function restartGame(game, hiddenBtns, unhiddenBtns, playerCount) {
     const startGameBtn = document.getElementById("start-game-btn");
     document.getElementById("ship-dock-container").style = "";
 
@@ -470,8 +469,8 @@ function restartGame(game, hiddenBtns, unhiddenBtns) {
         btn.hidden = true;
     })
 
-    const squares = renderGameBoard(game);
-    const humanSquares = squares.humanSquares;
+    const squares = renderGameBoard(game, playerCount);
+    const humanSquares = squares.firstPlayerSquares;
     const dragController = createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
     createShipDock(game, dragController);
 }
