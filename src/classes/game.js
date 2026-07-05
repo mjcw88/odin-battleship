@@ -8,6 +8,7 @@ export class Game {
         this.players = [];
         this.ships = [5, 4, 3, 3, 2];
         this.playerOneTurn = true;
+        this.currentPlayer = null;
         this.difficulty = difficulty;
         this.winner = null;
     }
@@ -480,5 +481,9 @@ export class Game {
 
     declareWinner(player) {
         this.winner = player;
+    }
+
+    getHumanPlayerCount() {
+        return this.players.filter((player) => player.human).length;
     }
 }

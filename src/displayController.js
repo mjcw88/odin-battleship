@@ -75,7 +75,7 @@ export function renderShipPlacement(ship, row, col, isVertical, shipSize, player
     board.append(ship);
 }
 
-export function renderGameBoard(game, playerCount) {
+export function renderMultipleGameBoards(game, playerCount) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
 
@@ -149,7 +149,7 @@ export function renderGameBoard(game, playerCount) {
     return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
 }
 
-export function renderPlayerTwoBoard(player) {
+export function renderSingleGameBoard(player) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
 

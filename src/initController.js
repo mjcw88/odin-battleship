@@ -12,10 +12,14 @@ export const renderNewGameForm = {
 
 export const eventListeners = {
     init() {
-        const setDiffcultyButtons = function() {
+        const setDiffcultyButtons = function(playerCount) {
             const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
             difficultyButtons.forEach(btn => {
-                btn.disabled = !btn.disabled;
+                if (playerCount > 1) {
+                    btn.disabled = true;
+                } else {
+                    btn.disabled = false;
+                }
             })
         }
 
@@ -26,7 +30,7 @@ export const eventListeners = {
             } else {
                 playerTwo.disabled = true;
             }
-            setDiffcultyButtons();
+            setDiffcultyButtons(playerCount);
         }
 
         const newGameFormDialog = document.getElementById("new-game-form");
@@ -39,6 +43,9 @@ export const eventListeners = {
 
         const closeBtn = document.getElementById("close-new-game-btn");
         closeBtn.addEventListener("click", () => {
+            const playerCount = parseInt(document.querySelector('input[name="playerCount"]:checked').value);
+            setPlayerTwo(playerCount);
+            setDiffcultyButtons(playerCount);
             closeForm(newGameFormDialog, newGameForm);
         })
         
