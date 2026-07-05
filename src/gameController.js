@@ -1,6 +1,6 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
-import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, revealShips, setOrientationStyling } from "./displayController.js";
+import { renderShipDock, renderValidPlacement, clearValidPlacement, renderShipPlacement, renderGameBoard, updateShipDisplay, renderWinner, revealShips, setOrientationStyling, renderPlayerTwoBoard } from "./displayController.js";
 
 // Helper Functions
 function createDragImage(target) {
@@ -21,6 +21,14 @@ function setPointerEvents(beingDragged, event) {
 
 function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
+}
+
+function setDoneBtn(doneBtn, gameboard, game) {
+    if (isAllShipsOnBoard(gameboard, game)) {
+        doneBtn.disabled = false;
+    } else {
+        doneBtn.disabled = true;
+    }
 }
 
 function setStartBtn(startGameBtn, gameboard, game) {
@@ -45,221 +53,29 @@ function replaceShipOnBoard(beingDragged, board) {
     }
 }
 
-// Main functions
-export function createGame(playerOneName, difficulty) {
-    document.getElementById("main-contents-container").hidden = false;;
-    document.getElementById("ship-dock-container").hidden = false;
-
-    const hiddenBtns = [];
-    const unhiddenBtns = [];
-
-    const game = new Game(difficulty);
-    game.addPlayer(playerOneName, true);
-    const player = game.getPlayer(playerOneName);
-    const boardSize = player.gameboard.board.length;
-
-    const randomiseBtn = document.getElementById("randomise-ships-btn");
-    const startGameBtn = document.getElementById("start-game-btn");
-    const rotateBtn = document.getElementById("rotate-btn");
-    hiddenBtns.push(randomiseBtn);
-    hiddenBtns.push(startGameBtn);
-    hiddenBtns.push(rotateBtn);
-
-    const restartBtn = document.getElementById("restart-game-btn");
-    const newGameBtn = document.getElementById("new-game-btn");
-    unhiddenBtns.push(restartBtn);
-    unhiddenBtns.push(newGameBtn);
-
+function createRandomiseButton(randomiseBtn, state, game, startGameBtn, doneBtn) {
     randomiseBtn.addEventListener("click", () => {
-        randomiseClickEvent(game, player, startGameBtn);
-    })
-
-    startGameBtn.addEventListener("click", () => {
-        startGameClickEvent(game);
-    })
-
-    rotateBtn.addEventListener("click", () => {
-        rotateShipsInDock();
-    })
-
-    restartGame(game, hiddenBtns, unhiddenBtns);
+        randomiseClickEvent(game, state.currentPlayer, startGameBtn, doneBtn);
+    });
 }
 
-function randomiseClickEvent(game, player, startGameBtn) {
-    const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
-    const ships = game.randomiseShipPlacement(player);
-    
-    ships.forEach(ship => {
-        const size = ship.size;
-        const index = innerShipContainers.findIndex((s) => s.children.length === size);
-        const container = innerShipContainers.splice(index, 1)[0];
-        const row = ship.start[0];
-        const col = ship.start[1];
-        const isVertical = ship.start[0] !== ship.end[0];
-        container.dataset.isVertical = Number(isVertical);
-        setOrientationStyling(isVertical, container, size)
-        renderShipPlacement(container, row, col, isVertical, size, player.name);
-    })
-    setStartBtn(startGameBtn, player.gameboard, game);
-}
+function createShipDock(game, dragController) {    
+    renderShipDock(game.ships);
 
-function startGameClickEvent(game) {
-    if (game.players.length >= 2) return;
-
-    const hiddenBtns = [];
-    const unhiddenBtns = [];
-
-    const randomiseBtn = document.getElementById("randomise-ships-btn");
-    const startGameBtn = document.getElementById("start-game-btn");
-    const rotateBtn = document.getElementById("rotate-btn");
-    hiddenBtns.push(randomiseBtn);
-    hiddenBtns.push(startGameBtn);
-    hiddenBtns.push(rotateBtn);
-
-    hiddenBtns.forEach(btn => {
-        btn.hidden = true;
-    })
-
-    const restartBtn = document.getElementById("restart-game-btn");
-    const newGameBtn = document.getElementById("new-game-btn");
-    unhiddenBtns.push(restartBtn);
-    unhiddenBtns.push(newGameBtn);
-
-    unhiddenBtns.forEach(btn => {
-        btn.hidden = false;
-    })
-
-    game.addPlayer();
-    const cpuPlayer = game.getPlayer("CPU");
-    game.randomiseShipPlacement(cpuPlayer);
-    const squares = renderGameBoard(game);
-    const cpuSquares = squares.cpuSquares;
-    cpuSquares.forEach(square => {
-        square.addEventListener("click", () => {
-            playTurnClickEvent(square, game);
-        })
-    })
-
-    restartBtn.addEventListener("click", () => {
-        document.getElementById("ship-dock-container").hidden = false;
-        restartGame(game, hiddenBtns, unhiddenBtns);
-    })
-
-    newGameBtn.addEventListener("click", () => {
-        showNewGameForm();
-    })
-
-    const shipBoards = document.querySelectorAll(".ship-board");
-    shipBoards.forEach(board => {
-        board.style.display = "none"
-    })
-}
-
-function rotateShipsInDock() {
-    const dock = document.getElementById("ship-dock-container");
     const outerShipContainers = document.querySelectorAll(".outer-ship-container");
-
-    const isEmpty = Array.from(outerShipContainers).every(container =>
-        container.children.length === 0
-    );
-
-    if (isEmpty) return;
-
-    const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
-    const isVertical = flip === 1;
-
-    if (isVertical) {
-        dock.style.display = "flex";
-    } else {
-        dock.style.display = "block";
-    }
-
-    dock.dataset.isVertical = flip;
-
     outerShipContainers.forEach(container => {
-        const innerShipContainer = container.children;
-        for (let ship of innerShipContainer) {
-            ship.dataset.isVertical = flip;
-            const size = ship.children.length;
-            setOrientationStyling(isVertical, ship, size);
-        }
+        container.addEventListener("dragover", dragController.dragOver)
+        container.addEventListener("drop", dragController.dragDropOnDock)
+        container.addEventListener("dragend", dragController.dragEnd)
+    })
+
+    const ships = document.querySelectorAll(".inner-ship-container");
+    ships.forEach(ship => {
+        ship.addEventListener("dragstart", dragController.dragStart)
+        ship.addEventListener("dragend", dragController.dragEnd)
     })
 }
 
-function rotateDraggedShip(ship) {
-    ship.dataset.isVertical = Number(!Boolean(parseInt(ship.dataset.isVertical)));
-}
-
-function playTurnClickEvent(btn, game) {
-    if (game.winner || !game.playerOneTurn) return;
-
-    const row = parseInt(btn.dataset.rowIndex);
-    const col = parseInt(btn.dataset.colIndex);
-
-    const cpuPlayer = game.getPlayer("CPU");
-    const cpuBoard = cpuPlayer.gameboard;
-    if (cpuBoard.board[row][col].hit) return;
-
-    game.playHumanTurn(row, col);
-    const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
-    updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col);
-    game.flipPlayerOneTurn();
-
-    const humanName = document.getElementById("player-1-name").textContent;
-    const humanPlayer = game.getPlayer(humanName);
-    if (cpuBoard.isAllSunk()) {
-        game.declareWinner(humanPlayer);
-        renderWinner(game.winner);
-    } else {
-        const WAIT = 500;
-        setTimeout(() => {
-            const square = game.playComputerTurn(humanPlayer);
-            const cpuRow = square[0];
-            const cpuCol = square[1];
-            const humanBoard = humanPlayer.gameboard;
-            const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
-            if (humanBoard.isAllSunk()) {
-                game.declareWinner(cpuPlayer);
-                renderWinner(game.winner);
-                revealShips(game.winner.gameboard.board, cpuBoardDisplay);
-            }
-            game.flipPlayerOneTurn();
-        }, WAIT);
-    }
-}
-
-function showNewGameForm() {
-    const newGameForm = document.getElementById("new-game-form");
-    const closeBtn = document.getElementById("close-new-game-btn");
-
-    closeBtn.hidden = false;
-    newGameForm.showModal();
-}
-
-function restartGame(game, hiddenBtns, unhiddenBtns) {
-    const startGameBtn = document.getElementById("start-game-btn");
-    document.getElementById("ship-dock-container").style = "";
-
-    game.players.splice(1);
-    game.playerOneTurn = true;
-    game.winner = null;
-    const player = game.players[0];
-    player.gameboard = new Gameboard();
-    const boardSize = player.gameboard.board.length;
-
-    hiddenBtns.forEach(btn => {
-        if (btn.id === "start-game-btn") btn.disabled = true;
-        btn.hidden = false;
-    })
-    unhiddenBtns.forEach(btn => {
-        btn.hidden = true;
-    })
-
-    const squares = renderGameBoard(game);
-    const humanSquares = squares.humanSquares;
-    createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
-}
 
 function createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize) {
     const dragController = createDragController(
@@ -270,8 +86,6 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
         boardSize
     );
 
-    createShipDock(game, player, dragController);
-
     humanSquares.forEach(square => {
         square.addEventListener("dragenter", dragController.dragEnter);
         square.addEventListener("dragover", dragController.dragOver);
@@ -281,6 +95,8 @@ function createDragEventListenersForBoard(humanSquares, player, startGameBtn, ga
     const board = document.querySelector(".player-board");
     board.addEventListener("dragleave", dragController.dragLeave);
     document.body.addEventListener("keydown", dragController.handleKeyboardPress);
+
+    return dragController;
 }
 
 function createDragController(player, game, humanSquares, startGameBtn, boardSize) {
@@ -412,20 +228,258 @@ function createDragController(player, game, humanSquares, startGameBtn, boardSiz
     };
 }
 
-function createShipDock(game, player, dragController) {    
-    const playerName = player.name;
-    renderShipDock(game.ships, playerName);
+// Main functions
+export function createPlayerOne(playerOneName, playerTwoName, difficulty, playerCount) {
+    document.getElementById("main-contents-container").hidden = false;;
+    document.getElementById("ship-dock-container").hidden = false;
 
-    const outerShipContainers = document.querySelectorAll(".outer-ship-container");
-    outerShipContainers.forEach(container => {
-        container.addEventListener("dragover", dragController.dragOver)
-        container.addEventListener("drop", dragController.dragDropOnDock)
-        container.addEventListener("dragend", dragController.dragEnd)
+    const hiddenBtns = [];
+    const unhiddenBtns = [];
+
+    const game = new Game(difficulty);
+    game.addPlayer(playerOneName, true);
+    const player = game.getPlayer(playerOneName);
+
+    const randomiseBtn = document.getElementById("randomise-ships-btn");
+    const rotateBtn = document.getElementById("rotate-btn");
+    const startGameBtn = document.getElementById("start-game-btn");
+    const doneBtn = document.getElementById("done-btn");
+    hiddenBtns.push(randomiseBtn);
+    hiddenBtns.push(rotateBtn);
+
+    const restartBtn = document.getElementById("restart-game-btn");
+    const newGameBtn = document.getElementById("new-game-btn");
+    unhiddenBtns.push(restartBtn);
+    unhiddenBtns.push(newGameBtn);
+
+    const state = {
+        currentPlayer: player
+    };
+
+    createRandomiseButton(randomiseBtn, state, game, startGameBtn, doneBtn)
+
+    rotateBtn.addEventListener("click", () => {
+        rotateShipsInDock();
     })
 
-    const ships = document.querySelectorAll(".inner-ship-container");
+    if (playerCount > 1) {
+        hiddenBtns.push(doneBtn);
+        doneBtn.addEventListener("click", () => {
+            doneBtnClickEvent(playerCount, playerTwoName, game, doneBtn, startGameBtn, randomiseBtn, state);
+        })
+    } else {
+        hiddenBtns.push(startGameBtn);
+    }
+
+    startGameBtn.addEventListener("click", () => {
+        startGameClickEvent(game, playerCount);
+    })
+
+    restartGame(game, hiddenBtns, unhiddenBtns);
+}
+
+function doneBtnClickEvent(playerCount, playerTwoName, game, doneBtn, startGameBtn, randomiseBtn, state) {
+    if (playerCount < 1) return;
+    createPlayerTwo(playerTwoName, game, doneBtn, startGameBtn, randomiseBtn, state);
+
+}
+
+function createPlayerTwo(playerTwoName, game, doneBtn, startGameBtn, randomiseBtn, state) {
+    game.addPlayer(playerTwoName, true);
+    const player = game.getPlayer(playerTwoName);
+    state.currentPlayer = player;
+
+    doneBtn.hidden = true;
+    doneBtn.disabled = true;
+
+    startGameBtn.hidden = false;
+    startGameBtn.disabled = true;
+
+    const squares = renderPlayerTwoBoard(player);
+    const boardSize = player.gameboard.board.length;
+
+    const dragController = createDragEventListenersForBoard(squares, player, startGameBtn, game, boardSize);
+    createShipDock(game, dragController);
+}
+
+function randomiseClickEvent(game, player, startGameBtn, doneBtn) {
+    const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
+    const ships = game.randomiseShipPlacement(player);
+    
     ships.forEach(ship => {
-        ship.addEventListener("dragstart", dragController.dragStart)
-        ship.addEventListener("dragend", dragController.dragEnd)
+        const size = ship.size;
+        const index = innerShipContainers.findIndex((s) => s.children.length === size);
+        const container = innerShipContainers.splice(index, 1)[0];
+        const row = ship.start[0];
+        const col = ship.start[1];
+        const isVertical = ship.start[0] !== ship.end[0];
+        container.dataset.isVertical = Number(isVertical);
+        setOrientationStyling(isVertical, container, size)
+        renderShipPlacement(container, row, col, isVertical, size, player.name);
     })
+    setDoneBtn(doneBtn, player.gameboard, game);
+    setStartBtn(startGameBtn, player.gameboard, game);
+}
+
+function startGameClickEvent(game, playerCount) {
+    if (playerCount === 1 && game.players.length >= 2) return;
+
+    const hiddenBtns = [];
+    const unhiddenBtns = [];
+
+    const randomiseBtn = document.getElementById("randomise-ships-btn");
+    const startGameBtn = document.getElementById("start-game-btn");
+    const rotateBtn = document.getElementById("rotate-btn");
+    hiddenBtns.push(randomiseBtn);
+    hiddenBtns.push(startGameBtn);
+    hiddenBtns.push(rotateBtn);
+
+    hiddenBtns.forEach(btn => {
+        btn.hidden = true;
+    })
+
+    const restartBtn = document.getElementById("restart-game-btn");
+    const newGameBtn = document.getElementById("new-game-btn");
+    unhiddenBtns.push(restartBtn);
+    unhiddenBtns.push(newGameBtn);
+
+    unhiddenBtns.forEach(btn => {
+        btn.hidden = false;
+    })
+
+    if (playerCount === 1) {
+        game.addPlayer();
+        const cpuPlayer = game.getPlayer("CPU");
+        game.randomiseShipPlacement(cpuPlayer);
+        const squares = renderGameBoard(game);
+        const cpuSquares = squares.cpuSquares;
+        cpuSquares.forEach(square => {
+            square.addEventListener("click", () => {
+                playTurnClickEvent(square, game);
+            })
+        })
+    } else {
+        // RENDER BOARD FOR TWO PLAYER MODE;
+    }
+
+    restartBtn.addEventListener("click", () => {
+        document.getElementById("ship-dock-container").hidden = false;
+        restartGame(game, hiddenBtns, unhiddenBtns);
+    })
+
+    newGameBtn.addEventListener("click", () => {
+        showNewGameForm();
+    })
+
+    const shipBoards = document.querySelectorAll(".ship-board");
+    shipBoards.forEach(board => {
+        board.style.display = "none"
+    })
+}
+
+function rotateShipsInDock() {
+    const dock = document.getElementById("ship-dock-container");
+    const outerShipContainers = document.querySelectorAll(".outer-ship-container");
+
+    const isEmpty = Array.from(outerShipContainers).every(container =>
+        container.children.length === 0
+    );
+
+    if (isEmpty) return;
+
+    const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
+    const isVertical = flip === 1;
+
+    if (isVertical) {
+        dock.style.display = "flex";
+    } else {
+        dock.style.display = "block";
+    }
+
+    dock.dataset.isVertical = flip;
+
+    outerShipContainers.forEach(container => {
+        const innerShipContainer = container.children;
+        for (let ship of innerShipContainer) {
+            ship.dataset.isVertical = flip;
+            const size = ship.children.length;
+            setOrientationStyling(isVertical, ship, size);
+        }
+    })
+}
+
+function rotateDraggedShip(ship) {
+    ship.dataset.isVertical = Number(!Boolean(parseInt(ship.dataset.isVertical)));
+}
+
+function playTurnClickEvent(btn, game) {
+    if (game.winner || !game.playerOneTurn) return;
+
+    const row = parseInt(btn.dataset.rowIndex);
+    const col = parseInt(btn.dataset.colIndex);
+
+    const cpuPlayer = game.getPlayer("CPU");
+    const cpuBoard = cpuPlayer.gameboard;
+    if (cpuBoard.board[row][col].hit) return;
+
+    game.playHumanTurn(row, col);
+    const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
+    updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col);
+    game.flipPlayerOneTurn();
+
+    const humanName = document.getElementById("player-1-name").textContent;
+    const humanPlayer = game.getPlayer(humanName);
+    if (cpuBoard.isAllSunk()) {
+        game.declareWinner(humanPlayer);
+        renderWinner(game.winner);
+    } else {
+        const WAIT = 500;
+        setTimeout(() => {
+            const square = game.playComputerTurn(humanPlayer);
+            const cpuRow = square[0];
+            const cpuCol = square[1];
+            const humanBoard = humanPlayer.gameboard;
+            const humanBoardDisplay = document.querySelectorAll(".human-board-square");
+            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
+            if (humanBoard.isAllSunk()) {
+                game.declareWinner(cpuPlayer);
+                renderWinner(game.winner);
+                revealShips(game.winner.gameboard.board, cpuBoardDisplay);
+            }
+            game.flipPlayerOneTurn();
+        }, WAIT);
+    }
+}
+
+function restartGame(game, hiddenBtns, unhiddenBtns) {
+    const startGameBtn = document.getElementById("start-game-btn");
+    document.getElementById("ship-dock-container").style = "";
+
+    game.players.splice(1);
+    game.playerOneTurn = true;
+    game.winner = null;
+    const player = game.players[0];
+    player.gameboard = new Gameboard();
+    const boardSize = player.gameboard.board.length;
+
+    hiddenBtns.forEach(btn => {
+        if (btn.id === "start-game-btn") btn.disabled = true;
+        btn.hidden = false;
+    })
+    unhiddenBtns.forEach(btn => {
+        btn.hidden = true;
+    })
+
+    const squares = renderGameBoard(game);
+    const humanSquares = squares.humanSquares;
+    const dragController = createDragEventListenersForBoard(humanSquares, player, startGameBtn, game, boardSize);
+    createShipDock(game, dragController);
+}
+
+function showNewGameForm() {
+    const newGameForm = document.getElementById("new-game-form");
+    const closeBtn = document.getElementById("close-new-game-btn");
+
+    closeBtn.hidden = false;
+    newGameForm.showModal();
 }

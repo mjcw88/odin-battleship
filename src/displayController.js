@@ -1,6 +1,4 @@
-export function renderShipDock(ships, playerName) {
-    playerName = playerName.replace(/ /g, "-").toLowerCase();
-
+export function renderShipDock(ships) {
     const dock = document.getElementById("ship-dock-container");
     dock.dataset.isVertical = "0";
     dock.innerHTML = "";
@@ -136,6 +134,60 @@ export function renderGameBoard(game) {
         playerContainer.append(playerHeader, boardContainer);
     })
     return { humanSquares, cpuSquares };
+}
+
+export function renderPlayerTwoBoard(player) {
+    const contents = document.getElementById("main-contents");
+    contents.innerHTML = "";
+
+    const squares = [];
+
+    const playerContainer = document.createElement("div");
+    playerContainer.classList.add("player-container");
+
+    const playerHeader = document.createElement("div");
+    playerHeader.classList.add("player-name");
+    playerHeader.id = `player-2-name`;
+    playerHeader.textContent = player.name;
+
+    const boardContainer = document.createElement("div");
+    boardContainer.classList.add("board-container");
+
+    const shipBoard = document.createElement("div");
+    shipBoard.classList.add("ship-board");
+    shipBoard.dataset.playerBoard = player.name;
+
+    const board = document.createElement("div");
+    board.classList.add("player-board");
+
+    const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    LETTERS.forEach(letter => {
+        const square = document.createElement("div");
+        square.textContent = letter;
+        board.append(square);
+    })
+
+    player.gameboard.board.forEach((row, rowIndex) => {
+        const square = document.createElement("div");
+        square.textContent = rowIndex + 1;
+        board.append(square);
+        row.forEach((cell, colIndex) => {
+            const square = document.createElement("div");
+            square.classList.add("board-square");
+            square.dataset.rowIndex = rowIndex;
+            square.dataset.colIndex = colIndex;
+            if (player.human && cell.ship) square.classList.add("square-with-ship");
+            board.append(square);
+            square.classList.add("human-board-square");
+            squares.push(square);
+        })
+    })
+        
+    contents.append(playerContainer);
+    boardContainer.append(shipBoard, board)
+    playerContainer.append(playerHeader, boardContainer);
+
+    return squares;
 }
 
 export function setOrientationStyling(isVertical, container, size) {
