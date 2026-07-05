@@ -265,23 +265,22 @@ export class Game {
         board.forEach((row, rowIndex) => {
             row.forEach((col, colIndex) => {
                 if (col.ship !== null && col.hit === false) {
-                    const queue = [{ row: rowIndex, col: colIndex }];
+                    const queue = [{ row: rowIndex, col: colIndex, distance: 0 }];
                     const visited = [];
                     targets.push([rowIndex,colIndex]);
                     this.#traverseFromShipLocation(TRAVERSE_DIRECTIONS, queue, visited, board, targets);
                 };
             })
         })
-        console.log(targets);
         return targets[Math.floor(Math.random() * targets.length)]; 
     }
 
     #traverseFromShipLocation(TRAVERSE_DIRECTIONS, queue, visited, board, targets) {
-        const CAP = 4;
-        let count = 0;
+        const CAP = 2;
 
-        while(count < CAP && queue.length > 0) {
+        while(queue.length > 0) {
             const current = queue.shift();
+            if (current.distance >= CAP) continue;
             if (visited.some(v => v.row === current.row && v.col === current.col && v.vertical === current.vertical)) continue;
             visited.push(current);
 
@@ -291,7 +290,7 @@ export class Game {
                     if (dir < 0 || dir >= board.length) return;
                     if (board[dir][current.col].hit === false) {
                         if (!targets.some(t => t[0] === dir && t[1] === current.col)) targets.push([dir, current.col]);
-                        queue.push({ row: dir, col: current.col, vertical: true });
+                        queue.push({ row: dir, col: current.col, vertical: true, distance: current.distance + 1 });
                     };
                 })
             }
@@ -302,11 +301,10 @@ export class Game {
                     if (dir < 0 || dir >= board.length) return;
                     if (board[current.row][dir].hit === false) {
                         if (!targets.some(t => t[0] === current.row && t[1] === dir)) targets.push([current.row, dir]);
-                        queue.push({ row: current.row, col: dir, vertical: false });
+                        queue.push({ row: current.row, col: dir, vertical: false, distance: current.distance + 1 });
                     };
                 })
             }
-            count++;
         }
     }
 
