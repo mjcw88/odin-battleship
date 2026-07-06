@@ -156,6 +156,7 @@ export function createDragEventListenersForBoard(squares, player, game) {
 
 function createDragController(squares, player, game) {
     const startGameBtn = document.getElementById("start-game-btn");
+    const doneBtn = document.getElementById("done-btn");
     const boardSize = player.gameboard.board.length;
 
     let beingDragged = null;
@@ -233,6 +234,7 @@ function createDragController(squares, player, game) {
 
         setOrientationStyling(isVertical, beingDragged, size);
         renderShipPlacement(beingDragged, row, col, isVertical, size, player.name);
+        if (game.getHumanPlayerCount() > 1) setDoneBtn(doneBtn, player.gameboard, game);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
         beingDragged = null;
@@ -253,6 +255,7 @@ function createDragController(squares, player, game) {
         beingDragged.dataset.isVertical = Number(isVertical);
         const size = beingDragged.children.length;
         setOrientationStyling(isVertical, beingDragged, size);
+        if (game.getHumanPlayerCount() > 1) setDoneBtn(doneBtn, player.gameboard, game);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
         
