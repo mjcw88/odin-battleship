@@ -1,3 +1,41 @@
+// Helper functions
+function renderBoardContainer(player, index = 0) {
+    const playerContainer = document.createElement("div");
+    playerContainer.classList.add("player-container");
+
+    const playerHeader = document.createElement("div");
+    playerHeader.classList.add("player-name");
+    playerHeader.id = `player-${index + 1}-name`;
+    playerHeader.textContent = player.name;
+
+    const boardContainer = document.createElement("div");
+    boardContainer.classList.add("board-container");
+
+    const shipBoard = document.createElement("div");
+    shipBoard.classList.add("ship-board");
+    shipBoard.dataset.playerBoard = player.name;
+
+    const board = document.createElement("div");
+    board.classList.add("player-board");
+
+    return { board: board, 
+        playerContainer: playerContainer, 
+        boardContainer: boardContainer, 
+        shipBoard: shipBoard, 
+        playerHeader: playerHeader 
+    };
+}
+
+function renderBoardHeader(board) {
+    const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
+    LETTERS.forEach(letter => {
+        const square = document.createElement("div");
+        square.textContent = letter;
+        board.append(square);
+    })
+}
+
+// Main functions
 export function showNewGameForm() {
     const newGameForm = document.getElementById("new-game-form");
     const closeBtn = document.getElementById("close-new-game-btn");
@@ -56,110 +94,20 @@ export function renderShipPlacement(ship, row, col, isVertical, shipSize, player
     board.append(ship);
 }
 
-export function renderMultipleGameBoards(game, playerCount) {
-    const contents = document.getElementById("main-contents");
-    contents.innerHTML = "";
-
-    const firstPlayerSquares = [];
-    const secondPlayerSquares = [];
-
-    game.players.forEach((player, playerIndex) => {
-        const playerContainer = document.createElement("div");
-        playerContainer.classList.add("player-container");
-
-        const playerHeader = document.createElement("div");
-        playerHeader.classList.add("player-name");
-        playerHeader.id = `player-${playerIndex + 1}-name`;
-        playerHeader.textContent = player.name;
-
-        const boardContainer = document.createElement("div");
-        boardContainer.classList.add("board-container");
-
-        const shipBoard = document.createElement("div");
-        shipBoard.classList.add("ship-board");
-        shipBoard.dataset.playerBoard = player.name;
-
-        const board = document.createElement("div");
-        board.classList.add("player-board");
-
-        const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-        LETTERS.forEach(letter => {
-            const square = document.createElement("div");
-            square.textContent = letter;
-            board.append(square);
-        })
-
-        player.gameboard.board.forEach((row, rowIndex) => {
-            const square = document.createElement("div");
-            square.textContent = rowIndex + 1;
-            board.append(square);
-            row.forEach((cell, colIndex) => {
-                const square = document.createElement("div");
-                square.classList.add("board-square");
-                square.dataset.rowIndex = rowIndex;
-                square.dataset.colIndex = colIndex;
-                if (playerCount === 1) {
-                    if (player.human && cell.ship) square.classList.add("square-with-ship");
-                    if (player.human) {
-                        square.classList.add("human-board-square");
-                        firstPlayerSquares.push(square);
-                    } else {
-                        square.classList.add("cpu-board-square");
-                        secondPlayerSquares.push(square);                    
-                    }
-                } else {
-                    if (game.playerOneTurn) {
-                        if (playerIndex === 0 && cell.ship) square.classList.add("square-with-ship");
-                        square.classList.add("human-board-square");
-                        firstPlayerSquares.push(square);
-                    } else {
-                        if (playerIndex === 1 && cell.ship) square.classList.add("square-with-ship");
-                        square.classList.add("human-board-square");
-                        firstPlayerSquares.push(square);
-                    }
-                }
-
-                board.append(square);
-            })
-        })
-        
-        contents.append(playerContainer);
-        boardContainer.append(shipBoard, board)
-        playerContainer.append(playerHeader, boardContainer);
-    })
-    return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
-}
-
 export function renderSingleGameBoard(player) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
 
     const squares = [];
 
-    const playerContainer = document.createElement("div");
-    playerContainer.classList.add("player-container");
+    const container = renderBoardContainer(player);
+    const board = container.board;
+    const playerContainer = container.playerContainer;
+    const boardContainer = container.boardContainer;
+    const shipBoard = container.shipBoard;
+    const playerHeader = container.playerHeader;
 
-    const playerHeader = document.createElement("div");
-    playerHeader.classList.add("player-name");
-    playerHeader.id = `player-2-name`;
-    playerHeader.textContent = player.name;
-
-    const boardContainer = document.createElement("div");
-    boardContainer.classList.add("board-container");
-
-    const shipBoard = document.createElement("div");
-    shipBoard.classList.add("ship-board");
-    shipBoard.dataset.playerBoard = player.name;
-
-    const board = document.createElement("div");
-    board.classList.add("player-board");
-
-    const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
-    LETTERS.forEach(letter => {
-        const square = document.createElement("div");
-        square.textContent = letter;
-        board.append(square);
-    })
+    renderBoardHeader(board);
 
     player.gameboard.board.forEach((row, rowIndex) => {
         const square = document.createElement("div");
@@ -182,6 +130,62 @@ export function renderSingleGameBoard(player) {
     playerContainer.append(playerHeader, boardContainer);
 
     return squares;
+}
+
+export function renderMultipleGameBoards(game, playerCount) {
+    const contents = document.getElementById("main-contents");
+    contents.innerHTML = "";
+
+    const firstPlayerSquares = [];
+    const secondPlayerSquares = [];
+
+    game.players.forEach((player, playerIndex) => {
+        const container = renderBoardContainer(player);
+        const board = container.board;
+        const playerContainer = container.playerContainer;
+        const boardContainer = container.boardContainer;
+        const playerHeader = container.playerHeader;
+
+        renderBoardHeader(board);
+
+        player.gameboard.board.forEach((row, rowIndex) => {
+            const square = document.createElement("div");
+            square.textContent = rowIndex + 1;
+            board.append(square);
+            row.forEach((cell, colIndex) => {
+                const square = document.createElement("div");
+                square.classList.add("board-square");
+                square.dataset.rowIndex = rowIndex;
+                square.dataset.colIndex = colIndex;
+                if (playerCount === 1) {
+                    if (player.human && cell.ship) square.classList.add("square-with-ship");
+                    if (player.human) {
+                        square.classList.add("human-board-square");
+                        firstPlayerSquares.push(square);
+                    } else {
+                        square.classList.add("cpu-board-square");
+                        secondPlayerSquares.push(square);                    
+                    }
+                } else {
+                    if (cell.ship) {
+                        square.classList.add("square-with-ship");
+                        square.classList.add("human-board-square");
+                    }
+                    if (playerIndex === 0) {
+                        firstPlayerSquares.push(square);
+                    } else {
+                        secondPlayerSquares.push(square);
+                    }
+                }
+                board.append(square);
+            })
+        })
+        
+        contents.append(playerContainer);
+        boardContainer.append(board)
+        playerContainer.append(playerHeader, boardContainer);
+    })
+    return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
 }
 
 export function updateShipDisplay(squares, board, row, col) {

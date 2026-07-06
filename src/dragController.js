@@ -62,7 +62,7 @@ function rotateDraggedShip(ship) {
     ship.dataset.isVertical = Number(!Boolean(parseInt(ship.dataset.isVertical)));
 }
 
-function setOrientationStyling(isVertical, container, size) {
+export function setOrientationStyling(isVertical, container, size) {
     if (isVertical) {
         container.style.gridTemplateColumns = "";
         container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
@@ -78,7 +78,15 @@ function isAllShipsOnBoard(gameboard, game) {
     return gameboard.ships.length === game.ships.length;
 }
 
-function setStartBtn(startGameBtn, gameboard, game) {
+export function setDoneBtn(doneBtn, gameboard, game) {
+    if (isAllShipsOnBoard(gameboard, game)) {
+        doneBtn.disabled = false;
+    } else {
+        doneBtn.disabled = true;
+    }
+}
+
+export function setStartBtn(startGameBtn, gameboard, game) {
     if (isAllShipsOnBoard(gameboard, game)) {
         startGameBtn.disabled = false;
     } else {

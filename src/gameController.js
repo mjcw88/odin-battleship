@@ -1,8 +1,8 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { setCurrentGame, getCurrentGame } from "./gameStateController.js";
-import { showNewGameForm, renderButtons, renderSingleGameBoard } from "./displayController.js";
-import { createDragEventListenersForBoard, createShipDock, rotateShipsInDock } from "./dragController.js"
+import { showNewGameForm, renderButtons, renderSingleGameBoard, renderShipPlacement, renderMultipleGameBoards } from "./displayController.js";
+import { createDragEventListenersForBoard, createShipDock, rotateShipsInDock, setOrientationStyling, setDoneBtn, setStartBtn } from "./dragController.js"
 
 export const eventListeners = {
     init() {
@@ -22,7 +22,7 @@ export const eventListeners = {
         })
 
         randomiseBtn.addEventListener("click", () => {
-            // randomiseClickEvent(getCurrentGame(), startGameBtn, doneBtn);
+            randomiseClickEvent(getCurrentGame(), startGameBtn, doneBtn);
         });
 
         restartBtn.addEventListener("click", () => {
@@ -34,7 +34,7 @@ export const eventListeners = {
         })
 
         startGameBtn.addEventListener("click", () => {
-            // startGameClickEvent(getCurrentGame());
+            startGameClickEvent(getCurrentGame());
         })
 
         doneBtn.addEventListener("click", () => {
@@ -55,11 +55,6 @@ function handleKeyboardPress(e) {
     }
 }
 
-function createHumanPlayer(game, playerName) {
-    game.addPlayer(playerName, true);
-    return game.getPlayer(playerName);
-}
-
 function resetButtonStates() {
     const disabled = ["done-btn", "start-game-btn", "restart-game-btn"];
 
@@ -70,9 +65,24 @@ function resetButtonStates() {
     });
 }
 
+function createHumanPlayer(game, playerName) {
+    game.addPlayer(playerName, true);
+    return game.getPlayer(playerName);
+}
+
 function resetDockState() {
     const dock = document.getElementById("ship-dock-container");
     dock.style.display = "block";
+}
+
+function setGameBtns() {
+    const hidden = ["randomise-btn", "rotate-btn", "start-game-btn", "done-btn"];
+
+    const btns = document.querySelectorAll(".multi-player-btn");
+    btns.forEach(btn => {
+        btn.disabled = hidden.includes(btn.id);
+        btn.hidden = hidden.includes(btn.id);
+    });
 }
 
 // Main functions
@@ -100,4 +110,50 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
     const squares = renderSingleGameBoard(playerOne);
     const dragController = createDragEventListenersForBoard(squares, playerOne, game);
     createShipDock(game, dragController);
+}
+
+function randomiseClickEvent(game, startGameBtn, doneBtn) {
+    const player = game.currentPlayer;
+    const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
+    const ships = game.randomiseShipPlacement(player);
+    
+    ships.forEach(ship => {
+        const size = ship.size;
+        const index = innerShipContainers.findIndex((s) => s.children.length === size);
+        const container = innerShipContainers.splice(index, 1)[0];
+        const row = ship.start[0];
+        const col = ship.start[1];
+        const isVertical = ship.start[0] !== ship.end[0];
+        container.dataset.isVertical = Number(isVertical);
+        setOrientationStyling(isVertical, container, size)
+        renderShipPlacement(container, row, col, isVertical, size, player.name);
+    })
+
+    if (game.getHumanPlayerCount() > 1) setDoneBtn(doneBtn, player.gameboard, game);
+    setStartBtn(startGameBtn, player.gameboard, game);
+}
+
+function startGameClickEvent(game) {
+    if(!game) return;
+
+    const playerCount = game.getHumanPlayerCount();
+    if (playerCount === 1 && game.players.length >= 2) return;
+
+    if (playerCount === 1) {
+        game.addPlayer();
+        const cpuPlayer = game.getPlayer("CPU");
+        game.randomiseShipPlacement(cpuPlayer);
+    }
+
+    const squares = renderMultipleGameBoards(game, playerCount);
+    const secondPlayerSquares = squares.secondPlayerSquares;
+    secondPlayerSquares.forEach(square => {
+        square.addEventListener("click", () => {
+            playTurnClickEvent(square, game);
+        })
+    })
+
+    document.getElementById("ship-dock-container").style.display = "none";
+
+    setGameBtns();
 }
