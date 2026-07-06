@@ -1,3 +1,35 @@
+export function showNewGameForm() {
+    const newGameForm = document.getElementById("new-game-form");
+    const closeBtn = document.getElementById("close-new-game-btn");
+
+    closeBtn.hidden = false;
+    newGameForm.showModal();
+}
+
+export function resetButtonStates() {
+    const disabled = ["done-btn", "start-game-btn", "restart-game-btn"];
+
+    const btns = document.querySelectorAll(".multi-player-btn");
+    btns.forEach(btn => {
+        btn.hidden = true;
+        btn.disabled = disabled.includes(btn.id);
+    });
+}
+
+export function setButtonStates(playerCount, btns) {
+    btns.forEach(btn => {
+        if (btn.dataset.action !== "restart") {
+            btn.hidden = false;
+        }
+        
+        if (playerCount > 1) {
+            if (btn.dataset.action === "start") {
+                btn.hidden = true
+            };
+        }
+    });
+}
+
 export function renderShipDock(ships) {
     const dock = document.getElementById("ship-dock-container");
     dock.dataset.isVertical = "0";

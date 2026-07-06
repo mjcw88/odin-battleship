@@ -10,7 +10,7 @@ export const renderNewGameForm = {
     }
 }
 
-export const eventListeners = {
+export const formEventListeners = {
     init() {
         const setDiffcultyButtons = function(playerCount) {
             const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');

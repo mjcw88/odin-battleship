@@ -1,4 +1,4 @@
-import { createSinglePlayerGame, createPlayerOne } from "./gameController.js";
+import { createGame } from "./gameController.js";
 
 export function submitForm(form) {
     if (!form.checkValidity()) {
@@ -14,7 +14,7 @@ export function submitForm(form) {
     data.playerTwoName?.trim() === "" ? playerTwoName = "Player 2" : playerTwoName = data.playerTwoName;
     const difficulty = parseInt(data.difficulty);
     const playerCount = parseInt(data.playerCount);
-    createPlayerOne(playerOneName, playerTwoName, difficulty, playerCount);
+    createGame(playerOneName, playerTwoName, difficulty, playerCount);
 }
 
 export function closeForm(dialog, form) {
