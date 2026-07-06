@@ -6,17 +6,7 @@ export function showNewGameForm() {
     newGameForm.showModal();
 }
 
-export function resetButtonStates() {
-    const disabled = ["done-btn", "start-game-btn", "restart-game-btn"];
-
-    const btns = document.querySelectorAll(".multi-player-btn");
-    btns.forEach(btn => {
-        btn.hidden = true;
-        btn.disabled = disabled.includes(btn.id);
-    });
-}
-
-export function setButtonStates(playerCount, btns) {
+export function renderButtonStates(playerCount, btns) {
     btns.forEach(btn => {
         if (btn.dataset.action !== "restart") {
             btn.hidden = false;
@@ -53,47 +43,6 @@ export function renderShipDock(ships) {
 
         outerShipContainer.append(innerShipContainer);
         dock.append(outerShipContainer);
-    })
-}
-
-export function renderValidPlacement(beingDragged, e, humanSquares, boardSize, gameboard) {
-    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
-    const shipSize = beingDragged.children.length;
-
-    const row = parseInt(e.target.dataset.rowIndex);
-    const col = parseInt(e.target.dataset.colIndex);
-
-    const coordinates = [];
-    for(let i = 0; i < shipSize; i++) {
-        if (isVertical) coordinates.push([row + i, col]);
-        else coordinates.push([row,col + i]);
-    }
-
-    let isValid = true;
-    coordinates.forEach(coordinate => {
-        const row = coordinate[0];
-        const col = coordinate[1];
-        if (row >= boardSize || col >= boardSize) isValid = false;
-        const square = humanSquares.find(square => parseInt(square.dataset.rowIndex) === row && parseInt(square.dataset.colIndex) === col);
-        if (square && gameboard[row][col].ship) isValid = false;
-    })
-
-    humanSquares.forEach(square => {
-        square.classList.remove("valid-placement");
-        square.classList.remove("invalid-placement");
-        const squareRow = parseInt(square.dataset.rowIndex);
-        const squareCol = parseInt(square.dataset.colIndex);
-        if (coordinates.some(element => element[0] === squareRow && element[1] === squareCol)) {
-            if (isValid) square.classList.add("valid-placement")
-            else square.classList.add("invalid-placement")
-        };
-    })
-}
-
-export function clearValidPlacement(humanSquares) {
-    humanSquares.forEach(square => {
-        square.classList.remove("valid-placement");
-        square.classList.remove("invalid-placement");
     })
 }
 
@@ -233,18 +182,6 @@ export function renderSingleGameBoard(player) {
     playerContainer.append(playerHeader, boardContainer);
 
     return squares;
-}
-
-export function setOrientationStyling(isVertical, container, size) {
-    if (isVertical) {
-        container.style.gridTemplateColumns = "";
-        container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
-        container.style.width = "var(--gridSize)";
-    } else {
-        container.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
-        container.style.gridTemplateRows = "";
-        container.style.width = "fit-content";
-    }
 }
 
 export function updateShipDisplay(squares, board, row, col) {

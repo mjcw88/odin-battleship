@@ -1,7 +1,8 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { setCurrentGame, getCurrentGame } from "./gameStateController.js";
-import { showNewGameForm, resetButtonStates, setButtonStates, renderSingleGameBoard } from "./displayController.js";
+import { showNewGameForm, renderButtonStates, renderSingleGameBoard } from "./displayController.js";
+import { createDragEventListenersForBoard, createShipDock, rotateShipsInDock } from "./dragController.js"
 
 export const eventListeners = {
     init() {
@@ -15,7 +16,7 @@ export const eventListeners = {
         const startGameBtn = getBtn("start");
         const restartBtn = getBtn("restart");
         const doneBtn = getBtn("done");
-
+        
         newGameBtn.addEventListener("click", () => {
             showNewGameForm();
         })
@@ -29,7 +30,7 @@ export const eventListeners = {
         })
 
         rotateBtn.addEventListener("click", () => {
-            // rotateShipsInDock();
+            rotateShipsInDock();
         })
 
         startGameBtn.addEventListener("click", () => {
@@ -42,18 +43,42 @@ export const eventListeners = {
                 // doneBtnClickEvent(game, playerCount, playerTwoName, doneBtn, startGameBtn, randomiseBtn);
             }
         })
+
+        document.body.addEventListener("keydown", handleKeyboardPress);
     }
 }
 
 // Helper Functions
+function handleKeyboardPress(e) {
+    if (e.key.toLowerCase() === "q") {
+        rotateShipsInDock();
+    }
+}
+
 function createHumanPlayer(game, playerName) {
     game.addPlayer(playerName, true);
     return game.getPlayer(playerName);
 }
 
+function resetButtonStates() {
+    const disabled = ["done-btn", "start-game-btn", "restart-game-btn"];
+
+    const btns = document.querySelectorAll(".multi-player-btn");
+    btns.forEach(btn => {
+        btn.hidden = true;
+        btn.disabled = disabled.includes(btn.id);
+    });
+}
+
+function resetDockState() {
+    const dock = document.getElementById("ship-dock-container");
+    dock.style.display = "block";
+}
+
 // Main functions
 export function createGame(playerOneName, playerTwoName, difficulty, playerCount) {
     resetButtonStates();
+    resetDockState();
 
     document.getElementById("main-contents-container").hidden = false;
     document.getElementById("ship-dock-container").hidden = false;
@@ -71,6 +96,8 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
         btns = document.querySelectorAll(".multi-player-btn");
     }
 
-    setButtonStates(playerCount, btns);
+    renderButtonStates(playerCount, btns);
     const squares = renderSingleGameBoard(playerOne);
+    const dragController = createDragEventListenersForBoard(squares, playerOne, game);
+    createShipDock(game, dragController);
 }
