@@ -38,9 +38,13 @@ export const eventListeners = {
         })
 
         doneBtn.addEventListener("click", () => {
-            const game = getCurrentGame(); // checked fresh, at click time
-            if (game?.getHumanPlayerCount() > 1) {
-                // doneBtnClickEvent(game, playerCount, playerTwoName, doneBtn, startGameBtn, randomiseBtn);
+            const game = getCurrentGame();
+            
+            let playerCount;
+            if (game) playerCount = game.getHumanPlayerCount();
+
+            if (playerCount > 1) {
+                doneBtnClickEvent(playerCount, game);
             }
         })
 
@@ -133,6 +137,25 @@ function randomiseClickEvent(game, startGameBtn, doneBtn) {
     setStartBtn(startGameBtn, player.gameboard, game);
 }
 
+function doneBtnClickEvent(playerCount, game) {
+    if (playerCount < 1) return;
+
+    const doneBtn = document.getElementById("done-btn")
+    doneBtn.hidden = true;
+    
+    const startGameBtn = document.getElementById("start-game-btn");
+    startGameBtn.hidden = false;
+
+    const nextPlayer = game.players.find(p => p !== game.currentPlayer);
+    game.currentPlayer = nextPlayer;
+
+    const squares = renderSingleGameBoard(nextPlayer);
+    const dragController = createDragEventListenersForBoard(squares, nextPlayer, game);
+    createShipDock(game, dragController);
+    setDoneBtn(doneBtn, nextPlayer.gameboard, game);
+    setStartBtn(startGameBtn, nextPlayer.gameboard, game);
+}
+
 function startGameClickEvent(game) {
     if(!game) return;
 
@@ -157,3 +180,4 @@ function startGameClickEvent(game) {
 
     setGameBtns();
 }
+
