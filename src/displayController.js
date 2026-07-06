@@ -6,7 +6,7 @@ export function showNewGameForm() {
     newGameForm.showModal();
 }
 
-export function renderButtonStates(playerCount, btns) {
+export function renderButtons(playerCount, btns) {
     btns.forEach(btn => {
         if (btn.dataset.action !== "restart") {
             btn.hidden = false;

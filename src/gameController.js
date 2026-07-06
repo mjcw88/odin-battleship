@@ -1,7 +1,7 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { setCurrentGame, getCurrentGame } from "./gameStateController.js";
-import { showNewGameForm, renderButtonStates, renderSingleGameBoard } from "./displayController.js";
+import { showNewGameForm, renderButtons, renderSingleGameBoard } from "./displayController.js";
 import { createDragEventListenersForBoard, createShipDock, rotateShipsInDock } from "./dragController.js"
 
 export const eventListeners = {
@@ -96,7 +96,7 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
         btns = document.querySelectorAll(".multi-player-btn");
     }
 
-    renderButtonStates(playerCount, btns);
+    renderButtons(playerCount, btns);
     const squares = renderSingleGameBoard(playerOne);
     const dragController = createDragEventListenersForBoard(squares, playerOne, game);
     createShipDock(game, dragController);
