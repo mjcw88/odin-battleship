@@ -26,7 +26,7 @@ export const eventListeners = {
         });
 
         restartBtn.addEventListener("click", () => {
-            // restartGame(getCurrentGame(), ...);
+            restartGame(getCurrentGame());
         })
 
         rotateBtn.addEventListener("click", () => {
@@ -39,23 +39,28 @@ export const eventListeners = {
 
         doneBtn.addEventListener("click", () => {
             const game = getCurrentGame();
-            
-            let playerCount;
-            if (game) playerCount = game.getHumanPlayerCount();
+            if (!game) return;
 
+            const playerCount = game.getHumanPlayerCount();
             if (playerCount > 1) {
                 doneBtnClickEvent(playerCount, game);
             }
         })
 
-        document.body.addEventListener("keydown", handleKeyboardPress);
+        document.body.addEventListener("keydown", (e) => {
+            handleKeyboardPress(e, startGameBtn, doneBtn)
+        });
     }
 }
 
 // Helper Functions
-function handleKeyboardPress(e) {
+function handleKeyboardPress(e, startGameBtn, doneBtn) {
     if (e.key.toLowerCase() === "q") {
         rotateShipsInDock();
+    }
+
+    if (e.key.toLowerCase() === "r") {
+        randomiseClickEvent(getCurrentGame(), startGameBtn, doneBtn);
     }
 }
 
@@ -117,8 +122,15 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
 }
 
 function randomiseClickEvent(game, startGameBtn, doneBtn) {
-    const player = game.currentPlayer;
     const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
+
+    const isEmpty = innerShipContainers.every(container =>
+        container.children.length === 0
+    );
+
+    if (isEmpty) return;
+
+    const player = game.currentPlayer;
     const ships = game.randomiseShipPlacement(player);
     
     ships.forEach(ship => {
@@ -176,8 +188,24 @@ function startGameClickEvent(game) {
         })
     })
 
-    document.getElementById("ship-dock-container").style.display = "none";
+    const shipDock = document.getElementById("ship-dock-container");
+    shipDock.innerHTML = "";
+    shipDock.hidden = true;
+    shipDock.style.display = "none";
 
     setGameBtns();
 }
 
+function restartGame(game) {
+    const playerCount = game.getHumanPlayerCount();
+    const playerOneName = document.getElementById("player-1-name").textContent;
+    const playerOne = game.getPlayer(playerOneName);
+    const difficulty = game.difficulty;
+    let playerTwoName = "";
+
+    if (playerCount > 1) {
+        playerTwoName = document.getElementById("player-2-name").textContent;
+    }
+
+    createGame(playerOneName, playerTwoName, difficulty, playerCount)
+}

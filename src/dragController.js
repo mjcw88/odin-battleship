@@ -109,8 +109,9 @@ function replaceShipOnBoard(beingDragged, board) {
 }
 
 export function rotateShipsInDock() {
-    const outerShipContainers = document.querySelectorAll(".outer-ship-container");
-    const isEmpty = Array.from(outerShipContainers).every(container =>
+    const outerShipContainers = Array.from(document.querySelectorAll(".outer-ship-container"));
+
+    const isEmpty = outerShipContainers.every(container =>
         container.children.length === 0
     );
 

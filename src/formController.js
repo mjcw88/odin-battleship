@@ -20,4 +20,9 @@ export function submitForm(form) {
 export function closeForm(dialog, form) {
     dialog.close();
     form.reset();
+
+    const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
+    difficultyButtons.forEach(btn => {
+        btn.disabled = false;
+    })
 }

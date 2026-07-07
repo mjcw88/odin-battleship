@@ -37,11 +37,7 @@ function renderBoardHeader(board) {
 
 // Main functions
 export function showNewGameForm() {
-    const newGameForm = document.getElementById("new-game-form");
-    const closeBtn = document.getElementById("close-new-game-btn");
-
-    closeBtn.hidden = false;
-    newGameForm.showModal();
+    document.getElementById("new-game-form").showModal();
 }
 
 export function renderButtons(playerCount, btns) {
@@ -140,7 +136,7 @@ export function renderMultipleGameBoards(game, playerCount) {
     const secondPlayerSquares = [];
 
     game.players.forEach((player, playerIndex) => {
-        const container = renderBoardContainer(player);
+        const container = renderBoardContainer(player, playerIndex);
         const board = container.board;
         const playerContainer = container.playerContainer;
         const boardContainer = container.boardContainer;

@@ -15,21 +15,13 @@ export const formEventListeners = {
         const setDiffcultyButtons = function(playerCount) {
             const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
             difficultyButtons.forEach(btn => {
-                if (playerCount > 1) {
-                    btn.disabled = true;
-                } else {
-                    btn.disabled = false;
-                }
+                btn.disabled = playerCount > 1;
             })
-        }
+        };
 
         const setPlayerTwo = function(playerCount) {
             const playerTwo = document.getElementById("player2-name");
-            if (playerCount > 1) {
-                playerTwo.disabled = false;
-            } else {
-                playerTwo.disabled = true;
-            }
+            playerTwo.disabled = playerCount > 1;
             setDiffcultyButtons(playerCount);
         }
 
@@ -37,6 +29,7 @@ export const formEventListeners = {
         const newGameForm = newGameFormDialog.querySelector("form");
         newGameFormDialog.addEventListener("submit", (e) => {
             e.preventDefault();
+            document.getElementById("close-new-game-btn").hidden = false;
             submitForm(newGameForm);
             closeForm(newGameFormDialog, newGameForm);
         });
@@ -47,12 +40,12 @@ export const formEventListeners = {
             setPlayerTwo(playerCount);
             setDiffcultyButtons(playerCount);
             closeForm(newGameFormDialog, newGameForm);
-        })
+        });
         
         newGameForm.addEventListener("change", (e) => {
             if (e.target.type === "radio" && e.target.name === "playerCount") {
                 setPlayerTwo(parseInt(e.target.value));
             }
-        })
+        });
     }
 }
