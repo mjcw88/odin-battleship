@@ -12,6 +12,7 @@ import { showNewGameForm,
     renderSingleGameBoard, 
     renderShipPlacement, 
     renderMultipleGameBoards, 
+    renderTwoPlayerStartTurn,
     updateShipDisplay,
     renderWinner,
     revealShips } from "./displayController.js";
@@ -87,13 +88,29 @@ function resetButtonStates() {
 }
 
 function createHumanPlayer(game, playerName) {
-    game.addPlayer(playerName, true);
-    return game.getPlayer(playerName);
+    return game.addPlayer(playerName, true);
 }
 
 function resetDockState() {
     const dock = document.getElementById("ship-dock-container");
     dock.style.display = "block";
+}
+
+function setGameBoards(game, playerCount) {
+    const squares = renderMultipleGameBoards(game, playerCount);
+    const secondPlayerSquares = squares.secondPlayerSquares;
+    secondPlayerSquares.forEach(square => {
+        square.addEventListener("click", () => {
+            playTurnClickEvent(square, game);
+        })
+    })
+
+    const shipDock = document.getElementById("ship-dock-container");
+    shipDock.innerHTML = "";
+    shipDock.hidden = true;
+    shipDock.style.display = "none";
+
+    setGameBtns();
 }
 
 function setGameBtns() {
@@ -223,28 +240,14 @@ function startGameClickEvent(game) {
     if(!game) return;
 
     const playerCount = game.getHumanPlayerCount();
-    if (playerCount === 1 && game.players.length >= 2) return;
 
     if (playerCount === 1) {
-        game.addPlayer();
-        const cpuPlayer = game.getPlayer("CPU");
+        const cpuPlayer = game.addPlayer();
         game.randomiseShipPlacement(cpuPlayer);
+        setGameBoards(game, playerCount);
+    } else {
+        renderTwoPlayerStartTurn(game);
     }
-
-    const squares = renderMultipleGameBoards(game, playerCount);
-    const secondPlayerSquares = squares.secondPlayerSquares;
-    secondPlayerSquares.forEach(square => {
-        square.addEventListener("click", () => {
-            playTurnClickEvent(square, game);
-        })
-    })
-
-    const shipDock = document.getElementById("ship-dock-container");
-    shipDock.innerHTML = "";
-    shipDock.hidden = true;
-    shipDock.style.display = "none";
-
-    setGameBtns();
 }
 
 function restartGame(game) {

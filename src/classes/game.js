@@ -312,6 +312,7 @@ export class Game {
     addPlayer(name = "CPU", human = false) {
         const player = new Player(name, human);
         this.players.push(player);
+        return player;
     }
 
     randomiseShipPlacement(player) {

@@ -184,6 +184,36 @@ export function renderMultipleGameBoards(game, playerCount) {
     return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
 }
 
+export function renderTwoPlayerStartTurn(game) {
+    const contents = document.getElementById("main-contents");
+    contents.innerHTML = "";
+
+    game.players.forEach((player, playerIndex) => {
+        const container = renderBoardContainer(player, playerIndex);
+        const board = container.board;
+        const playerContainer = container.playerContainer;
+        const boardContainer = container.boardContainer;
+        const playerHeader = container.playerHeader;
+
+        renderBoardHeader(board);
+
+        player.gameboard.board.forEach((row, rowIndex) => {
+            const square = document.createElement("div");
+            square.textContent = rowIndex + 1;
+            board.append(square);
+            row.forEach(cell => {
+                const square = document.createElement("div");
+                square.classList.add("board-square");
+                board.append(square);
+            })
+        })
+        
+        contents.append(playerContainer);
+        boardContainer.append(board)
+        playerContainer.append(playerHeader, boardContainer);
+    })
+}
+
 export function updateShipDisplay(squares, board, row, col) {
     const traverseBoard = function() {
         const TRAVERSE_DIRECTIONS = [-1,1];
