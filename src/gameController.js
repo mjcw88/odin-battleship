@@ -1,8 +1,20 @@
 import { Game } from "./classes/game.js";
 import { Gameboard } from "./classes/gameboard.js";
 import { setCurrentGame, getCurrentGame } from "./gameStateController.js";
-import { showNewGameForm, renderButtons, renderSingleGameBoard, renderShipPlacement, renderMultipleGameBoards } from "./displayController.js";
-import { createDragEventListenersForBoard, createShipDock, rotateShipsInDock, setOrientationStyling, setDoneBtn, setStartBtn } from "./dragController.js"
+import { createDragEventListenersForBoard, 
+    createShipDock, 
+    rotateShipsInDock, 
+    setOrientationStyling, 
+    setDoneBtn, 
+    setStartBtn } from "./dragController.js"
+import { showNewGameForm, 
+    renderButtons, 
+    renderSingleGameBoard, 
+    renderShipPlacement, 
+    renderMultipleGameBoards, 
+    updateShipDisplay,
+    renderWinner,
+    revealShips } from "./displayController.js";
 
 export const eventListeners = {
     init() {
@@ -94,6 +106,49 @@ function setGameBtns() {
     });
 }
 
+function playSinglePlayerTurn(btn, game) {
+    if (!game.playerOneTurn) return;
+
+    const row = parseInt(btn.dataset.rowIndex);
+    const col = parseInt(btn.dataset.colIndex);
+
+    const cpuPlayer = game.getPlayer("CPU");
+    const cpuBoard = cpuPlayer.gameboard;
+    if (cpuBoard.board[row][col].hit) return;
+
+    game.playHumanTurn(row, col);
+    const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
+    updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col);
+    game.flipPlayerOneTurn();
+
+    const humanName = document.getElementById("player-1-name").textContent;
+    const humanPlayer = game.getPlayer(humanName);
+    if (cpuBoard.isAllSunk()) {
+        game.declareWinner(humanPlayer);
+        renderWinner(game.winner);
+    } else {
+        const WAIT = 500;
+        setTimeout(() => {
+            const square = game.playComputerTurn(humanPlayer);
+            const cpuRow = square[0];
+            const cpuCol = square[1];
+            const humanBoard = humanPlayer.gameboard;
+            const humanBoardDisplay = document.querySelectorAll(".human-board-square");
+            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
+            if (humanBoard.isAllSunk()) {
+                game.declareWinner(cpuPlayer);
+                renderWinner(game.winner);
+                revealShips(game.winner.gameboard.board, cpuBoardDisplay);
+            }
+            game.flipPlayerOneTurn();
+        }, WAIT);
+    }
+}
+
+function playMultiPlayerTurn(btn, game) {
+    console.log("FOUND")
+}
+
 // Main functions
 export function createGame(playerOneName, playerTwoName, difficulty, playerCount) {
     resetButtonStates();
@@ -123,11 +178,7 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
 
 function randomiseClickEvent(game, startGameBtn, doneBtn) {
     const innerShipContainers = Array.from(document.querySelectorAll(".inner-ship-container"));
-
-    const isEmpty = innerShipContainers.every(container =>
-        container.children.length === 0
-    );
-
+    const isEmpty = innerShipContainers.every(container => container.children.length === 0);
     if (isEmpty) return;
 
     const player = game.currentPlayer;
@@ -197,15 +248,20 @@ function startGameClickEvent(game) {
 }
 
 function restartGame(game) {
-    const playerCount = game.getHumanPlayerCount();
     const playerOneName = document.getElementById("player-1-name").textContent;
-    const playerOne = game.getPlayer(playerOneName);
+    const playerTwoName = document.getElementById("player-2-name").textContent;
     const difficulty = game.difficulty;
-    let playerTwoName = "";
+    const playerCount = game.getHumanPlayerCount();
+    
+    createGame(playerOneName, playerTwoName, difficulty, playerCount);
+}
 
-    if (playerCount > 1) {
-        playerTwoName = document.getElementById("player-2-name").textContent;
+function playTurnClickEvent(btn, game) {
+    if (game.winner) return;
+
+    if (game.getHumanPlayerCount() === 1) {
+        playSinglePlayerTurn(btn, game);
+    } else {
+        playMultiPlayerTurn(btn, game);
     }
-
-    createGame(playerOneName, playerTwoName, difficulty, playerCount)
 }

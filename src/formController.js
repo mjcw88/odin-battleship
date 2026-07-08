@@ -21,6 +21,8 @@ export function closeForm(dialog, form) {
     dialog.close();
     form.reset();
 
+    document.getElementById("player2-name").disabled = true;
+
     const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
     difficultyButtons.forEach(btn => {
         btn.disabled = false;

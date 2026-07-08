@@ -21,7 +21,7 @@ export const formEventListeners = {
 
         const setPlayerTwo = function(playerCount) {
             const playerTwo = document.getElementById("player2-name");
-            playerTwo.disabled = playerCount > 1;
+            playerTwo.disabled = playerCount === 1;
             setDiffcultyButtons(playerCount);
         }
 
