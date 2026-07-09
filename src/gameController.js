@@ -12,10 +12,12 @@ import { showNewGameForm,
     renderSingleGameBoard, 
     renderShipPlacement, 
     renderMultipleGameBoards, 
-    renderTwoPlayerStartTurn,
+    renderTwoPlayerBlankGameBoards,
     updateShipDisplay,
     renderWinner,
-    revealShips } from "./displayController.js";
+    revealShips,
+    hideDock,
+    showStartTurnDialog } from "./displayController.js";
 
 export const eventListeners = {
     init() {
@@ -26,9 +28,10 @@ export const eventListeners = {
         const newGameBtn = getBtn("new");
         const randomiseBtn = getBtn("randomise");
         const rotateBtn = getBtn("rotate");
-        const startGameBtn = getBtn("start");
+        const startGameBtn = getBtn("start game");
         const restartBtn = getBtn("restart");
         const doneBtn = getBtn("done");
+        const startTurnBtn = getBtn("start turn");
         
         newGameBtn.addEventListener("click", () => {
             showNewGameForm();
@@ -58,6 +61,16 @@ export const eventListeners = {
             if (playerCount > 1) {
                 doneBtnClickEvent(playerCount, game);
             }
+        })
+
+        startTurnBtn.addEventListener("click", () => {
+            const game = getCurrentGame();
+            if (!game) return;
+
+            const startTurn = document.getElementById("start-turn-dialog");
+            startTurn.close();
+
+            setGameBoards(game, game.getHumanPlayerCount());
         })
 
         document.body.addEventListener("keydown", (e) => {
@@ -246,7 +259,9 @@ function startGameClickEvent(game) {
         game.randomiseShipPlacement(cpuPlayer);
         setGameBoards(game, playerCount);
     } else {
-        renderTwoPlayerStartTurn(game);
+        hideDock();
+        renderTwoPlayerBlankGameBoards(game);
+        showStartTurnDialog(game.playerOneTurn);
     }
 }
 

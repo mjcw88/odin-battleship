@@ -18,12 +18,14 @@ body {
     gap: 1rem;
 }
 
-#new-game-form {
+#new-game-form,
+#start-turn-dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
     width: fit-content;
+    padding: 1rem;
 }
 
 #main-contents {

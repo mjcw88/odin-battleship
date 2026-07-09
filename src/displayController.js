@@ -184,7 +184,7 @@ export function renderMultipleGameBoards(game, playerCount) {
     return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
 }
 
-export function renderTwoPlayerStartTurn(game) {
+export function renderTwoPlayerBlankGameBoards(game) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
 
@@ -212,6 +212,24 @@ export function renderTwoPlayerStartTurn(game) {
         boardContainer.append(board)
         playerContainer.append(playerHeader, boardContainer);
     })
+}
+
+export function showStartTurnDialog(playerOneTurn) {
+    const startTurn = document.getElementById("start-turn-dialog");
+    startTurn.showModal();
+
+    let playerName;
+    if (playerOneTurn) playerName = document.getElementById("player-1-name").textContent;
+    else playerName = document.getElementById("player-2-name").textContent;
+
+    const startTurnBtn = document.getElementById("start-turn-btn");
+    startTurnBtn.textContent = `Start ${playerName}'s turn`;
+}
+
+export function hideDock() {
+    const dock = document.getElementById("ship-dock-container");
+    dock.hidden = true;
+    dock.style.display = "none";
 }
 
 export function updateShipDisplay(squares, board, row, col) {
