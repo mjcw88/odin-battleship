@@ -35,6 +35,35 @@ function renderBoardHeader(board) {
     })
 }
 
+function renderSinglePlayerSquare(player, cell, square, firstPlayerSquares, secondPlayerSquares) {
+if (player.human && cell.ship) square.classList.add("square-with-ship");
+    if (player.human) {
+        square.classList.add("human-board-square");
+        firstPlayerSquares.push(square);
+    } else {
+        square.classList.add("cpu-board-square");
+        square.classList.add("non-turn-board-square");
+        secondPlayerSquares.push(square);                    
+    }
+}
+
+function renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares, secondPlayerSquares, playerOneTurn) {
+    if (playerOneTurn && playerIndex === 0) {
+        if (cell.ship) {
+            square.classList.add("square-with-ship");
+            square.classList.add("human-board-square");
+        }
+    } else {
+        square.classList.add("non-turn-board-square");
+    }
+
+    if (playerIndex === 0) {
+        firstPlayerSquares.push(square);
+    } else {
+        secondPlayerSquares.push(square);
+    }
+}
+
 // Main functions
 export function showNewGameForm() {
     document.getElementById("new-game-form").showModal();
@@ -47,7 +76,7 @@ export function renderButtons(playerCount, btns) {
         }
         
         if (playerCount > 1) {
-            if (btn.dataset.action === "start") {
+            if (btn.dataset.action === "start game") {
                 btn.hidden = true
             };
         }
@@ -154,24 +183,9 @@ export function renderMultipleGameBoards(game, playerCount) {
                 square.dataset.rowIndex = rowIndex;
                 square.dataset.colIndex = colIndex;
                 if (playerCount === 1) {
-                    if (player.human && cell.ship) square.classList.add("square-with-ship");
-                    if (player.human) {
-                        square.classList.add("human-board-square");
-                        firstPlayerSquares.push(square);
-                    } else {
-                        square.classList.add("cpu-board-square");
-                        secondPlayerSquares.push(square);                    
-                    }
+                    renderSinglePlayerSquare(player, cell, square, firstPlayerSquares, secondPlayerSquares);
                 } else {
-                    if (cell.ship) {
-                        square.classList.add("square-with-ship");
-                        square.classList.add("human-board-square");
-                    }
-                    if (playerIndex === 0) {
-                        firstPlayerSquares.push(square);
-                    } else {
-                        secondPlayerSquares.push(square);
-                    }
+                    renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares, secondPlayerSquares, game.playerOneTurn);
                 }
                 board.append(square);
             })

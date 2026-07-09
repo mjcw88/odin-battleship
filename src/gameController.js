@@ -235,6 +235,7 @@ function doneBtnClickEvent(playerCount, game) {
 
     const doneBtn = document.getElementById("done-btn")
     doneBtn.hidden = true;
+    doneBtn.disabled = true;
     
     const startGameBtn = document.getElementById("start-game-btn");
     startGameBtn.hidden = false;
@@ -244,6 +245,8 @@ function doneBtnClickEvent(playerCount, game) {
 
     const squares = renderSingleGameBoard(nextPlayer);
     const dragController = createDragEventListenersForBoard(squares, nextPlayer, game);
+
+    document.getElementById("ship-dock-container").style.display = "block";
     createShipDock(game, dragController);
     setDoneBtn(doneBtn, nextPlayer.gameboard, game);
     setStartBtn(startGameBtn, nextPlayer.gameboard, game);

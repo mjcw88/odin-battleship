@@ -99,7 +99,8 @@ body {
     background-color: darkgray;
 }
 
-.cpu-board-square {
+.cpu-board-square,
+.non-turn-board-square {
     cursor: pointer;
 }
 
