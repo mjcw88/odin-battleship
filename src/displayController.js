@@ -36,13 +36,14 @@ function renderBoardHeader(board) {
 }
 
 function renderSinglePlayerSquare(player, cell, square, firstPlayerSquares, secondPlayerSquares) {
-if (player.human && cell.ship) square.classList.add("square-with-ship");
+    if (player.human && cell.ship) square.classList.add("square-with-ship");
+
     if (player.human) {
         square.classList.add("human-board-square");
         firstPlayerSquares.push(square);
     } else {
         square.classList.add("cpu-board-square");
-        square.classList.add("non-turn-board-square");
+        square.classList.add("clickable-square");
         secondPlayerSquares.push(square);                    
     }
 }
@@ -54,7 +55,8 @@ function renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares,
             square.classList.add("human-board-square");
         }
     } else {
-        square.classList.add("non-turn-board-square");
+        square.classList.add("clickable-square");
+        square.classList.add("enemy-board-square");
     }
 
     if (playerIndex === 0) {
@@ -76,7 +78,7 @@ export function renderButtons(playerCount, btns) {
         }
         
         if (playerCount > 1) {
-            if (btn.dataset.action === "start game") {
+            if (btn.dataset.action === "start game" || btn.dataset.action === "end turn") {
                 btn.hidden = true
             };
         }
@@ -300,6 +302,15 @@ export function updateShipDisplay(squares, board, row, col) {
     } else {
         cell.classList.add("board-miss");
     }
+
+    cell.classList.remove("clickable-square");
+}
+
+export function removeClickableSquares() {
+    const squares = document.querySelectorAll(".clickable-square");
+    squares.forEach(square => {
+        square.classList.remove("clickable-square");
+    })
 }
 
 export function renderWinner(player) {

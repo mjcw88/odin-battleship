@@ -17,7 +17,8 @@ import { showNewGameForm,
     renderWinner,
     revealShips,
     hideDock,
-    showStartTurnDialog } from "./displayController.js";
+    showStartTurnDialog,
+    removeClickableSquares } from "./displayController.js";
 
 export const eventListeners = {
     init() {
@@ -32,6 +33,7 @@ export const eventListeners = {
         const restartBtn = getBtn("restart");
         const doneBtn = getBtn("done");
         const startTurnBtn = getBtn("start turn");
+        const endTurnBtn = getBtn("end turn");
         
         newGameBtn.addEventListener("click", () => {
             showNewGameForm();
@@ -69,8 +71,17 @@ export const eventListeners = {
 
             const startTurn = document.getElementById("start-turn-dialog");
             startTurn.close();
-
+            game.turnFinished = false;
             setGameBoards(game, game.getHumanPlayerCount());
+        })
+
+        endTurnBtn.addEventListener("click", () => {
+            const game = getCurrentGame();
+            if (!game) return;
+
+            game.flipPlayerOneTurn();
+            showStartTurnDialog(game.playerOneTurn);
+            renderTwoPlayerBlankGameBoards(game);
         })
 
         document.body.addEventListener("keydown", (e) => {
@@ -111,8 +122,12 @@ function resetDockState() {
 
 function setGameBoards(game, playerCount) {
     const squares = renderMultipleGameBoards(game, playerCount);
-    const secondPlayerSquares = squares.secondPlayerSquares;
-    secondPlayerSquares.forEach(square => {
+
+    let clickableSquares;
+    if (game.playerOneTurn) clickableSquares = squares.secondPlayerSquares;
+    else clickableSquares = squares.firstPlayerSquares;
+    
+    clickableSquares.forEach(square => {
         square.addEventListener("click", () => {
             playTurnClickEvent(square, game);
         })
@@ -127,7 +142,13 @@ function setGameBoards(game, playerCount) {
 }
 
 function setGameBtns() {
-    const hidden = ["randomise-btn", "rotate-btn", "start-game-btn", "done-btn"];
+    const hidden = [
+        "randomise-btn", 
+        "rotate-btn", 
+        "start-game-btn", 
+        "done-btn", 
+        "end-turn-btn"
+    ];
 
     const btns = document.querySelectorAll(".multi-player-btn");
     btns.forEach(btn => {
@@ -176,7 +197,39 @@ function playSinglePlayerTurn(btn, game) {
 }
 
 function playMultiPlayerTurn(btn, game) {
-    console.log("FOUND")
+    if (game.turnFinished) return;
+    const row = parseInt(btn.dataset.rowIndex);
+    const col = parseInt(btn.dataset.colIndex);
+
+    let currentPlayerName, enemyPlayerName;
+    if (game.playerOneTurn) {
+        currentPlayerName = document.getElementById("player-1-name").textContent
+        enemyPlayerName = document.getElementById("player-2-name").textContent
+    } else {
+        currentPlayerName = document.getElementById("player-2-name").textContent
+        enemyPlayerName = document.getElementById("player-1-name").textContent
+    };
+
+    const enemyPlayer = game.getPlayer(enemyPlayerName);
+    const enemyBoard = enemyPlayer.gameboard;
+    if (enemyBoard.board[row][col].hit) return;
+
+    game.playHumanTurn(row, col, enemyPlayerName);
+    const enemyBoardDisplay = document.querySelectorAll(".enemy-board-square");
+    updateShipDisplay(enemyBoardDisplay, enemyBoard.board, row, col);
+
+    const currentPlayer = game.getPlayer(currentPlayerName);
+    if (enemyPlayer.gameboard.isAllSunk()) {
+        game.declareWinner(currentPlayer);
+        renderWinner(game.winner);
+    } else {
+
+    }
+    removeClickableSquares();
+    const endTurnBtn = document.getElementById("end-turn-btn");
+    endTurnBtn.hidden = false;
+    endTurnBtn.disabled = false;
+    game.turnFinished = true;
 }
 
 // Main functions

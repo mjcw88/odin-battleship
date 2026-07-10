@@ -99,9 +99,12 @@ body {
     background-color: darkgray;
 }
 
-.cpu-board-square,
-.non-turn-board-square {
+.clickable-square {
     cursor: pointer;
+}
+
+.clickable-square:hover {
+    background-color: green;
 }
 
 .board-hit {

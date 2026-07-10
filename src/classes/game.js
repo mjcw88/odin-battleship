@@ -8,15 +8,16 @@ export class Game {
         this.players = [];
         this.ships = [5, 4, 3, 3, 2];
         this.playerOneTurn = true;
+        this.turnFinished = false;
         this.currentPlayer = null;
         this.difficulty = difficulty;
         this.winner = null;
     }
 
-    #isValidNumber(num) {
+    #isValidNumber(num, playerName) {
         if (!Number.isInteger(num)) throw new TypeError("Number must be an integer");
         
-        const player = this.getPlayer("CPU");
+        const player = this.getPlayer(playerName);
         const board = player.gameboard.board;
         if (num < 0 || num >= board.length) throw new RangeError("Integer out of bounds");
     }
@@ -382,18 +383,16 @@ export class Game {
         return placements;
     }
 
-    playHumanTurn(row, col) {
-        this.#isValidNumber(row);
-        this.#isValidNumber(col);
+    playHumanTurn(row, col, enemyPlayerName = "CPU") {
+        if (this.winner) return;
 
-        if (this.winner || !this.playerOneTurn) return;
+        this.#isValidNumber(row, enemyPlayerName);
+        this.#isValidNumber(col, enemyPlayerName);
 
-        const cpu = this.getPlayer("CPU");
-        const cpuBoard = cpu.gameboard;
-
-        if (cpuBoard.board[row][col].hit) return;
-
-        cpuBoard.recieveAttack(row, col);
+        const enemyPlayer = this.getPlayer(enemyPlayerName);
+        const enemyBoard = enemyPlayer.gameboard;
+        if (enemyBoard.board[row][col].hit) return;
+        enemyBoard.recieveAttack(row, col);
     }
 
     #playVeryEasyTurn(targets, available, hits) {
