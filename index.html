@@ -18,16 +18,16 @@
                     <label for="player1-name">Player 1</label>
                     <input type="text" id="player1-name" name="playerOneName" maxlength="16" placeholder="Name">
                 </div>
-                <!-- <div class="form-row player-name">
+                <div class="form-row player-name">
                     <label for="player2-name">Player 2</label>
                     <input type="text" id="player2-name" name="playerTwoName" maxlength="16" placeholder="Name" disabled>
-                </div> -->
-                <!-- <div class="form-row radio-btns">
+                </div>
+                <div class="form-row radio-btns">
                     <input type="radio" id="player2-cpu" name="playerCount" value="1" checked>
                     <label for="player2-cpu">CPU</label>
                     <input type="radio" id="player2-human" name="playerCount" value="2">
                     <label for="player2-human">Human</label>
-                </div> -->
+                </div>
                 <div class="form-row difficulty-btns">
                     <div class="form-row">Difficulty</div>
                     <input type="radio" id="difficulty-very-easy" name="difficulty" value="0">
@@ -47,14 +47,22 @@
             </form>
         </dialog>
     </div>
+    <div class="start-turn-container">
+        <dialog id="start-turn-dialog">
+            <h1>Start Turn</h1>
+            <button id="start-turn-btn" class="multi-player-btn" data-action="start turn"></button>
+        </dialog>
+    </div>
     <h1>Battleship</h1>
     <div id="main-contents-container" hidden="true">
         <div id="buttons-container">
-            <button id="rotate-btn" hidden="true">Rotate</button>
-            <button id="randomise-ships-btn" hidden="true">Randomise</button>
-            <button id="start-game-btn" hidden="true" disabled="true">Start Game</button>
-            <button id="restart-game-btn" hidden="true">Restart Game</button>
-            <button id="new-game-btn" hidden="true">New Game</button>
+            <button id="rotate-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="rotate">Rotate</button>
+            <button id="randomise-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="randomise">Randomise</button>
+            <button id="done-btn" class="multi-player-btn" hidden="true" disabled="true" data-action="done">Done</button>
+            <button id="start-game-btn" class="single-player-btn multi-player-btn" hidden="true" disabled="true" data-action="start game">Start Game</button>
+            <button id="restart-game-btn" class="single-player-btn multi-player-btn" hidden="true" disabled="true" data-action="restart">Restart Game</button>
+            <button id="new-game-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="new">New Game</button>
+            <button id="end-turn-btn" class="multi-player-btn" hidden="true" disabled="true" data-action="end turn">End Turn</button>
         </div>
         <div id="ship-dock-main-container">
             <div id="ship-dock-container">
