@@ -352,6 +352,11 @@ export function removeClickableSquares() {
 }
 
 export function renderWinner(player) {
+    const clickableSquares = document.querySelectorAll(".clickable-square");
+    clickableSquares.forEach(square => {
+        square.classList.remove("clickable-square");
+    })
+    
     const name = player.name;
     console.log(`A winner is you, ${name}!`);
 }
