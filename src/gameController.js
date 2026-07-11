@@ -12,7 +12,7 @@ import { showNewGameForm,
     renderSingleGameBoard, 
     renderShipPlacement, 
     renderMultipleGameBoards, 
-    renderTwoPlayerBlankGameBoards,
+    renderTwoPlayerBetweenTurnsBoards,
     updateShipDisplay,
     renderWinner,
     revealShips,
@@ -77,11 +77,11 @@ export const eventListeners = {
 
         endTurnBtn.addEventListener("click", () => {
             const game = getCurrentGame();
-            if (!game) return;
+            if (!game || game.winner) return;
 
             game.flipPlayerOneTurn();
             showStartTurnDialog(game.playerOneTurn);
-            renderTwoPlayerBlankGameBoards(game);
+            renderTwoPlayerBetweenTurnsBoards(game);
         })
 
         document.body.addEventListener("keydown", (e) => {
@@ -316,7 +316,7 @@ function startGameClickEvent(game) {
         setGameBoards(game, playerCount);
     } else {
         hideDock();
-        renderTwoPlayerBlankGameBoards(game);
+        renderTwoPlayerBetweenTurnsBoards(game);
         showStartTurnDialog(game.playerOneTurn);
     }
 }

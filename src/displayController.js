@@ -49,14 +49,44 @@ function renderSinglePlayerSquare(player, cell, square, firstPlayerSquares, seco
 }
 
 function renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares, secondPlayerSquares, playerOneTurn) {
-    if (playerOneTurn && playerIndex === 0) {
+    const renderCurrentPlayersSquares = function() {
+        square.classList.add("human-board-square");
         if (cell.ship) {
+            if (cell.ship.isSunk()) {
+                square.classList.add("board-sunk");
+            } else if (cell.hit) {
+                square.classList.add("board-hit");
+            }
             square.classList.add("square-with-ship");
-            square.classList.add("human-board-square");
+        } else if (cell.hit) {
+            square.classList.add("board-miss");
         }
-    } else {
-        square.classList.add("clickable-square");
+    }
+
+    const renderEnemyPlayerSquares = function() {
         square.classList.add("enemy-board-square");
+        square.classList.add("human-board-square");
+        if (cell.ship) {
+            if (cell.ship.isSunk()) {
+                square.classList.add("board-sunk");
+            } else if (cell.hit) {
+                square.classList.add("board-hit");
+            }
+        } else if (!cell.ship && cell.hit) {
+            square.classList.add("board-miss");
+        } 
+
+        if (!cell.hit) {
+            square.classList.add("clickable-square");
+        }
+    }
+
+    if (playerOneTurn && playerIndex === 0) {
+        renderCurrentPlayersSquares();
+    } else if (!playerOneTurn && playerIndex === 1) {
+        renderCurrentPlayersSquares();
+    } else {
+        renderEnemyPlayerSquares();
     }
 
     if (playerIndex === 0) {
@@ -200,7 +230,7 @@ export function renderMultipleGameBoards(game, playerCount) {
     return { firstPlayerSquares: firstPlayerSquares, secondPlayerSquares: secondPlayerSquares };
 }
 
-export function renderTwoPlayerBlankGameBoards(game) {
+export function renderTwoPlayerBetweenTurnsBoards(game) {
     const contents = document.getElementById("main-contents");
     contents.innerHTML = "";
 
@@ -220,6 +250,15 @@ export function renderTwoPlayerBlankGameBoards(game) {
             row.forEach(cell => {
                 const square = document.createElement("div");
                 square.classList.add("board-square");
+                if (cell.ship) {
+                    if (cell.ship.isSunk()) {
+                        square.classList.add("board-sunk");
+                    } else if (cell.hit) {
+                        square.classList.add("board-hit");
+                    }
+                } else if (!cell.ship && cell.hit) {
+                    square.classList.add("board-miss");
+                }
                 board.append(square);
             })
         })
@@ -302,7 +341,6 @@ export function updateShipDisplay(squares, board, row, col) {
     } else {
         cell.classList.add("board-miss");
     }
-
     cell.classList.remove("clickable-square");
 }
 
