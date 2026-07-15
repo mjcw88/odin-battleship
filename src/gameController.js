@@ -34,6 +34,11 @@ export const eventListeners = {
         const doneBtn = getBtn("done");
         const startTurnBtn = getBtn("start turn");
         const endTurnBtn = getBtn("end turn");
+
+        const restartGameDialog = document.getElementById("restart-game-dialog");
+        const closeRestart = document.getElementById("close-restart-game-btn");
+        const yesRestartBtn = document.getElementById("yes-restart-game-btn");
+        const noRestartBtn = document.getElementById("no-restart-game-btn");
         
         newGameBtn.addEventListener("click", () => {
             showNewGameForm();
@@ -44,7 +49,20 @@ export const eventListeners = {
         });
 
         restartBtn.addEventListener("click", () => {
+            restartGameDialog.showModal();
+        })
+
+        closeRestart.addEventListener("click", () => {
+            restartGameDialog.close();
+        })
+
+        yesRestartBtn.addEventListener("click", () => {            
+            restartGameDialog.close();
             restartGame(getCurrentGame());
+        })
+
+        noRestartBtn.addEventListener("click", () => {
+            restartGameDialog.close();
         })
 
         rotateBtn.addEventListener("click", () => {

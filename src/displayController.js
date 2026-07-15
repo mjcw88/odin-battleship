@@ -98,7 +98,9 @@ function renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares,
 
 // Main functions
 export function showNewGameForm() {
-    document.getElementById("new-game-form").showModal();
+    const closeBtn = document.getElementById("close-new-game-btn");
+    closeBtn.hidden = false;
+    document.getElementById("player-count-dialog").showModal();
 }
 
 export function renderButtons(playerCount, btns) {

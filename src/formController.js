@@ -1,30 +1,72 @@
 import { createGame } from "./gameController.js";
 
-export function submitForm(form) {
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
+function createGameSetup() {
+    let playerOneName = "";
+    let playerTwoName = "";
+    let difficulty = 0;
+    let playerCount = 0;
+
+    function isValid(form) {
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return false;
+        }
+        return true;
     }
 
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
+    function handleFormData(form) {
+        if (!isValid(form)) return null;
 
-    let playerOneName, playerTwoName;
-    data.playerOneName?.trim() === "" ? playerOneName = "Player 1" : playerOneName = data.playerOneName;
-    data.playerTwoName?.trim() === "" ? playerTwoName = "Player 2" : playerTwoName = data.playerTwoName;
-    const difficulty = parseInt(data.difficulty);
-    const playerCount = parseInt(data.playerCount);
-    createGame(playerOneName, playerTwoName, difficulty, playerCount);
+        return Object.fromEntries(new FormData(form));
+    }
+
+    function create() {
+        createGame(
+            playerOneName,
+            playerTwoName,
+            difficulty,
+            playerCount
+        );
+    }
+
+    return {
+        submitPlayerCount(value) {
+            playerCount = Number(value);
+        },
+
+        submitPlayerOne(form) {
+            const data = handleFormData(form);
+            if (!data) return;
+
+            playerOneName = data.playerName?.trim() || "Player 1";
+        },
+
+        submitPlayerTwo(form) {
+            const data = handleFormData(form);
+            if (!data) return;
+
+            playerTwoName = data.playerName?.trim() || "Player 2";
+            create();
+        },
+
+        submitCpuDifficulty(value) {
+            difficulty = Number(value);
+            create();
+        },
+
+        getState() {
+            return {
+                playerOneName,
+                playerTwoName,
+                difficulty,
+                playerCount,
+            };
+        }
+    };
 }
 
-export function closeForm(dialog, form) {
+export function closeForm(dialog) {
     dialog.close();
-    form.reset();
-
-    document.getElementById("player2-name").disabled = true;
-
-    const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
-    difficultyButtons.forEach(btn => {
-        btn.disabled = false;
-    })
 }
+
+export const gameSetup = createGameSetup();

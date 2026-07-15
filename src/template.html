@@ -8,47 +8,62 @@
 </head>
 <body>
     <div class="new-game-form-container">
-        <dialog id="new-game-form">
-            <div class="new-game-header">
-                <h1>New Game</h1>
+        <dialog id="player-count-dialog" class="dialog-container">
+            <div class="game-header">
                 <button type="button" id="close-new-game-btn" hidden="true">X</button>
             </div>
             <form>
-                <div class="form-row player-name">
-                    <label for="player1-name">Player 1</label>
-                    <input type="text" id="player1-name" name="playerOneName" maxlength="16" placeholder="Name">
-                </div>
-                <div class="form-row player-name">
-                    <label for="player2-name">Player 2</label>
-                    <input type="text" id="player2-name" name="playerTwoName" maxlength="16" placeholder="Name" disabled>
-                </div>
-                <div class="form-row radio-btns">
-                    <input type="radio" id="player2-cpu" name="playerCount" value="1" checked>
-                    <label for="player2-cpu">CPU</label>
-                    <input type="radio" id="player2-human" name="playerCount" value="2">
-                    <label for="player2-human">Human</label>
-                </div>
-                <div class="form-row difficulty-btns">
-                    <div class="form-row">Difficulty</div>
-                    <input type="radio" id="difficulty-very-easy" name="difficulty" value="0">
-                    <label for="difficulty-very-easy">Very Easy</label>
-                    <input type="radio" id="difficulty-easy" name="difficulty" value="1">
-                    <label for="difficulty-easy">Easy</label>
-                    <input type="radio" id="difficulty-medium" name="difficulty" value="2" checked>
-                    <label for="difficulty-medium">Medium</label>
-                    <input type="radio" id="difficulty-hard" name="difficulty" value="3">
-                    <label for="difficulty-hard">Hard</label>
-                    <input type="radio" id="difficulty-very-hard" name="difficulty" value="4">
-                    <label for="difficulty-very-hard">Very Hard</label>
-                </div>
-                <div class="form-row form-btns">
-                    <button type="submit">Start Game</button>
-                </div>
+                <button type="submit" value="1">1 Player</button>
+                <button type="submit" value="2">2 Players</button>
             </form>
+        </dialog>
+        <dialog id="player-one-dialog" class="dialog-container">
+            <div class="game-header">
+                <button id="player-one-back-btn">Back</button>
+            </div>
+            <form>
+                <div>Player 1</div>
+                <label for="player1-name">Enter your name:</label>
+                <input type="text" id="player1-name" name="playerName" maxlength="16" placeholder="Player 1">
+                <button type="submit">Done</button>
+            </form>
+        </dialog>
+        <dialog id="player-two-dialog" class="dialog-container">
+            <div class="game-header">
+                <button id="player-two-back-btn">Back</button>
+            </div>
+            <form>
+                <div>Player 2</div>
+                <label for="player2-name">Enter your name:</label>
+                <input type="text" id="player2-name" name="playerName" maxlength="16" placeholder="Player 2">
+                <button type="submit">Done</button>
+            </form>
+        </dialog>
+        <dialog id="cpu-dialog" class="dialog-container">
+            <div class="game-header">
+                <button id="cpu-back-btn">Back</button>
+            </div>
+            <form>
+                <div>Select CPU difficulty:</div>
+                <button type="submit" value="0">Very Easy</button>
+                <button type="submit" value="1">Easy</button>
+                <button type="submit" value="2">Medium</button>
+                <button type="submit" value="3">Hard</button>
+                <button type="submit" value="4">Very Hard</button>
+            </form>
+        </dialog>
+        <dialog id="restart-game-dialog" class="dialog-container">
+            <div class="game-header">
+                <span>Restart Game</span>
+                <button type="button" id="close-restart-game-btn">X</button>
+            </div>
+            <div>Are you sure?</div>
+            <button id="yes-restart-game-btn">Yes</button>
+            <button id="no-restart-game-btn">No</button>
         </dialog>
     </div>
     <div class="start-turn-container">
-        <dialog id="start-turn-dialog">
+        <dialog id="start-turn-dialog" class="dialog-container">
             <h1>Start Turn</h1>
             <button id="start-turn-btn" class="multi-player-btn" data-action="start turn"></button>
         </dialog>

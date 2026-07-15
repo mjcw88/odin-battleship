@@ -1,51 +1,81 @@
-import { submitForm, closeForm } from "./formController.js";
+import { gameSetup, closeForm } from "./formController.js";
 
 export const renderNewGameForm = {
     init() {
-        const newGameForm = document.getElementById("new-game-form");
+        const playerCountDialog = document.getElementById("player-count-dialog");
         const closeBtn = document.getElementById("close-new-game-btn");
 
         closeBtn.hidden = true;
-        newGameForm.showModal();
+        playerCountDialog.showModal();
     }
 }
 
 export const formEventListeners = {
     init() {
-        const setDiffcultyButtons = function(playerCount) {
-            const difficultyButtons = document.querySelectorAll('input[name="difficulty"]');
-            difficultyButtons.forEach(btn => {
-                btn.disabled = playerCount > 1;
-            })
-        };
+        const playerCountDialog = document.getElementById("player-count-dialog");
+        const playerCountForm = playerCountDialog.querySelector("form");
 
-        const setPlayerTwo = function(playerCount) {
-            const playerTwo = document.getElementById("player2-name");
-            playerTwo.disabled = playerCount === 1;
-            setDiffcultyButtons(playerCount);
-        }
+        const playerOneDialog = document.getElementById("player-one-dialog");
+        const playerOneForm = playerOneDialog.querySelector("form");
+        const playerOneBackBtn = document.getElementById("player-one-back-btn");
 
-        const newGameFormDialog = document.getElementById("new-game-form");
-        const newGameForm = newGameFormDialog.querySelector("form");
-        newGameFormDialog.addEventListener("submit", (e) => {
-            e.preventDefault();
-            document.getElementById("close-new-game-btn").hidden = false;
-            submitForm(newGameForm);
-            closeForm(newGameFormDialog, newGameForm);
-        });
+        const playerTwoDialog = document.getElementById("player-two-dialog");
+        const playerTwoForm = playerTwoDialog.querySelector("form");
+        const playerTwoBackBtn = document.getElementById("player-two-back-btn");
+
+        const cpuDialog = document.getElementById("cpu-dialog");
+        const cpuForm = cpuDialog.querySelector("form");
+        const cpuBackBtn = document.getElementById("cpu-back-btn");
 
         const closeBtn = document.getElementById("close-new-game-btn");
-        closeBtn.addEventListener("click", () => {
-            const playerCount = parseInt(document.querySelector('input[name="playerCount"]:checked').value);
-            setPlayerTwo(playerCount);
-            setDiffcultyButtons(playerCount);
-            closeForm(newGameFormDialog, newGameForm);
-        });
+
+        let playerCount;
+
+        playerCountForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            gameSetup.submitPlayerCount(e.submitter.value);
+            playerCount = e.submitter.value;
+            playerCountDialog.close();
+            playerOneDialog.showModal();
+        })
         
-        newGameForm.addEventListener("change", (e) => {
-            if (e.target.type === "radio" && e.target.name === "playerCount") {
-                setPlayerTwo(parseInt(e.target.value));
-            }
+        playerOneForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            gameSetup.submitPlayerOne(playerOneForm);
+            playerOneDialog.close();
+            if (playerCount > 1) playerTwoDialog.showModal();
+            else cpuDialog.showModal();
+        })
+
+        playerTwoForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            gameSetup.submitPlayerTwo(playerTwoForm);
+            playerTwoDialog.close();
+        })
+
+        cpuForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            gameSetup.submitCpuDifficulty(e.submitter.value);
+            cpuDialog.close();
+        })
+
+        closeBtn.addEventListener("click", () => {
+            closeForm(playerCountDialog);
         });
+
+        playerOneBackBtn.addEventListener("click", () => {
+            playerOneDialog.close();
+            playerCountDialog.showModal();
+        })
+
+        playerTwoBackBtn.addEventListener("click", () => {
+            playerTwoDialog.close();
+            playerOneDialog.showModal();
+        })
+
+        cpuBackBtn.addEventListener("click", () => {
+            cpuDialog.close();
+            playerOneDialog.showModal();
+        })
     }
 }
