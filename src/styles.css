@@ -1,7 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+@font-face {
+    font-family: "A Goblin Appears";
+    src: url("../src/fonts/AGoblinAppears-o2aV.ttf") format("truetype");
+}
 
 :root {
-    --blackOpsFont: 'Black Ops One', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    --jersey10Font: 'Jersey 10', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    --AGoblinAppearsFont: 'A Goblin Appears', monospace;
     --gridSize: 3rem;
 }
 
@@ -11,7 +17,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    border: 1px solid red;
+    /* border: 1px solid red; */
 }
 
 body {
@@ -36,8 +42,30 @@ form {
     gap: 1rem;
 }
 
+.header-container > * {
+    text-transform: uppercase;
+}
+
+form > *,
+.back-btn,
+.single-player-btn,
+.multi-player-btn,
+#close-new-game-btn,
+.restart-game-btn,
+#restart-game-dialog,
+#start-turn-dialog {
+    font-family: var(--AGoblinAppearsFont);
+    text-transform: uppercase;
+}
+
 .header-container {
-    font-family: var(--blackOpsFont);
+    font-family: var(--jersey10Font);
+    font-size: 2rem;
+}
+
+button {
+    padding: 1rem;
+    cursor: pointer;
 }
 
 #main-contents {
