@@ -4,7 +4,7 @@ export const renderNewGameForm = {
     init() {
         const playerCountDialog = document.getElementById("player-count-dialog");
         const closeBtn = document.getElementById("close-new-game-btn");
-
+        
         closeBtn.hidden = true;
         playerCountDialog.showModal();
     }

@@ -7,67 +7,63 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="new-game-form-container">
-        <dialog id="player-count-dialog" class="dialog-container">
-            <div class="game-header">
-                <button type="button" id="close-new-game-btn" hidden="true">X</button>
-            </div>
-            <form>
-                <button type="submit" value="1">1 Player</button>
-                <button type="submit" value="2">2 Players</button>
-            </form>
-        </dialog>
-        <dialog id="player-one-dialog" class="dialog-container">
-            <div class="game-header">
-                <button id="player-one-back-btn" class="back-btn">Back</button>
-            </div>
-            <form>
-                <div>Player 1</div>
-                <label for="player1-name">Enter your name:</label>
-                <input type="text" id="player1-name" name="playerName" maxlength="16" placeholder="Player 1">
-                <button type="submit">Done</button>
-            </form>
-        </dialog>
-        <dialog id="player-two-dialog" class="dialog-container">
-            <div class="game-header">
-                <button id="player-two-back-btn" class="back-btn">Back</button>
-            </div>
-            <form>
-                <div>Player 2</div>
-                <label for="player2-name">Enter your name:</label>
-                <input type="text" id="player2-name" name="playerName" maxlength="16" placeholder="Player 2">
-                <button type="submit">Done</button>
-            </form>
-        </dialog>
-        <dialog id="cpu-dialog" class="dialog-container">
-            <div class="game-header">
-                <button id="cpu-back-btn" class="back-btn">Back</button>
-            </div>
-            <form>
-                <div>Select CPU difficulty:</div>
-                <button type="submit" value="0">Very Easy</button>
-                <button type="submit" value="1">Easy</button>
-                <button type="submit" value="2">Medium</button>
-                <button type="submit" value="3">Hard</button>
-                <button type="submit" value="4">Very Hard</button>
-            </form>
-        </dialog>
-        <dialog id="restart-game-dialog" class="dialog-container">
-            <div class="game-header">
-                <span>Restart Game</span>
-                <button type="button" id="close-restart-game-btn" class="restart-game-btn">X</button>
-            </div>
-            <div>Are you sure?</div>
-            <button id="yes-restart-game-btn" class="restart-game-btn">Yes</button>
-            <button id="no-restart-game-btn" class="restart-game-btn">No</button>
-        </dialog>
-    </div>
-    <div class="start-turn-container">
-        <dialog id="start-turn-dialog" class="dialog-container">
-            <div>Start Turn</div>
-            <button id="start-turn-btn" class="multi-player-btn" data-action="start turn"></button>
-        </dialog>
-    </div>
+    <dialog id="player-count-dialog">
+        <div id="close-new-game-container" class="game-header">
+            <button type="button" id="close-new-game-btn">X</button>
+        </div>
+        <form>
+            <button type="submit" value="1">1 Player</button>
+            <button type="submit" value="2">2 Players</button>
+        </form>
+    </dialog>
+    <dialog id="player-one-dialog">
+        <div class="game-header">
+            <button id="player-one-back-btn" class="back-btn">Back</button>
+        </div>
+        <form>
+            <div>Player 1</div>
+            <label for="player1-name">Enter your name:</label>
+            <input type="text" id="player1-name" name="playerName" maxlength="16" placeholder="Player 1">
+            <button type="submit">Done</button>
+        </form>
+    </dialog>
+    <dialog id="player-two-dialog">
+        <div class="game-header">
+            <button id="player-two-back-btn" class="back-btn">Back</button>
+        </div>
+        <form>
+            <div>Player 2</div>
+            <label for="player2-name">Enter your name:</label>
+            <input type="text" id="player2-name" name="playerName" maxlength="16" placeholder="Player 2">
+            <button type="submit">Done</button>
+        </form>
+    </dialog>
+    <dialog id="cpu-dialog">
+        <div class="game-header">
+            <button id="cpu-back-btn" class="back-btn">Back</button>
+        </div>
+        <form>
+            <div>Select difficulty:</div>
+            <button type="submit" value="0">Very Easy</button>
+            <button type="submit" value="1">Easy</button>
+            <button type="submit" value="2">Medium</button>
+            <button type="submit" value="3">Hard</button>
+            <button type="submit" value="4">Very Hard</button>
+        </form>
+    </dialog>
+    <dialog id="restart-game-dialog">
+        <div class="game-header">
+            <span>Restart Game</span>
+            <button type="button" id="close-restart-game-btn" class="restart-game-btn">X</button>
+        </div>
+        <div>Are you sure?</div>
+        <button id="yes-restart-game-btn" class="restart-game-btn">Yes</button>
+        <button id="no-restart-game-btn" class="restart-game-btn">No</button>
+    </dialog>
+    <dialog id="start-turn-dialog">
+        <div>Start Turn</div>
+        <button id="start-turn-btn" class="multi-player-btn" data-action="start turn"></button>
+    </dialog>
     <div class="header-container">
         <h1>Battleship</h1>
     </div>

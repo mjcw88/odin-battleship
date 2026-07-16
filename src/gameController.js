@@ -39,8 +39,10 @@ export const eventListeners = {
         const closeRestart = document.getElementById("close-restart-game-btn");
         const yesRestartBtn = document.getElementById("yes-restart-game-btn");
         const noRestartBtn = document.getElementById("no-restart-game-btn");
+        const closeBtnContainer = document.getElementById("close-new-game-container");
         
         newGameBtn.addEventListener("click", () => {
+            closeBtnContainer.style.display = "flex";
             showNewGameForm();
         })
 

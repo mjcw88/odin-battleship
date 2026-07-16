@@ -9,6 +9,9 @@
     --jersey10Font: 'Jersey 10', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     --AGoblinAppearsFont: 'A Goblin Appears', monospace;
     --gridSize: 3rem;
+    --padding: 20px;
+    --border: 4px solid #000;
+    --borderDisabled: 4px solid #888;
 }
 
 *,
@@ -23,17 +26,29 @@
 body {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 1rem;
+    align-items: center;
+    font-size: 1rem;
+    line-height: 1.5;
+    min-height: 100vh;
+    padding: var(--padding);
+    background-color: hsl(215,90%,60%);
 }
 
-.dialog-container {
+dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     translate: -50% -50%;
     width: fit-content;
     padding: 1rem;
+    background-color: hsl(56,100%,25%);
+    border: var(--border);
+}
+
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
 }
 
 form {
@@ -42,8 +57,33 @@ form {
     gap: 1rem;
 }
 
-.header-container > * {
-    text-transform: uppercase;
+form input[type='text'] {
+    padding: 1rem;
+    border: var(--border);
+    outline: none;
+}
+
+button {
+    background-color: hsl(57,40%,70%);
+    border: var(--border);
+}
+
+button:hover {
+    background-color: hsl(57,40%,60%);
+}
+
+button:active {
+    background-color: hsl(57,40%,50%);
+    transform: scale(0.95);
+}
+
+button:disabled {
+    background-color: hsl(57,40%,80%);
+    border: var(--borderDisabled);
+}
+
+button:focus {
+    border: 4px solid #000;
 }
 
 form > *,
@@ -60,12 +100,40 @@ form > *,
 
 .header-container {
     font-family: var(--jersey10Font);
-    font-size: 2rem;
+    font-size: clamp(2rem, calc(2rem + 1vw), 4rem);
+    color: hsl(25,100%,50%);
+    word-break: break-all;
+    text-align: center;
+    line-height: 1;
+}
+
+.header-container > * {
+    align-content: center;
+    letter-spacing: .5rem;
+    text-transform: uppercase;
+    text-shadow:
+        -.125rem -.125rem 0 #000,
+         .125rem -.125rem 0 #000,
+        -.125rem  .125rem 0 #000,
+         .125rem  .125rem 0 #000;
+}
+
+#close-new-game-container {
+    display: none;
+    justify-content: end;
 }
 
 button {
     padding: 1rem;
     cursor: pointer;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
 }
 
 #main-contents {
@@ -167,6 +235,18 @@ button {
     background-color: red;
 }
 
-/* @media only screen and (min-width: 768px) {
+@media only screen and (min-width: 768px) {
+    .header-container {
+        font-size: clamp(4rem, calc(4rem + 1vw), 8rem);
+    }
 
-} */
+    .header-container > * {
+        letter-spacing: .5rem;
+        text-transform: uppercase;
+        text-shadow:
+            -.25rem -.25rem 0 #000,
+            .25rem -.25rem 0 #000,
+            -.25rem  .25rem 0 #000,
+            .25rem  .25rem 0 #000;
+    }
+}
