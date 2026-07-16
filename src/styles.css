@@ -217,6 +217,7 @@ form > *,
 
 .board-container {
     position: relative;
+    font-size: clamp(.5rem, calc(.5rem + 1vw), 1rem);
 }
 
 .ship-board {
