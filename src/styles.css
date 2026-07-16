@@ -10,8 +10,8 @@
     --AGoblinAppearsFont: 'A Goblin Appears', monospace;
     --gridSize: 3rem;
     --padding: 20px;
-    --border: 4px solid #000;
-    --borderDisabled: 4px solid #888;
+    --border: .25rem solid #000;
+    --borderDisabled: .25rem solid #888;
 }
 
 *,
@@ -64,6 +64,12 @@ form input[type='text'] {
 }
 
 button {
+    padding: 1rem;
+    cursor: pointer;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     background-color: hsl(57,40%,70%);
     border: var(--border);
 }
@@ -83,7 +89,7 @@ button:disabled {
 }
 
 button:focus {
-    border: 4px solid #000;
+    border: var(--border);
 }
 
 form > *,
@@ -100,9 +106,8 @@ form > *,
 
 .header-container {
     font-family: var(--jersey10Font);
-    font-size: clamp(2rem, calc(2rem + 1vw), 4rem);
+    font-size: clamp(1.5rem, calc(1.5rem + 1vw), 4rem);
     color: hsl(25,100%,50%);
-    word-break: break-all;
     text-align: center;
     line-height: 1;
 }
@@ -121,11 +126,6 @@ form > *,
 #close-new-game-container {
     display: none;
     justify-content: end;
-}
-
-button {
-    padding: 1rem;
-    cursor: pointer;
 }
 
 .game-header {
