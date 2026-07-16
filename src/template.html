@@ -21,7 +21,7 @@
             <button id="player-one-back-btn" class="back-btn">Back</button>
         </div>
         <form>
-            <div>Player 1</div>
+            <div class="player-title-container">Player 1</div>
             <label for="player1-name">Enter your name:</label>
             <input type="text" id="player1-name" name="playerName" maxlength="16" placeholder="Player 1">
             <button type="submit">Done</button>
@@ -32,7 +32,7 @@
             <button id="player-two-back-btn" class="back-btn">Back</button>
         </div>
         <form>
-            <div>Player 2</div>
+            <div class="player-title-container">Player 2</div>
             <label for="player2-name">Enter your name:</label>
             <input type="text" id="player2-name" name="playerName" maxlength="16" placeholder="Player 2">
             <button type="submit">Done</button>
@@ -43,7 +43,7 @@
             <button id="cpu-back-btn" class="back-btn">Back</button>
         </div>
         <form>
-            <div>Select difficulty:</div>
+            <div class="player-title-container">Select difficulty:</div>
             <button type="submit" value="0">Very Easy</button>
             <button type="submit" value="1">Easy</button>
             <button type="submit" value="2">Medium</button>
@@ -56,9 +56,11 @@
             <span>Restart Game</span>
             <button type="button" id="close-restart-game-btn" class="restart-game-btn">X</button>
         </div>
-        <div>Are you sure?</div>
-        <button id="yes-restart-game-btn" class="restart-game-btn">Yes</button>
-        <button id="no-restart-game-btn" class="restart-game-btn">No</button>
+        <div class="restart-container">Are you sure?</div>
+        <div class="restart-container">
+            <button id="yes-restart-game-btn" class="restart-game-btn">Yes</button>
+            <button id="no-restart-game-btn" class="restart-game-btn">No</button>
+        </div>
     </dialog>
     <dialog id="start-turn-dialog">
         <div>Start Turn</div>
@@ -78,9 +80,8 @@
             <button id="end-turn-btn" class="multi-player-btn" hidden="true" disabled="true" data-action="end turn">End Turn</button>
         </div>
         <div id="ship-dock-main-container">
-            <div id="ship-dock-container">
-            </div>
-            <div id="main-contents"></div>
+            <div id="main-board-contents"></div>
+            <div id="ship-dock-container"></div>
         </div>
     </div>
 </body>

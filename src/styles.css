@@ -8,9 +8,19 @@
 :root {
     --jersey10Font: 'Jersey 10', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
     --AGoblinAppearsFont: 'A Goblin Appears', monospace;
-    --gridSize: 3rem;
+    --gridSize: clamp(1.25rem, 8vw, 3rem);
     --padding: 20px;
     --border: .25rem solid #000;
+    --gridBorder: .125rem solid #000;
+    --orange: hsl(25,100%,50%);
+    --blueBackground: hsl(215,90%,60%);
+    --blueSea: hsl(204,100%,42%);
+    --blueSeaSunk: hsl(204,100%,32%);
+    --darkYellow: hsl(56,100%,25%);
+    --buttonYellow: hsl(57,40%,70%);
+    --buttonHoverYellow: hsl(57,40%,60%);
+    --buttonClickYellow: hsl(57,40%,50%);
+    --buttonDisabledYellow: hsl(57,40%,80%);
     --borderDisabled: .25rem solid #888;
 }
 
@@ -32,7 +42,7 @@ body {
     line-height: 1.5;
     min-height: 100vh;
     padding: var(--padding);
-    background-color: hsl(215,90%,60%);
+    background-color: var(--blueBackground);
 }
 
 dialog {
@@ -42,7 +52,7 @@ dialog {
     translate: -50% -50%;
     width: fit-content;
     padding: 1rem;
-    background-color: hsl(56,100%,25%);
+    background-color: var(--darkYellow);
     border: var(--border);
 }
 
@@ -70,26 +80,32 @@ button {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background-color: hsl(57,40%,70%);
+    background-color: var(--buttonYellow);
     border: var(--border);
 }
 
 button:hover {
-    background-color: hsl(57,40%,60%);
+    background-color: var(--buttonHoverYellow);
 }
 
 button:active {
-    background-color: hsl(57,40%,50%);
+    background-color: var(--buttonClickYellow);
     transform: scale(0.95);
 }
 
 button:disabled {
-    background-color: hsl(57,40%,80%);
+    background-color: var(--buttonDisabledYellow);
     border: var(--borderDisabled);
 }
 
 button:focus {
     border: var(--border);
+}
+
+#close-new-game-btn,
+#close-restart-game-btn,
+.back-btn {
+    width: fit-content;
 }
 
 form > *,
@@ -99,7 +115,9 @@ form > *,
 #close-new-game-btn,
 .restart-game-btn,
 #restart-game-dialog,
-#start-turn-dialog {
+#start-turn-dialog,
+.player-name,
+.board-container {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
 }
@@ -107,7 +125,7 @@ form > *,
 .header-container {
     font-family: var(--jersey10Font);
     font-size: clamp(1.5rem, calc(1.5rem + 1vw), 4rem);
-    color: hsl(25,100%,50%);
+    color: var(--orange);
     text-align: center;
     line-height: 1;
 }
@@ -126,56 +144,79 @@ form > *,
 #close-new-game-container {
     display: none;
     justify-content: end;
+    padding-bottom: 1rem;
 }
 
-.game-header {
+.game-header,
+.restart-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 1rem;
-    padding-bottom: 1rem;
 }
 
-#main-contents {
-    display: flex;
-    width: 100%;
-    max-width: 2500px;
-    justify-content: space-evenly;
-    gap: 1rem;
+.player-title-container,
+.restart-container {
+    padding-top: 1rem;
 }
 
 #ship-dock-main-container {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 1rem;
+}
+
+.player-name {
+    padding: 1rem;
+    background-color: var(--buttonYellow);
+    border: var(--border);
+    gap: 1rem;
 }
 
 #ship-dock-container {
-    align-self: center;
+    border: 8px solid red;
 }
 
 .outer-ship-container {
     display: flex;
     justify-content: end;
     padding: 1rem;
+    border: 4px solid red;
 }
 
 .inner-ship-container {
     display: grid;
     grid-auto-rows: minmax(var(--gridSize), 1fr);
-    width: fit-content;
-    pointer-events: all
+    pointer-events: all;
 }
 
 .inner-ship-container > div {
     cursor: pointer;
 }
 
+#main-board-contents {
+    --gap: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    padding-top: var(--gap);
+}
+
 .player-container {
+    display: flex;
+    flex-direction: column;
     text-align: center;
+    padding: 1rem;
+    gap: 1rem;
+    background-color: var(--darkYellow);
+    border: var(--border);
 }
 
 .board-container {
     position: relative;
-    width: fit-content;
 }
 
 .ship-board {
@@ -192,15 +233,25 @@ form > *,
     user-select: none;
 }
 
+.grid-label {
+    background-color: var(--buttonYellow);
+}
+
 .player-board > div {
     text-align: center;
     align-content: center;
-    border: 1px solid grey;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.player-board, 
+.ship-board,
+.player-board > div {
+    border: var(--gridBorder);
 }
 
 .board-square {
-    border: 1px solid grey;
-    background-color: blue;
+    background-color: var(--blueSea);
 }
 
 .square-with-ship {
@@ -224,7 +275,7 @@ form > *,
 }
 
 .board-sunk {
-    background-color: darkblue;
+    background-color: var(--blueSeaSunk);
 }
 
 .valid-placement {
@@ -248,5 +299,9 @@ form > *,
             .25rem -.25rem 0 #000,
             -.25rem  .25rem 0 #000,
             .25rem  .25rem 0 #000;
+    }
+
+    #main-contents-container {
+        max-width: 2500px;
     }
 }

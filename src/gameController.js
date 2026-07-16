@@ -105,6 +105,7 @@ export const eventListeners = {
         })
 
         document.body.addEventListener("keydown", (e) => {
+            if (document.querySelector("dialog[open]")) return;
             handleKeyboardPress(e, startGameBtn, doneBtn)
         });
     }

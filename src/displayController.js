@@ -30,6 +30,7 @@ function renderBoardHeader(board) {
     const LETTERS = ["", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
     LETTERS.forEach(letter => {
         const square = document.createElement("div");
+        square.classList.add("grid-label");
         square.textContent = letter;
         board.append(square);
     })
@@ -154,7 +155,7 @@ export function renderShipPlacement(ship, row, col, isVertical, shipSize, player
 }
 
 export function renderSingleGameBoard(player) {
-    const contents = document.getElementById("main-contents");
+    const contents = document.getElementById("main-board-contents");
     contents.innerHTML = "";
 
     const squares = [];
@@ -170,6 +171,7 @@ export function renderSingleGameBoard(player) {
 
     player.gameboard.board.forEach((row, rowIndex) => {
         const square = document.createElement("div");
+        square.classList.add("grid-label");
         square.textContent = rowIndex + 1;
         board.append(square);
         row.forEach((cell, colIndex) => {
@@ -192,7 +194,7 @@ export function renderSingleGameBoard(player) {
 }
 
 export function renderMultipleGameBoards(game, playerCount) {
-    const contents = document.getElementById("main-contents");
+    const contents = document.getElementById("main-board-contents");
     contents.innerHTML = "";
 
     const firstPlayerSquares = [];
@@ -209,6 +211,7 @@ export function renderMultipleGameBoards(game, playerCount) {
 
         player.gameboard.board.forEach((row, rowIndex) => {
             const square = document.createElement("div");
+            square.classList.add("grid-label");
             square.textContent = rowIndex + 1;
             board.append(square);
             row.forEach((cell, colIndex) => {
@@ -233,7 +236,7 @@ export function renderMultipleGameBoards(game, playerCount) {
 }
 
 export function renderTwoPlayerBetweenTurnsBoards(game) {
-    const contents = document.getElementById("main-contents");
+    const contents = document.getElementById("main-board-contents");
     contents.innerHTML = "";
 
     game.players.forEach((player, playerIndex) => {
@@ -247,6 +250,7 @@ export function renderTwoPlayerBetweenTurnsBoards(game) {
 
         player.gameboard.board.forEach((row, rowIndex) => {
             const square = document.createElement("div");
+            square.classList.add("grid-label");
             square.textContent = rowIndex + 1;
             board.append(square);
             row.forEach(cell => {
