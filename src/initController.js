@@ -34,7 +34,8 @@ export const formEventListeners = {
         playerCountForm.addEventListener("submit", (e) => {
             e.preventDefault();
             gameSetup.submitPlayerCount(e.submitter.value);
-            playerCount = e.submitter.value;
+
+            playerCount = Number(e.submitter.value);
             playerCountDialog.close();
             playerOneDialog.showModal();
         })
@@ -50,12 +51,15 @@ export const formEventListeners = {
         playerTwoForm.addEventListener("submit", (e) => {
             e.preventDefault();
             gameSetup.submitPlayerTwo(playerTwoForm);
+            playerOneForm.reset();
+            playerTwoForm.reset();
             playerTwoDialog.close();
         })
 
         cpuForm.addEventListener("submit", (e) => {
             e.preventDefault();
             gameSetup.submitCpuDifficulty(e.submitter.value);
+            playerOneForm.reset();
             cpuDialog.close();
         })
 
@@ -65,11 +69,13 @@ export const formEventListeners = {
 
         playerOneBackBtn.addEventListener("click", () => {
             playerOneDialog.close();
+            playerOneForm.reset();
             playerCountDialog.showModal();
         })
 
         playerTwoBackBtn.addEventListener("click", () => {
             playerTwoDialog.close();
+            playerTwoForm.reset();
             playerOneDialog.showModal();
         })
 
