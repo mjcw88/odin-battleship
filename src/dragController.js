@@ -65,10 +65,10 @@ function rotateDraggedShip(ship) {
 export function setOrientationStyling(isVertical, container, size) {
     if (isVertical) {
         container.style.gridTemplateColumns = "";
-        container.style.gridTemplateRows = `repeat(${size}, var(--gridSize))`;
+        container.style.gridTemplateRows = `repeat(${size}, 1fr)`;
         container.style.width = "var(--gridSize)";
     } else {
-        container.style.gridTemplateColumns = `repeat(${size}, var(--gridSize))`;
+        container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
         container.style.gridTemplateRows = "";
         container.style.width = "fit-content";
     }
@@ -117,12 +117,7 @@ export function rotateShipsInDock() {
     const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
     const isVertical = flip === 1;
 
-    if (isVertical) {
-        dock.style.display = "flex";
-    } else {
-        dock.style.display = "block";
-    }
-
+    dock.style.flexDirection = isVertical ? "row" : "column";
     dock.dataset.isVertical = flip;
 
     outerShipContainers.forEach(container => {

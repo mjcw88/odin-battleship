@@ -132,7 +132,7 @@ export function renderShipDock(ships) {
 
         innerShipContainer.dataset.isVertical = "0";
         innerShipContainer.draggable = true;
-        innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, var(--gridSize))`;
+        innerShipContainer.style.gridTemplateColumns = `repeat(${ship}, 1fr)`;
         for (let i = 0; i < ship; i++) {
             const square = document.createElement("div");
             square.classList.add("square-with-ship");

@@ -138,7 +138,7 @@ function createHumanPlayer(game, playerName) {
 
 function resetDockState() {
     const dock = document.getElementById("ship-dock-container");
-    dock.style.display = "block";
+    // dock.style.display = "block";
 }
 
 function setGameBoards(game, playerCount) {
@@ -320,7 +320,7 @@ function doneBtnClickEvent(playerCount, game) {
     const squares = renderSingleGameBoard(nextPlayer);
     const dragController = createDragEventListenersForBoard(squares, nextPlayer, game);
 
-    document.getElementById("ship-dock-container").style.display = "block";
+    // document.getElementById("ship-dock-container").style.display = "block";
     createShipDock(game, dragController);
     setDoneBtn(doneBtn, nextPlayer.gameboard, game);
     setStartBtn(startGameBtn, nextPlayer.gameboard, game);
