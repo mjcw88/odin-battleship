@@ -131,29 +131,36 @@ button:focus {
 #close-restart-game-btn,
 .back-btn {
     width: fit-content;
+    text-align: center;
 }
 
 form > *,
 .back-btn,
 .single-player-btn,
 .multi-player-btn,
-#close-new-game-btn,
+.restart-game-btn,
+#restart-game-dialog,
+#start-turn-dialog,
+.player-name,
+.board-container,
+.dock-header,
+#close-new-game-btn {
+    font-family: var(--AGoblinAppearsFont);
+    text-transform: uppercase;
+}
+
+form > *,
+.back-btn,
+.single-player-btn,
+.multi-player-btn,
 .restart-game-btn,
 #restart-game-dialog,
 #start-turn-dialog,
 .player-name,
 .board-container,
 .dock-header {
-    font-family: var(--AGoblinAppearsFont);
-    text-transform: uppercase;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-#close-new-game-btn,
-#close-restart-game-btn {
-    overflow: auto;
-    text-overflow: none;
 }
 
 .header-container {
