@@ -113,7 +113,7 @@ export function rotateShipsInDock() {
     const isEmpty = outerShipContainers.every(container => container.children.length === 0);
     if (isEmpty) return;
 
-    const dock = document.getElementById("ship-dock-container");
+    const dock = document.getElementById("ship-container");
     const flip = Number(!Boolean(parseInt(dock.dataset.isVertical)));
     const isVertical = flip === 1;
 
@@ -241,7 +241,7 @@ function createDragController(squares, player, game) {
         beingDragged.addEventListener("dragstart", dragStart);
         beingDragged.addEventListener("dragend", dragEnd);
 
-        const dock = document.getElementById("ship-dock-container");
+        const dock = document.getElementById("ship-container");
         const isVertical = parseInt(dock.dataset.isVertical) === 1;
 
         beingDragged.dataset.isVertical = Number(isVertical);

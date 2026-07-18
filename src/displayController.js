@@ -119,7 +119,7 @@ export function renderButtons(playerCount, btns) {
 }
 
 export function renderShipDock(ships) {
-    const dock = document.getElementById("ship-dock-container");
+    const dock = document.getElementById("ship-container");
     dock.dataset.isVertical = "0";
     dock.innerHTML = "";
 
@@ -288,7 +288,7 @@ export function showStartTurnDialog(playerOneTurn) {
 }
 
 export function hideDock() {
-    const dock = document.getElementById("ship-dock-container");
+    const dock = document.getElementById("ship-container");
     dock.hidden = true;
     dock.style.display = "none";
 }

@@ -53,7 +53,8 @@ dialog {
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    width: fit-content;
+    width: 75%;
+    max-width: 500px;
     padding: 1rem;
     background-color: var(--darkYellow);
     border: var(--border);
@@ -118,7 +119,8 @@ form > *,
 #restart-game-dialog,
 #start-turn-dialog,
 .player-name,
-.board-container {
+.board-container,
+.dock-header {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
 }
@@ -131,15 +133,15 @@ form > *,
     width: 100%;
 }
 
-.header-container > * {
+.header-container > h1 {
     text-transform: uppercase;
     text-align: center;
-    letter-spacing: .05em;
+    letter-spacing: .1em;
     text-shadow:
-        -.04em -.04em 0 #000,
-        .04em -.04em 0 #000,
-        -.04em  .04em 0 #000,
-        .04em  .04em 0 #000;
+        -.035em -.035em 0 #000,
+        .035em -.035em 0 #000,
+        -.035em  .035em 0 #000,
+        .035em  .035em 0 #000;
 }
 
 #close-new-game-container {
@@ -181,6 +183,8 @@ form > *,
     background-color: var(--buttonYellow);
     border: var(--border);
     gap: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 #ship-dock-main-container {
@@ -190,6 +194,14 @@ form > *,
     width: 100%;
 }
 
+.dock-header {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    background-color: var(--buttonYellow);
+    border: var(--border);
+}
+
 #ship-dock-container {
     display: flex;
     flex-direction: column;
@@ -197,6 +209,13 @@ form > *,
     border: var(--border);
     padding: 1rem;
     background-color: var(--darkYellow);
+    gap: 1rem;
+}
+
+#ship-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
     gap: 1rem;
 }
 

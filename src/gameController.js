@@ -137,7 +137,7 @@ function createHumanPlayer(game, playerName) {
 }
 
 function resetDockState() {
-    const dock = document.getElementById("ship-dock-container");
+    const dock = document.getElementById("ship-container");
     // dock.style.display = "block";
 }
 
@@ -154,10 +154,10 @@ function setGameBoards(game, playerCount) {
         })
     })
 
-    const shipDock = document.getElementById("ship-dock-container");
-    shipDock.innerHTML = "";
-    shipDock.hidden = true;
-    shipDock.style.display = "none";
+    const dock = document.getElementById("ship-container");
+    dock.innerHTML = "";
+    dock.hidden = true;
+    dock.style.display = "none";
 
     setGameBtns();
 }
@@ -259,7 +259,7 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
     resetDockState();
 
     document.getElementById("main-contents-container").hidden = false;
-    document.getElementById("ship-dock-container").hidden = false;
+    document.getElementById("ship-container").hidden = false;
 
     const game = new Game(difficulty);
     setCurrentGame(game);
@@ -320,7 +320,7 @@ function doneBtnClickEvent(playerCount, game) {
     const squares = renderSingleGameBoard(nextPlayer);
     const dragController = createDragEventListenersForBoard(squares, nextPlayer, game);
 
-    // document.getElementById("ship-dock-container").style.display = "block";
+    // document.getElementById("ship-container").style.display = "block";
     createShipDock(game, dragController);
     setDoneBtn(doneBtn, nextPlayer.gameboard, game);
     setStartBtn(startGameBtn, nextPlayer.gameboard, game);
