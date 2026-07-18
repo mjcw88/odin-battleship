@@ -150,6 +150,12 @@ form > *,
     text-overflow: ellipsis;
 }
 
+#close-new-game-btn,
+#close-restart-game-btn {
+    overflow: auto;
+    text-overflow: none;
+}
+
 .header-container {
     font-family: var(--jersey10Font);
     font-size: clamp(1rem, calc(1rem + 5vw), 6rem);
