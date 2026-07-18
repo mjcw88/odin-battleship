@@ -127,13 +127,6 @@ button:focus {
     padding-top: 1rem;
 }
 
-#close-new-game-btn,
-#close-restart-game-btn,
-.back-btn {
-    width: fit-content;
-    text-align: center;
-}
-
 form > *,
 .back-btn,
 .single-player-btn,
@@ -162,6 +155,19 @@ form > *,
 .dock-header {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+#close-new-game-btn,
+#close-restart-game-btn,
+.back-btn {
+    width: fit-content;
+    text-align: center;
+}
+
+#close-new-game-btn,
+#close-restart-game-btn {
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .header-container {
