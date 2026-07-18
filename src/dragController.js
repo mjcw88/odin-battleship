@@ -2,9 +2,24 @@ import { renderShipDock, renderShipPlacement } from "./displayController";
 
 // Helper functions
 function createDragImage(target) {
+    const rect = target.getBoundingClientRect();
+    const isVertical = parseInt(target.dataset.isVertical) === 1;
+    const size = target.children.length;
+
     const dragImage = target.cloneNode(true);
     dragImage.style.position = "absolute";
     dragImage.style.top = "-1000px";
+    dragImage.style.width = `${rect.width}px`;
+    dragImage.style.height = `${rect.height}px`;
+
+    if (isVertical) {
+        dragImage.style.gridTemplateColumns = "1fr";
+        dragImage.style.gridTemplateRows = `repeat(${size}, 1fr)`;
+    } else {
+        dragImage.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
+        dragImage.style.gridTemplateRows = "1fr";
+    }
+
     document.body.appendChild(dragImage);
     return dragImage;
 }
@@ -15,6 +30,22 @@ function setPointerEvents(beingDragged, event) {
     });
 
     beingDragged.style.pointerEvents = event;
+}
+
+function setShipyardClass(beingDragged, target) {
+    if (target.classList.contains("outer-ship-container")) {
+        beingDragged.classList.add("inner-ship-container-shipyard");
+    } else {
+        beingDragged.classList.remove("inner-ship-container-shipyard");
+    }
+
+    Array.from(beingDragged.children).forEach(square => {
+        if (target.classList.contains("outer-ship-container")) {
+            square.classList.add("shipyard-square");
+        } else {
+            square.classList.remove("shipyard-square");
+        }
+    });
 }
 
 function renderValidPlacement(beingDragged, e, squares, boardSize, gameboard) {
@@ -66,11 +97,9 @@ export function setOrientationStyling(isVertical, container, size) {
     if (isVertical) {
         container.style.gridTemplateColumns = "";
         container.style.gridTemplateRows = `repeat(${size}, 1fr)`;
-        container.style.width = "var(--gridSize)";
     } else {
         container.style.gridTemplateColumns = `repeat(${size}, 1fr)`;
         container.style.gridTemplateRows = "";
-        container.style.width = "fit-content";
     }
 }
 
@@ -220,15 +249,17 @@ function createDragController(squares, player, game) {
         try {
             player.gameboard.placeShip(start, end, size);
         } catch (error) {
-            console.error(error);
             return;
         }
 
-        setOrientationStyling(isVertical, beingDragged, size);
+        beingDragged.style.gridTemplateColumns = "";
+        beingDragged.style.gridTemplateRows = "";
+        
         renderShipPlacement(beingDragged, row, col, isVertical, size, player.name);
         if (game.getHumanPlayerCount() > 1) setDoneBtn(doneBtn, player.gameboard, game);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
+        setShipyardClass(beingDragged, e.currentTarget);
         beingDragged = null;
     }
 
@@ -250,7 +281,8 @@ function createDragController(squares, player, game) {
         if (game.getHumanPlayerCount() > 1) setDoneBtn(doneBtn, player.gameboard, game);
         setStartBtn(startGameBtn, player.gameboard, game);
         setPointerEvents(beingDragged, "all");
-        
+        setShipyardClass(beingDragged, e.currentTarget);
+
         e.currentTarget.append(beingDragged);
         beingDragged = null;
     }

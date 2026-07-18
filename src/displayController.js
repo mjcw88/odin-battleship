@@ -134,6 +134,7 @@ export function renderShipDock(ships) {
 
         const innerShipContainer = document.createElement("div");
         innerShipContainer.classList.add("inner-ship-container");
+        innerShipContainer.classList.add("inner-ship-container-shipyard");
 
         innerShipContainer.dataset.isVertical = "0";
         innerShipContainer.draggable = true;
@@ -141,6 +142,7 @@ export function renderShipDock(ships) {
         for (let i = 0; i < ship; i++) {
             const square = document.createElement("div");
             square.classList.add("square-with-ship");
+            square.classList.add("shipyard-square");
             innerShipContainer.append(square);
         }
 

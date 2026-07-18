@@ -295,6 +295,11 @@ function randomiseClickEvent(game, startGameBtn, doneBtn) {
         const size = ship.size;
         const index = innerShipContainers.findIndex((s) => s.children.length === size);
         const container = innerShipContainers.splice(index, 1)[0];
+        container.classList.remove("inner-ship-container-shipyard");
+        Array.from(container.children).forEach(square => {
+            square.classList.remove("shipyard-square");
+        })
+
         const row = ship.start[0];
         const col = ship.start[1];
         const isVertical = ship.start[0] !== ship.end[0];

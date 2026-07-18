@@ -311,11 +311,11 @@ form > *,
 .ship-board {
     display: grid;
     grid-template-columns: repeat(11, 1fr);
+    grid-template-rows: repeat(11, 1fr);
 }
 
 .player-board, 
-.ship-board,
-.square-with-ship {
+.ship-board {
     aspect-ratio: 1 / 1;
 }
 
@@ -326,13 +326,17 @@ form > *,
 
 .inner-ship-container {
     display: grid;
+    grid-template-columns: subgrid;
+    grid-template-rows: subgrid;
     pointer-events: all;
+}
+
+.inner-ship-container-shipyard {
     border: var(--gridBorder);
 }
 
-.square-with-ship {
-    background-color: darkgray;
-    cursor: pointer;
+.shipyard-square {
+    aspect-ratio: 1 / 1;
     width: 8vw;
 }
 
@@ -347,15 +351,20 @@ form > *,
     text-overflow: ellipsis;
 }
 
-.player-board, 
 .ship-board,
-.player-board > div,
-.square-with-ship {
+.player-board, 
+.player-board > div {
     border: var(--gridBorder);
 }
 
 .board-square {
     background-color: var(--blueSea);
+}
+
+.square-with-ship {
+    cursor: pointer;
+    background-color: darkgray;
+    border: var(--gridBorder);
 }
 
 .clickable-square {
