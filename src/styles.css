@@ -84,6 +84,8 @@ button {
     line-height: 1.5;
     background-color: var(--buttonYellow);
     border: var(--border);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 button:hover {
@@ -123,6 +125,8 @@ form > *,
 .dock-header {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-container {
@@ -131,6 +135,8 @@ form > *,
     color: var(--orange);
     line-height: 1;
     width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .header-container > h1 {
