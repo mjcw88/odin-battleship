@@ -144,7 +144,8 @@ form > *,
 .player-name,
 .board-container,
 .dock-header,
-#close-new-game-btn {
+#close-new-game-btn,
+#close-restart-game-btn {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
 }
