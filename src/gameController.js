@@ -99,6 +99,7 @@ export const eventListeners = {
             const game = getCurrentGame();
             if (!game || game.winner) return;
 
+            document.getElementById("end-turn-btn").disabled = true;
             game.flipPlayerOneTurn();
             showStartTurnDialog(game.playerOneTurn);
             renderTwoPlayerBetweenTurnsBoards(game);
@@ -138,7 +139,6 @@ function createHumanPlayer(game, playerName) {
 
 function resetDockState() {
     const dock = document.getElementById("ship-container");
-    // dock.style.display = "block";
 }
 
 function setGameBoards(game, playerCount) {
@@ -167,7 +167,6 @@ function setGameBtns() {
         "rotate-btn", 
         "start-game-btn", 
         "done-btn", 
-        "end-turn-btn"
     ];
 
     const btns = document.querySelectorAll(".multi-player-btn");
@@ -175,6 +174,8 @@ function setGameBtns() {
         btn.disabled = hidden.includes(btn.id);
         btn.hidden = hidden.includes(btn.id);
     });
+
+    document.getElementById("end-turn-btn").disabled = true;
 }
 
 function playSinglePlayerTurn(btn, game) {
@@ -218,6 +219,7 @@ function playSinglePlayerTurn(btn, game) {
 
 function playMultiPlayerTurn(btn, game) {
     if (game.turnFinished) return;
+
     const row = parseInt(btn.dataset.rowIndex);
     const col = parseInt(btn.dataset.colIndex);
 
@@ -247,7 +249,6 @@ function playMultiPlayerTurn(btn, game) {
     }
     removeClickableSquares();
     const endTurnBtn = document.getElementById("end-turn-btn");
-    endTurnBtn.hidden = false;
     endTurnBtn.disabled = false;
     game.turnFinished = true;
 }
@@ -257,6 +258,8 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
     resetButtonStates();
     resetDockState();
 
+    document.getElementById("game-setup-btns-container").style.display = "flex";
+    document.getElementById("start-game-btn-container").style.display = "flex";
     document.getElementById("main-contents-container").hidden = false;
     document.getElementById("ship-dock-container").hidden = false;
 
@@ -273,6 +276,7 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
         btns = document.querySelectorAll(".multi-player-btn");
     }
 
+    document.getElementById("bottom-buttons-container").style.display = "none";
     renderButtons(playerCount, btns);
     const squares = renderSingleGameBoard(playerOne);
     const dragController = createDragEventListenersForBoard(squares, playerOne, game);
@@ -310,6 +314,7 @@ function doneBtnClickEvent(playerCount, game) {
     doneBtn.hidden = true;
     doneBtn.disabled = true;
     
+    document.getElementById("start-game-btn-container").style.display = "flex";
     const startGameBtn = document.getElementById("start-game-btn");
     startGameBtn.hidden = false;
 
@@ -328,6 +333,8 @@ function startGameClickEvent(game) {
     if(!game) return;
 
     const playerCount = game.getHumanPlayerCount();
+    document.getElementById("game-setup-btns-container").style.display = "none";
+    document.getElementById("start-game-btn-container").style.display = "none";
 
     if (playerCount === 1) {
         const cpuPlayer = game.addPlayer();
@@ -337,6 +344,10 @@ function startGameClickEvent(game) {
         hideDock();
         renderTwoPlayerBetweenTurnsBoards(game);
         showStartTurnDialog(game.playerOneTurn);
+        document.getElementById("bottom-buttons-container").style.display = "flex";
+        const endTurnBtn = document.getElementById("end-turn-btn");
+        endTurnBtn.disabled = true;
+        endTurnBtn.hidden = false;
     }
 }
 

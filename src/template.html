@@ -70,20 +70,30 @@
         <h1>Battleship</h1>
     </div>
     <div id="main-contents-container" hidden="true">
-        <div id="buttons-container">
-            <button id="rotate-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="rotate">Rotate</button>
-            <button id="randomise-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="randomise">Randomise</button>
-            <button id="done-btn" class="multi-player-btn" hidden="true" disabled="true" data-action="done">Done</button>
-            <button id="start-game-btn" class="single-player-btn multi-player-btn" hidden="true" disabled="true" data-action="start game">Start Game</button>
-            <button id="restart-game-btn" class="single-player-btn multi-player-btn" hidden="true" disabled="true" data-action="restart">Restart Game</button>
-            <button id="new-game-btn" class="single-player-btn multi-player-btn" hidden="true" data-action="new">New Game</button>
-            <button id="end-turn-btn" class="multi-player-btn" hidden="true" disabled="true" data-action="end turn">End Turn</button>
+        <div id="top-buttons-container">
+            <div id="restart-new-game-btns-container">
+                <button id="restart-game-btn" class="single-player-btn multi-player-btn" data-action="restart">Restart Game</button>
+                <button id="new-game-btn" class="single-player-btn multi-player-btn" data-action="new">New Game</button>
+            </div>
+            <div id="game-setup-btns-container">
+                <button id="rotate-btn" class="single-player-btn multi-player-btn" data-action="rotate">Rotate</button>
+                <button id="randomise-btn" class="single-player-btn multi-player-btn" data-action="randomise">Randomise</button>
+            </div>
+            <div id="start-game-btn-container">
+                <button id="done-btn" class="multi-player-btn"data-action="done">Done</button>
+                <button id="start-game-btn" class="single-player-btn multi-player-btn" data-action="start game">Start Game</button>
+            </div>
         </div>
         <div id="ship-dock-main-container">
             <div id="main-board-contents"></div>
             <div id="ship-dock-container">
                 <div class="dock-header">Shipyard</div>
                 <div id="ship-container"></div>
+            </div>
+        </div>
+        <div id="bottom-buttons-container">
+            <div id="end-turn-btn-container">
+                <button id="end-turn-btn" class="multi-player-btn" data-action="end turn">End Turn</button>
             </div>
         </div>
     </div>

@@ -119,9 +119,13 @@ export function renderButtons(playerCount, btns) {
 }
 
 export function renderShipDock(ships) {
-    document.getElementById("ship-dock-container").style.display = "flex";
+    const container = document.getElementById("ship-dock-container");
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+
     const dock = document.getElementById("ship-container");
     dock.dataset.isVertical = "0";
+    dock.style.flexDirection = "column";
     dock.innerHTML = "";
 
     ships.forEach(ship => {
