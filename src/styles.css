@@ -269,8 +269,8 @@ form > *,
 
 .outer-ship-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: start;
+    align-items: start;
     padding: 1rem;
     border: var(--border);
     background-color: var(--buttonYellow);
