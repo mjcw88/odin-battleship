@@ -456,10 +456,6 @@ form > *,
     animation: caret 1s steps(1) infinite;
 }
 
-/* #display-text {
-    animation: caret 1s steps(1) infinite;
-} */
-
 @keyframes caret {
   50% {
     color: transparent;
