@@ -39,7 +39,6 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    /* border: 1px solid red; */
 }
 
 body {
@@ -200,7 +199,7 @@ form > *,
     gap: 1rem;
     text-align: center;
     font-family: var(--jersey10Font);
-    font-size: clamp(0.75rem, calc(0.75rem + 5vw), 6rem);
+    font-size: clamp(1rem, calc(1rem + 4vw), 4rem);
     color: var(--orange);
     line-height: 1;
     width: 100%;
@@ -470,7 +469,7 @@ form > *,
 }
 
 .hit-text-multiplayer,
-.sunk-text-multiplayer
+.sunk-text-multiplayer,
 .win-text {
     animation: caret 1s steps(1) infinite;
 }
@@ -482,7 +481,75 @@ form > *,
 }
 
 @media only screen and (min-width: 768px) {
+    .header-container,
     #main-contents-container {
-        max-width: 2500px;
+        max-width: 1200px;
+    }
+
+    #top-buttons-container {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    #top-buttons-container > div {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #restart-new-game-btns-container > button,
+    #game-setup-btns-container > button,
+    #start-game-btn-container > button {
+        width: fit-content;
+    }
+
+    #restart-new-game-btns-container {
+        display: flex;
+        justify-content: center;
+    }
+
+    #ship-dock-main-container {
+        padding-top: 1rem;
+        flex-direction: row-reverse;
+        justify-content: space-between;
+    }
+
+    #ship-dock-container {
+        flex: 1;
+    }
+
+    .shipyard-square {
+        width: 4vw;
+        max-width: 50px;
+    }
+
+    #main-board-contents {
+        display: flex;
+        flex-direction: row;
+        padding-top: 0;
+        flex: 1;
+    }
+
+    .player-container {
+        flex: 1;
+    }
+
+    #bottom-buttons-container {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #end-turn-btn-container {
+        width: fit-content;
+    }
+
+    #display-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #display-text-container {
+        width: 50%;
     }
 }
