@@ -171,8 +171,9 @@ form > *,
 }
 
 .header-container {
+    text-align: center;
     font-family: var(--jersey10Font);
-    font-size: clamp(1rem, calc(1rem + 5vw), 6rem);
+    font-size: clamp(0.75rem, calc(0.75rem + 5vw), 6rem);
     color: var(--orange);
     line-height: 1;
     width: 100%;
