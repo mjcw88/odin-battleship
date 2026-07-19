@@ -123,8 +123,7 @@ export function setStartBtn(startGameBtn, gameboard, game) {
     }
 }
 
-function replaceShipOnBoard(beingDragged, board) {
-    const isVertical = parseInt(beingDragged.dataset.isVertical) === 1;
+function replaceShipOnBoard(beingDragged, board, originalIsVertical) {
     const size = beingDragged.children.length;
 
     const originalRow = parseInt(beingDragged.dataset.rowIndex);
@@ -132,8 +131,12 @@ function replaceShipOnBoard(beingDragged, board) {
 
     if (!isNaN(originalRow) && !isNaN(originalCol)) {
         const originalStart = [originalRow, originalCol];
-        const originalEnd = isVertical ? [originalRow + size - 1, originalCol] : [originalRow, originalCol + size - 1];
-        board.placeShip(originalStart, originalEnd, size)
+        const originalEnd = originalIsVertical ? [originalRow + size - 1, originalCol] : [originalRow, originalCol + size - 1];
+        try {
+            board.placeShip(originalStart, originalEnd, size);
+        } catch (error) {
+            console.error(error);
+        }
     }
 }
 
@@ -182,6 +185,7 @@ function createDragController(squares, player, game) {
 
     let beingDragged = null;
     let shiftKeyHeld = false;
+    let originalIsVertical = false;
 
     function dragStart(e) {
         if (!e.target.classList.contains("inner-ship-container")) return;
@@ -192,16 +196,18 @@ function createDragController(squares, player, game) {
 
         const row = parseInt(e.target.dataset.rowIndex);
         const col = parseInt(e.target.dataset.colIndex);
-        
+
+        originalIsVertical = parseInt(e.target.dataset.isVertical) === 1;
+
         if (!isNaN(row) && !isNaN(col) && player.gameboard.isShipOnBoard(row, col)) {
-            const isVertical = parseInt(e.target.dataset.isVertical) === 1;
+            const isVertical = originalIsVertical;
             const size = e.target.children.length;
 
             const start = [row, col];
             const end = isVertical ? [row + size - 1, col] : [row, col + size - 1];
             player.gameboard.removeShip(start, end, size);
         }
-        
+
         beingDragged = e.target;
 
         // setTimeout required to work in Chrome
@@ -249,6 +255,7 @@ function createDragController(squares, player, game) {
         try {
             player.gameboard.placeShip(start, end, size);
         } catch (error) {
+            console.error(error);
             return;
         }
 
@@ -289,7 +296,8 @@ function createDragController(squares, player, game) {
 
     function dragEnd(e) {
         if (!beingDragged) return;
-        replaceShipOnBoard(beingDragged, player.gameboard);
+        replaceShipOnBoard(beingDragged, player.gameboard, originalIsVertical);
+        beingDragged.dataset.isVertical = Number(originalIsVertical);
         setPointerEvents(beingDragged, "all");
         beingDragged = null;
         shiftKeyHeld = false;
