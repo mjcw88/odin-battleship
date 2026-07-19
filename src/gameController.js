@@ -44,6 +44,10 @@ export const eventListeners = {
         const yesRestartBtn = document.getElementById("yes-restart-game-btn");
         const noRestartBtn = document.getElementById("no-restart-game-btn");
         const closeBtnContainer = document.getElementById("close-new-game-container");
+
+        const helpBtn = document.getElementById("help-btn");
+        const helpDialog = document.getElementById("help-dialog");
+        const closeHelpBtn = document.getElementById("close-help-btn");
         
         newGameBtn.addEventListener("click", () => {
             closeBtnContainer.style.display = "flex";
@@ -95,6 +99,14 @@ export const eventListeners = {
 
         endTurnBtn.addEventListener("click", () => {
             endTurnClickEvent();
+        })
+
+        helpBtn.addEventListener("click", () => {
+            helpDialog.showModal();
+        })
+
+        closeHelpBtn.addEventListener("click", () => {
+            helpDialog.close();
         })
 
         document.body.addEventListener("keydown", (e) => {

@@ -69,6 +69,7 @@ dialog {
     padding: 1rem;
     background-color: var(--darkYellow);
     border: var(--border);
+    font-size: 1rem;
 }
 
 dialog::backdrop {
@@ -141,6 +142,7 @@ button:focus {
     padding-top: 1rem;
 }
 
+dialog,
 form > *,
 .back-btn,
 .single-player-btn,
@@ -153,7 +155,9 @@ form > *,
 .dock-header,
 #close-new-game-btn,
 #close-restart-game-btn,
-#display-text {
+#display-text,
+#help-btn,
+#close-help-btn {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
 }
@@ -175,29 +179,35 @@ form > *,
 
 #close-new-game-btn,
 #close-restart-game-btn,
-.back-btn {
+.back-btn,
+#close-help-btn {
     width: fit-content;
     text-align: center;
 }
 
 #close-new-game-btn,
-#close-restart-game-btn {
+#close-restart-game-btn,
+#close-help-btn {
     overflow: visible;
     text-overflow: clip;
 }
 
 .header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
     text-align: center;
     font-family: var(--jersey10Font);
     font-size: clamp(0.75rem, calc(0.75rem + 5vw), 6rem);
     color: var(--orange);
     line-height: 1;
     width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .header-container > h1 {
+    margin: 0 auto;
     text-transform: uppercase;
     text-align: center;
     letter-spacing: .1em;
@@ -206,6 +216,20 @@ form > *,
         .035em -.035em 0 #000,
         -.035em  .035em 0 #000,
         .035em  .035em 0 #000;
+}
+
+#help-btn {
+    width: fit-content;
+    color: var(--black);
+}
+
+.help-paragraph {
+    background-color: var(--buttonYellow);
+    border: var(--border);
+    line-height: 1.5;
+    text-align: left;
+    padding: 1rem;
+    margin-top: 1rem;
 }
 
 #close-new-game-container {
@@ -338,11 +362,6 @@ form > *,
 .player-board, 
 .ship-board {
     aspect-ratio: 1 / 1;
-}
-
-.player-board, 
-.ship-board {
-    user-select: none;
 }
 
 .inner-ship-container {
