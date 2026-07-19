@@ -11,7 +11,17 @@
     --padding: 20px;
     --border: clamp(4px, .25rem, 12px) solid #000;
     --gridBorder: clamp(2px, .125rem, 6px) solid #000;
+    --black: hsl(0,0%,0%);
     --orange: hsl(25,100%,50%);
+    --lightOrange: hsl(40,100%,50%);
+    --darkOrange: hsl(20,100%,50%);
+    --red: hsl(0,100%,50%);
+    --green: hsl(120,100%,35%);
+    --darkGreen: hsl(120,100%, 15%);
+    --verydarkGreen: hsl(120,100%,10%);
+    --yellowFont: hsl(57,87%,76%);
+    --turquoise: hsl(174,78%,54%);
+    --purple: hsl(236,88%,72%);
     --blueBackground: hsl(215,90%,60%);
     --blueSea: hsl(204,100%,42%);
     --blueSeaSunk: hsl(204,100%,22%);
@@ -42,6 +52,7 @@ body {
     min-height: 100vh;
     padding: var(--padding);
     background-color: var(--blueBackground);
+    color: var(--black);
 }
 
 #main-contents-container {
@@ -247,12 +258,15 @@ form > *,
     width: 100%;
 }
 
+.dock-header {
+    background-color: var(--buttonYellow);
+}
+
 .dock-header,
 #display-text {
     width: 100%;
     text-align: center;
     padding: 1rem;
-    background-color: var(--buttonYellow);
     border: var(--border);
 }
 
@@ -379,15 +393,15 @@ form > *,
 }
 
 .clickable-square:hover {
-    background-color: green;
+    background-color: var(--green);
 }
 
 .board-hit {
-    background-color: red;
+    background-color: var(--red);
 }
 
 .board-miss {
-    background-color: lightyellow;
+    background-color: var(--buttonDisabledYellow);
 }
 
 .board-sunk {
@@ -395,24 +409,62 @@ form > *,
 }
 
 .valid-placement {
-    background-color: green;
+    background-color: var(--green);
 }
 
 .invalid-placement {
-    background-color: red;
+    background-color: var(--red);
 }
 
-#display-text {
+.player-turn-background,
+.hit-background,
+.miss-background,
+.sunk-background {
+    background-color: var(--lightOrange) !important;
+}
+
+.win-background {
+    background-color: var(--purple) !important;
+}
+
+.player-turn-text {
+    color: var(--yellowFont);
+    background-color: var(--darkGreen);
+}
+
+.hit-text,
+.sunk-text,
+.hit-text-multiplayer,
+.sunk-text-multiplayer {
+    color: var(--verydarkGreen);
+    background-color: var(--darkOrange);
+}
+
+.miss-text {
+    color: var(--black);
+    background-color: var(--buttonDisabledYellow);
+}
+
+.win-text {
+    color: var(--black);
+    background-color: var(--turquoise);
+}
+
+.hit-text-multiplayer,
+.sunk-text-multiplayer
+.win-text {
     animation: caret 1s steps(1) infinite;
 }
 
-/* use animation for hits and winner */
-
-/* @keyframes caret {
-  50% {
-    border-color: transparent;
-  }
+/* #display-text {
+    animation: caret 1s steps(1) infinite;
 } */
+
+@keyframes caret {
+  50% {
+    color: transparent;
+  }
+}
 
 @media only screen and (min-width: 768px) {
     #main-contents-container {

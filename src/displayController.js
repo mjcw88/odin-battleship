@@ -111,6 +111,36 @@ export function setDisplays(playerCount) {
     document.getElementById("start-game-btn-container").style.display = "none";
 }
 
+export function renderDisplayStyling(containerClass, textClass) {
+    const container = document.getElementById("display-text-container");
+    container.classList.remove(...container.classList);
+    container.classList.add(containerClass);
+
+    const text = document.getElementById("display-text");
+    text.classList.remove(...text.classList);
+    text.classList.add(textClass);
+}
+
+function renderHitMessage() {
+    const message = "Hit!"
+    renderMessage(message);
+}
+
+function renderMissMessage() {
+    const message = "Miss!"
+    renderMessage(message);
+};
+
+function renderSunkMessage(playerCount, playerOneTurn) {
+    let message = "You sunk their battleship!";
+
+    if (playerCount === 1 && !playerOneTurn) {
+        message = "They sunk your battleship!";
+    }
+    
+    renderMessage(message);
+}
+
 // Main functions
 export function showNewGameForm() {
     const closeBtn = document.getElementById("close-new-game-btn");
@@ -312,7 +342,9 @@ export function hideDock() {
     dock.style.display = "none";
 }
 
-export function updateShipDisplay(squares, board, row, col) {
+export function updateShipDisplay(squares, board, row, col, game) {
+    const playerCount = game.getHumanPlayerCount();
+
     const traverseBoard = function() {
         const TRAVERSE_DIRECTIONS = [-1,1];
         const visited = [];
@@ -333,6 +365,12 @@ export function updateShipDisplay(squares, board, row, col) {
                     );
                     cell.classList.remove("board-hit");
                     cell.classList.add("board-sunk");
+                    if (playerCount > 1) {
+                        renderDisplayStyling("sunk-background", "sunk-text-multiplayer");
+                    } else {
+                        renderDisplayStyling("sunk-background", "sunk-text");
+                    }
+                    renderSunkMessage(playerCount, game.playerOneTurn);
                     queue.push({ row: dir, col: current.col });
                 }
             })
@@ -346,6 +384,12 @@ export function updateShipDisplay(squares, board, row, col) {
                     );
                     cell.classList.remove("board-hit");
                     cell.classList.add("board-sunk");
+                    if (playerCount > 1) {
+                        renderDisplayStyling("sunk-background", "sunk-text-multiplayer");
+                    } else {
+                        renderDisplayStyling("sunk-background", "sunk-text");
+                    }
+                    renderSunkMessage(playerCount, game.playerOneTurn);
                     queue.push({ row: current.row, col: dir });
                 }
             })
@@ -356,17 +400,29 @@ export function updateShipDisplay(squares, board, row, col) {
         square.dataset.rowIndex == row && square.dataset.colIndex == col
     );
 
+    let isSunk = false;
+    
     const coordinate = board[row][col];
     if (coordinate.ship) {
         if (coordinate.ship.isSunk()) {
             traverseBoard();
+            isSunk = true;
         } else {
             cell.classList.add("board-hit");
+            if (playerCount > 1) {
+                renderDisplayStyling("hit-background", "hit-text-multiplayer");
+            } else {
+                renderDisplayStyling("hit-background", "hit-text");
+            }
+            renderHitMessage();
         }
     } else {
         cell.classList.add("board-miss");
+        renderDisplayStyling("miss-background", "miss-text");
+        renderMissMessage();
     }
     cell.classList.remove("clickable-square");
+    return isSunk;
 }
 
 export function removeClickableSquares() {
@@ -382,7 +438,7 @@ export function renderWinner(player) {
         square.classList.remove("clickable-square");
     })
     
-    const message = `A winner is you, ${player.name}!`;
+    const message = `${player.name}, wins!`;
     renderMessage(message);
 }
 

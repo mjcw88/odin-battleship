@@ -21,7 +21,8 @@ import { showNewGameForm,
     removeClickableSquares,
     resetDisplays,
     setDisplays,
-    renderMessage } from "./displayController.js";
+    renderMessage,
+    renderDisplayStyling } from "./displayController.js";
 
 export const eventListeners = {
     init() {
@@ -169,6 +170,8 @@ function setGameBtns() {
 function playSinglePlayerTurn(btn, game) {
     if (!game.playerOneTurn) return;
 
+    const WAIT = 1000;
+
     const row = parseInt(btn.dataset.rowIndex);
     const col = parseInt(btn.dataset.colIndex);
 
@@ -178,36 +181,49 @@ function playSinglePlayerTurn(btn, game) {
 
     game.playHumanTurn(row, col);
     const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
-    updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col);
+    let sunk = updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col, game);
+    let resetWait = sunk ? WAIT * 2 : WAIT;
+
     game.flipPlayerOneTurn();
 
     const humanName = document.getElementById("player-1-name").textContent;
     const humanPlayer = game.getPlayer(humanName);
+
     if (cpuBoard.isAllSunk()) {
         game.declareWinner(humanPlayer);
+        renderDisplayStyling("win-background", "win-text");
         renderWinner(game.winner);
-    } else {
-        let message = "CPU's turn";
-        renderMessage(message);
-        const WAIT = 500;
+        return;
+    }
+    setTimeout(() => {
+        renderDisplayStyling("player-turn-background", "player-turn-text");
+        renderMessage("CPU's turn");
+
         setTimeout(() => {
             const square = game.playComputerTurn(humanPlayer);
             const cpuRow = square[0];
             const cpuCol = square[1];
             const humanBoard = humanPlayer.gameboard;
             const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol);
+            sunk = updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol, game);
+
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
+                renderDisplayStyling("win-background", "win-text");
                 renderWinner(game.winner);
                 revealShips(game.winner.gameboard.board, cpuBoardDisplay);
-            } else {
-                game.flipPlayerOneTurn();
-                message = `${humanName}'s turn`;
-                renderMessage(message)
+                return;
             }
+
+            resetWait = sunk ? WAIT * 2 : WAIT;
+
+            setTimeout(() => {
+                game.flipPlayerOneTurn();
+                renderDisplayStyling("player-turn-background", "player-turn-text");
+                renderMessage(`${humanName}'s turn`);
+            }, resetWait);
         }, WAIT);
-    }
+    }, resetWait);
 }
 
 function playMultiPlayerTurn(btn, game) {
@@ -231,11 +247,12 @@ function playMultiPlayerTurn(btn, game) {
 
     game.playHumanTurn(row, col, enemyPlayerName);
     const enemyBoardDisplay = document.querySelectorAll(".enemy-board-square");
-    updateShipDisplay(enemyBoardDisplay, enemyBoard.board, row, col);
+    updateShipDisplay(enemyBoardDisplay, enemyBoard.board, row, col, game);
 
     const currentPlayer = game.getPlayer(currentPlayerName);
     if (enemyPlayer.gameboard.isAllSunk()) {
         game.declareWinner(currentPlayer);
+        renderDisplayStyling("win-background", "win-text");
         renderWinner(game.winner);
     }
     removeClickableSquares();
@@ -338,6 +355,7 @@ function startTurnClickEvent() {
     if (game.playerOneTurn) playerName = document.getElementById("player-1-name").textContent;
     else playerName = document.getElementById("player-2-name").textContent;
     const message =`${playerName}'s turn`;
+    renderDisplayStyling("player-turn-background", "player-turn-text");
     renderMessage(message);
 }
 
@@ -362,6 +380,7 @@ function startGameClickEvent(game) {
         const playerName = document.getElementById("player-1-name").textContent;
         const message = `${playerName}'s turn`;
         renderMessage(message);
+        renderDisplayStyling("player-turn-background", "player-turn-text");
         document.getElementById("display-container").style.display = "flex";
     } else {
         hideDock();

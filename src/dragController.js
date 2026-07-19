@@ -11,6 +11,7 @@ function createDragImage(target) {
     dragImage.style.top = "-1000px";
     dragImage.style.width = `${rect.width}px`;
     dragImage.style.height = `${rect.height}px`;
+    dragImage.style.border = "clamp(2px, .125rem, 6px) solid #000";
 
     if (isVertical) {
         dragImage.style.gridTemplateColumns = "1fr";
