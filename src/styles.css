@@ -107,14 +107,16 @@ button:focus {
 }
 
 #top-buttons-container,
-#bottom-buttons-container {
+#bottom-buttons-container,
+#display-container {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
 #top-buttons-container > div,
-#bottom-buttons-container > div {
+#bottom-buttons-container > div,
+#display-container > div {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -123,7 +125,8 @@ button:focus {
     padding: 1rem;   
 }
 
-#bottom-buttons-container {
+#bottom-buttons-container,
+#display-container {
     padding-top: 1rem;
 }
 
@@ -138,7 +141,8 @@ form > *,
 .board-container,
 .dock-header,
 #close-new-game-btn,
-#close-restart-game-btn {
+#close-restart-game-btn,
+#display-text {
     font-family: var(--AGoblinAppearsFont);
     text-transform: uppercase;
 }
@@ -152,7 +156,8 @@ form > *,
 #start-turn-dialog,
 .player-name,
 .board-container,
-.dock-header {
+.dock-header,
+#display-text {
     overflow: hidden;
     text-overflow: ellipsis;
 }
@@ -242,7 +247,8 @@ form > *,
     width: 100%;
 }
 
-.dock-header {
+.dock-header,
+#display-text {
     width: 100%;
     text-align: center;
     padding: 1rem;
@@ -330,6 +336,7 @@ form > *,
     grid-template-columns: subgrid;
     grid-template-rows: subgrid;
     pointer-events: all;
+    cursor: pointer;
 }
 
 .inner-ship-container-shipyard {
@@ -363,7 +370,6 @@ form > *,
 }
 
 .square-with-ship {
-    cursor: pointer;
     background-color: darkgray;
     border: var(--gridBorder);
 }
@@ -395,6 +401,18 @@ form > *,
 .invalid-placement {
     background-color: red;
 }
+
+#display-text {
+    animation: caret 1s steps(1) infinite;
+}
+
+/* use animation for hits and winner */
+
+/* @keyframes caret {
+  50% {
+    border-color: transparent;
+  }
+} */
 
 @media only screen and (min-width: 768px) {
     #main-contents-container {

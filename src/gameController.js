@@ -18,7 +18,10 @@ import { showNewGameForm,
     revealShips,
     hideDock,
     showStartTurnDialog,
-    removeClickableSquares } from "./displayController.js";
+    removeClickableSquares,
+    resetDisplays,
+    setDisplays,
+    renderMessage } from "./displayController.js";
 
 export const eventListeners = {
     init() {
@@ -86,23 +89,11 @@ export const eventListeners = {
         })
 
         startTurnBtn.addEventListener("click", () => {
-            const game = getCurrentGame();
-            if (!game) return;
-
-            const startTurn = document.getElementById("start-turn-dialog");
-            startTurn.close();
-            game.turnFinished = false;
-            setGameBoards(game, game.getHumanPlayerCount());
+            startTurnClickEvent();
         })
 
         endTurnBtn.addEventListener("click", () => {
-            const game = getCurrentGame();
-            if (!game || game.winner) return;
-
-            document.getElementById("end-turn-btn").disabled = true;
-            game.flipPlayerOneTurn();
-            showStartTurnDialog(game.playerOneTurn);
-            renderTwoPlayerBetweenTurnsBoards(game);
+            endTurnClickEvent();
         })
 
         document.body.addEventListener("keydown", (e) => {
@@ -137,9 +128,6 @@ function createHumanPlayer(game, playerName) {
     return game.addPlayer(playerName, true);
 }
 
-function resetDockState() {
-    const dock = document.getElementById("ship-container");
-}
 
 function setGameBoards(game, playerCount) {
     const squares = renderMultipleGameBoards(game, playerCount);
@@ -199,6 +187,8 @@ function playSinglePlayerTurn(btn, game) {
         game.declareWinner(humanPlayer);
         renderWinner(game.winner);
     } else {
+        let message = "CPU's turn";
+        renderMessage(message);
         const WAIT = 500;
         setTimeout(() => {
             const square = game.playComputerTurn(humanPlayer);
@@ -211,8 +201,11 @@ function playSinglePlayerTurn(btn, game) {
                 game.declareWinner(cpuPlayer);
                 renderWinner(game.winner);
                 revealShips(game.winner.gameboard.board, cpuBoardDisplay);
+            } else {
+                game.flipPlayerOneTurn();
+                message = `${humanName}'s turn`;
+                renderMessage(message)
             }
-            game.flipPlayerOneTurn();
         }, WAIT);
     }
 }
@@ -225,11 +218,11 @@ function playMultiPlayerTurn(btn, game) {
 
     let currentPlayerName, enemyPlayerName;
     if (game.playerOneTurn) {
-        currentPlayerName = document.getElementById("player-1-name").textContent
-        enemyPlayerName = document.getElementById("player-2-name").textContent
+        currentPlayerName = document.getElementById("player-1-name").textContent;
+        enemyPlayerName = document.getElementById("player-2-name").textContent;
     } else {
-        currentPlayerName = document.getElementById("player-2-name").textContent
-        enemyPlayerName = document.getElementById("player-1-name").textContent
+        currentPlayerName = document.getElementById("player-2-name").textContent;
+        enemyPlayerName = document.getElementById("player-1-name").textContent;
     };
 
     const enemyPlayer = game.getPlayer(enemyPlayerName);
@@ -244,8 +237,6 @@ function playMultiPlayerTurn(btn, game) {
     if (enemyPlayer.gameboard.isAllSunk()) {
         game.declareWinner(currentPlayer);
         renderWinner(game.winner);
-    } else {
-
     }
     removeClickableSquares();
     const endTurnBtn = document.getElementById("end-turn-btn");
@@ -256,12 +247,7 @@ function playMultiPlayerTurn(btn, game) {
 // Main functions
 export function createGame(playerOneName, playerTwoName, difficulty, playerCount) {
     resetButtonStates();
-    resetDockState();
-
-    document.getElementById("game-setup-btns-container").style.display = "flex";
-    document.getElementById("start-game-btn-container").style.display = "flex";
-    document.getElementById("main-contents-container").hidden = false;
-    document.getElementById("ship-dock-container").hidden = false;
+    resetDisplays();
 
     const game = new Game(difficulty);
     setCurrentGame(game);
@@ -276,7 +262,6 @@ export function createGame(playerOneName, playerTwoName, difficulty, playerCount
         btns = document.querySelectorAll(".multi-player-btn");
     }
 
-    document.getElementById("bottom-buttons-container").style.display = "none";
     renderButtons(playerCount, btns);
     const squares = renderSingleGameBoard(playerOne);
     const dragController = createDragEventListenersForBoard(squares, playerOne, game);
@@ -334,26 +319,56 @@ function doneBtnClickEvent(playerCount, game) {
     setStartBtn(startGameBtn, nextPlayer.gameboard, game);
 }
 
+function startTurnClickEvent() {
+    const game = getCurrentGame();
+    if (!game) return;
+
+    document.getElementById("start-turn-dialog").close();
+    game.turnFinished = false;
+    setGameBoards(game, game.getHumanPlayerCount());
+
+    document.getElementById("bottom-buttons-container").style.display = "flex";
+    const endTurnBtn = document.getElementById("end-turn-btn");
+    endTurnBtn.disabled = true;
+    endTurnBtn.hidden = false;
+
+    document.getElementById("display-container").style.display = "flex";
+
+    let playerName;
+    if (game.playerOneTurn) playerName = document.getElementById("player-1-name").textContent;
+    else playerName = document.getElementById("player-2-name").textContent;
+    const message =`${playerName}'s turn`;
+    renderMessage(message);
+}
+
+function endTurnClickEvent() {
+    const game = getCurrentGame();
+    if (!game || game.winner) return;
+
+    game.flipPlayerOneTurn();
+    showStartTurnDialog(game.playerOneTurn);
+    renderTwoPlayerBetweenTurnsBoards(game);
+}
+
 function startGameClickEvent(game) {
     if(!game) return;
 
     const playerCount = game.getHumanPlayerCount();
-    document.getElementById("game-setup-btns-container").style.display = "none";
-    document.getElementById("start-game-btn-container").style.display = "none";
 
     if (playerCount === 1) {
         const cpuPlayer = game.addPlayer();
         game.randomiseShipPlacement(cpuPlayer);
         setGameBoards(game, playerCount);
+        const playerName = document.getElementById("player-1-name").textContent;
+        const message = `${playerName}'s turn`;
+        renderMessage(message);
+        document.getElementById("display-container").style.display = "flex";
     } else {
         hideDock();
         renderTwoPlayerBetweenTurnsBoards(game);
         showStartTurnDialog(game.playerOneTurn);
-        document.getElementById("bottom-buttons-container").style.display = "flex";
-        const endTurnBtn = document.getElementById("end-turn-btn");
-        endTurnBtn.disabled = true;
-        endTurnBtn.hidden = false;
     }
+    setDisplays(playerCount);
 }
 
 function restartGame(game) {

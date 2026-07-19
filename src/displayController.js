@@ -97,6 +97,20 @@ function renderMultiPlayerSquares(cell, square, playerIndex, firstPlayerSquares,
     }
 }
 
+export function resetDisplays() {
+    document.getElementById("game-setup-btns-container").style.display = "flex";
+    document.getElementById("start-game-btn-container").style.display = "flex";
+    document.getElementById("main-contents-container").hidden = false;
+    document.getElementById("ship-dock-container").hidden = false;
+    document.getElementById("display-container").style.display = "none";
+    document.getElementById("bottom-buttons-container").style.display = "none";
+}
+
+export function setDisplays(playerCount) {
+    document.getElementById("game-setup-btns-container").style.display = "none";
+    document.getElementById("start-game-btn-container").style.display = "none";
+}
+
 // Main functions
 export function showNewGameForm() {
     const closeBtn = document.getElementById("close-new-game-btn");
@@ -283,15 +297,13 @@ export function renderTwoPlayerBetweenTurnsBoards(game) {
 }
 
 export function showStartTurnDialog(playerOneTurn) {
-    const startTurn = document.getElementById("start-turn-dialog");
-    startTurn.showModal();
+    document.getElementById("start-turn-dialog").showModal();
 
     let playerName;
     if (playerOneTurn) playerName = document.getElementById("player-1-name").textContent;
     else playerName = document.getElementById("player-2-name").textContent;
 
-    const startTurnBtn = document.getElementById("start-turn-btn");
-    startTurnBtn.textContent = `Start ${playerName}'s turn`;
+    document.getElementById("start-turn-btn").textContent = `Start ${playerName}'s turn`;
 }
 
 export function hideDock() {
@@ -370,8 +382,12 @@ export function renderWinner(player) {
         square.classList.remove("clickable-square");
     })
     
-    const name = player.name;
-    console.log(`A winner is you, ${name}!`);
+    const message = `A winner is you, ${player.name}!`;
+    renderMessage(message);
+}
+
+export function renderMessage(message) {
+    document.getElementById("display-text").textContent = message;
 }
 
 export function revealShips(board, squares) {
