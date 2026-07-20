@@ -1,5 +1,5 @@
 # The Odin Project (Full Stack Javascript) - Battleship
-Battleship project for the Odin Project Full Stack Javascript course. This project integrates most of the topics covered in the javascript curriculum so far such as modules, objects, eventlisteners, closure, and BTS traversal for the cpu logic.
+Battleship project for the Odin Project Full Stack Javascript course. This project integrates most of the topics covered in the javascript curriculum so far such as modules, objects,  event listeners, closure, test driven development, and BTS traversal for the cpu logic.
 
 Graphical design was mostly inspired by the Gameboy Color game "Battleship".
 
