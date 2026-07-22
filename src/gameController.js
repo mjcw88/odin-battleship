@@ -193,8 +193,8 @@ function playSinglePlayerTurn(btn, game) {
 
     game.playHumanTurn(row, col);
     const cpuBoardDisplay = document.querySelectorAll(".cpu-board-square");
-    let sunk = updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col, game);
-    let resetWait = sunk ? WAIT * 2 : WAIT;
+    let isSunk = updateShipDisplay(cpuBoardDisplay, cpuBoard.board, row, col, game);
+    let resetWait = isSunk ? WAIT * 2 : WAIT;
 
     game.flipPlayerOneTurn();
 
@@ -217,7 +217,7 @@ function playSinglePlayerTurn(btn, game) {
             const cpuCol = square[1];
             const humanBoard = humanPlayer.gameboard;
             const humanBoardDisplay = document.querySelectorAll(".human-board-square");
-            sunk = updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol, game);
+            isSunk = updateShipDisplay(humanBoardDisplay, humanBoard.board, cpuRow, cpuCol, game);
 
             if (humanBoard.isAllSunk()) {
                 game.declareWinner(cpuPlayer);
@@ -227,7 +227,7 @@ function playSinglePlayerTurn(btn, game) {
                 return;
             }
 
-            resetWait = sunk ? WAIT * 2 : WAIT;
+            resetWait = isSunk ? WAIT * 2 : WAIT;
 
             setTimeout(() => {
                 game.flipPlayerOneTurn();
