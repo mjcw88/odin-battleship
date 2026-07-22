@@ -115,7 +115,11 @@ button:disabled {
     border: var(--borderDisabled);
 }
 
-button:focus,
+button:focus {
+    outline: none;
+}
+
+button:focus-visible,
 form input[type='text']:focus {
     outline: var(--borderFocus);
 }
