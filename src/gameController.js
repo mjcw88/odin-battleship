@@ -241,6 +241,8 @@ function playSinglePlayerTurn(btn, game) {
 function playMultiPlayerTurn(btn, game) {
     if (game.turnFinished) return;
 
+    const endTurnBtn = document.getElementById("end-turn-btn");
+
     const row = parseInt(btn.dataset.rowIndex);
     const col = parseInt(btn.dataset.colIndex);
 
@@ -260,15 +262,16 @@ function playMultiPlayerTurn(btn, game) {
     game.playHumanTurn(row, col, enemyPlayerName);
     const enemyBoardDisplay = document.querySelectorAll(".enemy-board-square");
     updateShipDisplay(enemyBoardDisplay, enemyBoard.board, row, col, game);
+    removeClickableSquares();
 
     const currentPlayer = game.getPlayer(currentPlayerName);
     if (enemyPlayer.gameboard.isAllSunk()) {
         game.declareWinner(currentPlayer);
         renderDisplayStyling("win-background", "win-text");
         renderWinner(game.winner);
+        endTurnBtn.disabled = true;
+        return;
     }
-    removeClickableSquares();
-    const endTurnBtn = document.getElementById("end-turn-btn");
     endTurnBtn.disabled = false;
     game.turnFinished = true;
 }
