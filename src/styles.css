@@ -10,6 +10,7 @@
     --AGoblinAppearsFont: 'A Goblin Appears', monospace;
     --padding: 20px;
     --border: clamp(4px, .25rem, 12px) solid #000;
+    --borderFocus: clamp(4px, .25rem, 12px) solid hsl(23,100%,50%);
     --gridBorder: clamp(2px, .125rem, 6px) solid #000;
     --black: hsl(0,0%,0%);
     --orange: hsl(23,100%,50%);
@@ -114,8 +115,9 @@ button:disabled {
     border: var(--borderDisabled);
 }
 
-button:focus {
-    border: var(--border);
+button:focus,
+form input[type='text']:focus {
+    outline: var(--borderFocus);
 }
 
 #top-buttons-container,
